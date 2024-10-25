@@ -17,7 +17,7 @@ const buttons = ref<Button[]>([])
 const { sendData } = useWebApp()
 
 const onSubmit = () => {
-  sendData?.(JSON.stringify(buttons))
+  sendData?.(JSON.stringify(buttons.value))
 }
 
 </script>
