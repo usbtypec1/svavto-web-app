@@ -40,7 +40,7 @@ const locale = {
     'Сентябрь',
     'Октябрь',
     'Ноябрь',
-    'Декабрь'
+    'Декабрь',
   ],
   monthNamesShort: [
     'Янв',
@@ -54,7 +54,7 @@ const locale = {
     'Сен',
     'Окт',
     'Ноя',
-    'Дек'
+    'Дек',
   ],
   dayNames: [
     'Воскресенье',
@@ -63,7 +63,7 @@ const locale = {
     'Среда',
     'Четверг',
     'Пятница',
-    'Суббота'
+    'Суббота',
   ],
   dayNamesShort: [
     'Вс',
@@ -72,7 +72,7 @@ const locale = {
     'Ср',
     'Чт',
     'Пт',
-    'Сб'
+    'Сб',
   ],
   dayNamesMin: [
     'Вс',
@@ -81,15 +81,19 @@ const locale = {
     'Ср',
     'Чт',
     'Пт',
-    'Сб'
-  ]
+    'Сб',
+  ],
 }
 
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['@primevue/nuxt-module', '@pinia/nuxt'],
+  modules: [
+    '@primevue/nuxt-module',
+    '@pinia/nuxt',
+    '@formkit/auto-animate/nuxt',
+  ],
   primevue: {
     options: {
       theme: {
@@ -104,7 +108,10 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  css: ['~/assets/css/main.css'],
+  css: [
+    '~/assets/css/main.css',
+    'primeicons/primeicons.css',
+  ],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
