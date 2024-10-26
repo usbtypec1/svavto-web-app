@@ -1,4 +1,7 @@
 export interface Button {
-  text: string
-  url: string
+  id: string
+  text: string | null
+  url: string | null
+  textErrors: string[]
+  urlErrors: string[]
 }

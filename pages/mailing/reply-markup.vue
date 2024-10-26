@@ -6,6 +6,7 @@
     <MainButton
       @click="onSubmit"
       text="Сохранить"
+      :disabled="anyButton"
     />
   </div>
 </template>
@@ -20,6 +21,10 @@ const { sendData } = useWebApp()
 const buttons = ref<Button[]>([])
 
 const anyButton = computed((): boolean => buttons.value.length > 0)
+const anyButtonError = computed((): boolean => {
+  return buttons.value.map(({ textErrors, urlErrors }) => textErrors.length > 0 || urlErrors.length > 0)
+    .reduce((anyErrors, isError) => anyErrors || isError, false)
+})
 
 const onSubmit = () => {
   if (!anyButton.value) {
