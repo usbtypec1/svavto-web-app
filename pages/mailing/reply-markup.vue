@@ -6,17 +6,16 @@
     <MainButton
       @click="onSubmit"
       text="Сохранить"
-      :visible="anyButtonError"
+      :visible="!anyButtonError && anyButton"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import ReplyMarkupBuilder from '~/components/forms/ReplyMarkupBuilder.vue'
-import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
+import { MainButton, useWebApp } from 'vue-tg'
 import type { Button } from '~/reply-markup'
 
-const { showAlert } = useWebAppPopup()
 const { sendData } = useWebApp()
 const buttons = ref<Button[]>([])
 
@@ -27,11 +26,7 @@ const anyButtonError = computed((): boolean => {
 })
 
 const onSubmit = () => {
-  if (!anyButton.value) {
-    showAlert?.('Добавьте хотя бы одну кнопку')
-  } else {
-    sendData?.(JSON.stringify({ event: 'attach_reply_markup', buttons: buttons.value }))
-  }
+  sendData?.(JSON.stringify({ event: 'attach_reply_markup', buttons: buttons.value }))
 }
 
 
