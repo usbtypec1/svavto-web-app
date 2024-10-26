@@ -6,7 +6,7 @@
     <MainButton
       @click="onSubmit"
       text="Сохранить"
-      :disabled="anyButton"
+      :disabled="anyButtonError"
     />
   </div>
 </template>
