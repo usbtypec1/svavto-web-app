@@ -3,7 +3,6 @@
     <form class="flex flex-col gap-y-4" @submit.prevent>
       <h3 class="text-center font-semibold text-2xl">Записаться на смены</h3>
       <DatePicker
-        :disabled="isFormSent"
         v-model="dates"
         selection-mode="multiple"
         inline
@@ -11,63 +10,43 @@
         show-button-bar
       />
       <p v-if="datesError" class="font-semibold">{{ datesError }}</p>
-      <Button :disabled="isFormSent" v-if="dates.length" @click="onClearDates" label="Очистить" outlined/>
       <Button
         v-if="dates.length"
-        @click="onShowSubmitDialog"
-        type="submit"
-        label="Подтвердить"
-        raised
-        :disabled="isFormSent"
+        @click="onClearDates"
+        label="Очистить"
+        icon="pi pi-trash"
+        outlined
       />
     </form>
+    <MainButton
+      @click="onSubmit"
+      type="submit"
+      label="Подтвердить"
+      raised
+      :visible="dates.length > 0"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-interface CalendarDate {
-  day: number
-  month: number
-  year: number
-  today: boolean
-}
+import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 
-const isPreviousDate = (date: CalendarDate): boolean => {
-  if (date.today) return false
-
-  const currentDate = new Date()
-  const selectedDate = new Date(date.year, date.month, date.day)
-  return selectedDate.getTime() < currentDate.getTime()
-}
+const { sendData } = useWebApp()
+const { showConfirm } = useWebAppPopup()
 
 const dates = ref<string[]>([])
 
-const toast = useToast()
-const confirm = useConfirm()
-
-const isFormSent = ref<boolean>(false)
-
-const submit = (): void => {
-  isFormSent.value = true
-  toast.add({
-    severity: 'success',
-    summary: 'Успешно',
-    detail: 'Ваш график отправлен',
-    life: 3000,
-  })
+const onConfirm = (ok: boolean): void => {
+  if (ok) {
+    sendData?.(JSON.stringify({ event: 'shift_apply', dates }))
+  }
 }
 
-const onShowSubmitDialog = (): void => {
-  confirm.require({
-    header: 'Запись на смены',
-    message: 'Вы уверены, что хотите записаться на выбранные даты?',
-    accept: submit,
-    acceptLabel: 'Подтвердить',
-    rejectProps: {
-      label: 'Отменить',
-      severity: 'secondary',
-    },
-  })
+const onSubmit = () => {
+  showConfirm?.(
+    'Вы уверены, что хотите записаться на выбранные даты?',
+    onConfirm,
+  )
 }
 
 const onClearDates = (): void => {
