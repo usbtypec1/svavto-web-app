@@ -8,7 +8,15 @@
       option-label="full_name"
       option-value="id"
     />
-    <p v-if="!anySelectedStaff">Выберите сотрудников которым нужно отправить рассылку</p>
+    <transition-group name="p-message" tag="div" class="flex flex-col">
+      <Message
+        v-if="!anySelectedStaff"
+        severity="info"
+        class="my-3"
+      >
+        Выберите сотрудников которым нужно отправить рассылку
+      </Message>
+    </transition-group>
     <MainButton
       :visible="anySelectedStaff"
       @click="onSubmit"
@@ -18,21 +26,15 @@
 
 <script setup lang="ts">
 import { useStaffStore } from '~/stores/staff'
-import { useWebApp, MainButton, useWebAppPopup } from 'vue-tg'
+import { MainButton, useWebApp } from 'vue-tg'
 
-const { sendData, close } = useWebApp()
-const { showAlert } = useWebAppPopup()
+const { sendData } = useWebApp()
 
 const selectedStaffIds = ref<number[]>([])
 const anySelectedStaff = computed((): boolean => selectedStaffIds.value.length > 0)
 
 const onSubmit = () => {
-  if (!selectedStaffIds.value) {
-    showAlert?.('Не выбран ни один сотрудник')
-  } else {
-    sendData?.(JSON.stringify(selectedStaffIds.value))
-    close?.()
-  }
+  sendData?.(JSON.stringify(selectedStaffIds.value))
 }
 
 const staffStore = useStaffStore()
