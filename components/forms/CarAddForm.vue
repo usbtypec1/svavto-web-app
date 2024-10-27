@@ -3,29 +3,32 @@
     @submit.prevent
     class="flex flex-col gap-y-4"
   >
-    <div class="flex flex-col gap-y-2">
-      <label class="font-semibold">Гос.номер автомобиля в формате а111аа799</label>
-      <InputText v-model.trim="carNumber"/>
-    </div>
-    <div class="flex flex-col gap-y-2">
-      <label class="font-semibold">Какому классу принадлежит автомобиль</label>
+    <Fieldset legend="Гос.номер автомобиля в формате а111аа799">
+      <InputText class="w-full" v-model.trim="carNumber"/>
+    </Fieldset>
+    <Fieldset legend="Класс автомобиля">
       <SelectButton v-model="carClass" :options="carClassOptions"/>
-    </div>
-    <div class="flex flex-col gap-y-2">
-      <label class="font-semibold">Вид мойки</label>
+    </Fieldset>
+    <Fieldset legend="Вид мойки">
       <SelectButton v-model="carWashType" :options="carWashTypeOptions"/>
-    </div>
-    <div class="flex flex-col gap-y-2">
-      <label class="font-semibold">Осуществлен долив стеклоомывателя?</label>
-      <ToggleButton v-model="isWindshieldWasherRefilled" off-label="Нет" on-label="Да"/>
-    </div>
-    <div v-if="isWindshieldWasherRefilled" class="flex flex-col gap-y-2">
-      <label class="font-semibold">Сколько % от бутылки было залито?</label>
-      <Select
-        v-model="windshieldWasherRefilledBottlePercentage"
-        :options="windshieldWasherRefilledBottlePercentageOptions"
-      />
-    </div>
+    </Fieldset>
+    <Fieldset legend="Осуществлен долив стеклоомывателя">
+      <div class="flex flex-col gap-y-2">
+        <ToggleButton
+          v-model="isWindshieldWasherRefilled"
+          off-label="Нет"
+          on-label="Да"
+          on-icon="pi pi-check"
+        />
+        <div v-if="isWindshieldWasherRefilled" class="flex flex-col gap-y-2">
+          <label class="font-semibold">Сколько % от бутылки было залито?</label>
+          <Select
+            v-model="windshieldWasherRefilledBottlePercentage"
+            :options="windshieldWasherRefilledBottlePercentageOptions"
+          />
+        </div>
+      </div>
+    </Fieldset>
   </form>
 </template>
 
