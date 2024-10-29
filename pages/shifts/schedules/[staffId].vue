@@ -31,7 +31,6 @@
         <Divider/>
       </div>
     </div>
-    {{ staff }}
     <Button label="Добавить месяц" @click="onAddStaffAvailableDate"/>
     <MainButton @click="onSaveStaffAvailableDates" text="Сохранить"/>
   </div>
