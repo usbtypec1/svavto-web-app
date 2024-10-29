@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-y-4 mb-10">
+  <div class="flex flex-col gap-y-3 mb-10">
     <p class="font-semibold text-md">Выберите месяцы которые будут отображаться у сотрудника</p>
     <div v-auto-animate>
       <div
@@ -81,7 +81,10 @@ const dateToMonthAndYear = (date: Date): MonthAndYear => {
 }
 
 const uniqueDatesSerialized = computed<string>(() => {
-  return JSON.stringify(uniqueDates.value.map(dateToMonthAndYear))
+  return JSON.stringify({
+    staffId,
+    dates: uniqueDates.value.map(dateToMonthAndYear),
+  })
 })
 
 const onSaveStaffAvailableDates = (): void => {
