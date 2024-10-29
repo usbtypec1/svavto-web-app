@@ -37,12 +37,19 @@ const isAdditionalServicesIncluded = ref<boolean>(false)
 
 const additionalServices = ref([])
 
+const onConfirmAction = (ok: boolean) => {
+  if (!ok) return
+  showAlert?.('Данные по автомобилю {ГОС НОМЕР} записаны')
+  sendData?.(JSON.stringify({
+    number: carToWash.value?.number,
+    classType: carToWash.value?.classType,
+    washType: carToWash.value?.washType,
+    windshieldWasherRefilledBottlePercentage: carToWash.value?.windshieldWasherRefilledBottlePercentage ?? 0,
+    additionalServices: additionalServices.value,
+  }))
+}
+
 const onConfirmAll = () => {
-  showConfirm?.('Записать автомобиль в список выполненных?', (ok: boolean) => {
-    if (ok) {
-      showAlert?.('Данные по автомобилю {ГОС НОМЕР} записаны')
-      sendData?.(JSON.stringify(additionalServices.value))
-    }
-  })
+  showConfirm?.('Записать автомобиль в список выполненных?', onConfirmAction)
 }
 </script>
