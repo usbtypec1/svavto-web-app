@@ -1,53 +1,95 @@
 <template>
-  <div>
-    <BackButton @click="onBackButtonClicked"/>
-    <template v-if="staff !== null">
-      <Fieldset legend="Месяц в графике у сотрудника">
-        <form class="flex flex-col gap-y-3" @submit.prevent>
+  <div class="flex flex-col gap-y-4 mb-10">
+    <p class="font-semibold text-md">Выберите месяцы которые будут отображаться у сотрудника</p>
+    <div v-auto-animate>
+      <div
+        v-for="(availableDate, index) in staffAvailableDates"
+        :key="availableDate.id"
+        class="flex flex-col gap-y-1"
+      >
+        <label
+          class="font-semibold"
+          :for="availableDate.id"
+        >
+          Месяц №{{ index + 1 }}
+        </label>
+        <div class="flex justify-between gap-x-3">
           <DatePicker
-            v-model="staffScheduleMonthAndYear"
             view="month"
+            v-model="availableDate.value"
             dateFormat="MM - yy год"
+            class="flex-1"
+            :input-id="availableDate.id"
           />
-          <Button label="Сохранить" outlined icon="pi pi-save"/>
-        </form>
-      </Fieldset>
-      <Fieldset legend="График сотрудника">
-        <DatePicker
-          v-model="shiftSchedules"
-          selection-mode="multiple"
-          :manual-input="false"
-          inline
-          class="w-full"
-        />
-      </Fieldset>
-    </template>
-    <Message
-      v-else
-      severity="warn"
-      icon="pi pi-exclamation-triangle"
-    >
-      Сотрудник не найден
-    </Message>
+          <Button
+            @click="onRemoveStaffAvailableDate(availableDate.id)"
+            icon="pi pi-trash"
+            severity="danger"
+            text
+          />
+        </div>
+        <Divider/>
+      </div>
+    </div>
+    <Button label="Добавить месяц" @click="onAddStaffAvailableDate"/>
+    <MainButton @click="onSaveStaffAvailableDates" text="Сохранить"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { BackButton, useWebAppPopup, useWebAppHapticFeedback } from 'vue-tg'
+import { v4 as uuid4 } from 'uuid'
+import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 
 const { showAlert } = useWebAppPopup()
-const { notificationOccurred } = useWebAppHapticFeedback()
 
-const shiftSchedules = ref<Date[]>()
-const staffScheduleMonthAndYear = ref()
-
-const onSaveStaffScheduleMonthAndYear = async () => {
-  showAlert?.('Месяц в графике сотрудника сохранен')
-  notificationOccurred?.('success')
+const onRemoveStaffAvailableDate = (id: string): void => {
+  staffAvailableDates.value = staffAvailableDates.value.filter(availableDate => availableDate.id !== id)
 }
 
-const onBackButtonClicked = async () => {
-  await navigateTo({ name: 'shifts-schedules' })
+const onAddStaffAvailableDate = (): void => {
+  staffAvailableDates.value.push({ id: uuid4() })
+}
+
+interface AvailableDate {
+  id: string,
+  value?: Date
+}
+
+interface MonthAndYear {
+  month: number
+  year: number
+}
+
+
+const { sendData } = useWebApp()
+
+const staffAvailableDates = ref<AvailableDate[]>([])
+
+const uniqueDates = computed<Date[]>(() => {
+  const dates = staffAvailableDates.value
+    .filter(date => date.value !== undefined)
+    .map(date => date.value!)
+
+  return Array.from(new Set(dates))
+})
+
+const dateToMonthAndYear = (date: Date): MonthAndYear => {
+  return {
+    month: date.getMonth() + 1,
+    year: date.getFullYear(),
+  }
+}
+
+const uniqueDatesSerialized = computed<string>(() => {
+  return JSON.stringify(uniqueDates.value.map(dateToMonthAndYear))
+})
+
+const onSaveStaffAvailableDates = (): void => {
+  if (uniqueDates.value.length > 0) {
+    sendData?.(uniqueDatesSerialized.value)
+  } else {
+    showAlert?.('Выберите хотя бы один месяц')
+  }
 }
 
 const route = useRoute()
@@ -59,5 +101,4 @@ let staff = staffStore.findById(staffId)
 if (staff === null) {
   staff = await staffStore.fetchById(staffId)
 }
-
 </script>
