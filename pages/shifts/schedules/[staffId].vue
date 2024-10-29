@@ -31,6 +31,7 @@
         <Divider/>
       </div>
     </div>
+    {{ staff }}
     <Button label="Добавить месяц" @click="onAddStaffAvailableDate"/>
     <MainButton @click="onSaveStaffAvailableDates" text="Сохранить"/>
   </div>
@@ -108,9 +109,6 @@ const transformToAvailableDate = (input: MonthAndYear[]): AvailableDate[] => {
 
 
 const staffStore = useStaffStore()
-let staff = staffStore.findById(staffId)
-if (staff === null) {
-  staff = await staffStore.fetchById(staffId)
-  staffAvailableDates.value = transformToAvailableDate(staff?.available_dates ?? [])
-}
+const staff = await staffStore.fetchById(staffId)
+staffAvailableDates.value = transformToAvailableDate(staff?.available_dates ?? [])
 </script>
