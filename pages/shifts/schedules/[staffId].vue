@@ -82,7 +82,7 @@ const dateToMonthAndYear = (date: Date): MonthAndYear => {
 
 const uniqueDatesSerialized = computed<string>(() => {
   return JSON.stringify({
-    staffId,
+    staff_id: staffId,
     dates: uniqueDates.value.map(dateToMonthAndYear),
   })
 })
