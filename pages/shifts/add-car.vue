@@ -1,25 +1,23 @@
 <template>
   <div>
     <CarAddForm
+      @include-additional-services="car => carToWash = car"
       v-model:is-additional-services-included="isAdditionalServicesIncluded"
     />
     <template v-if="isAdditionalServicesIncluded">
       <AdditionalServicesForm v-model="additionalServices"/>
-      <div class="flex justify-between gap-x-3 my-5">
-        <Button
-          @click="onConfirmAll"
-          label="Подтвердить все"
-          icon="pi pi-check"
-          class="w-full"
-        />
-        <Button
-          @click="isAdditionalServicesIncluded = false"
-          class="w-full"
-          severity="warn"
-          icon="pi pi-times"
-          label="Очистить доп.услуги"
-        />
-      </div>
+      <Button
+        v-if="additionalServices.length > 0"
+        @click="isAdditionalServicesIncluded = false"
+        class="w-full my-5"
+        severity="warn"
+        icon="pi pi-times"
+        label="Очистить все доп.услуги"
+      />
+      <MainButton
+        text="Подтвердить все услуги"
+        @click="onConfirmAll"
+      />
     </template>
   </div>
 
@@ -29,10 +27,12 @@
 import CarAddForm from '~/components/forms/CarAddForm.vue'
 import AdditionalServicesForm from '~/components/forms/AdditionalServicesForm.vue'
 import { useWebAppPopup, useWebApp } from 'vue-tg'
+import type { CarToWash } from '~/types/cars'
 
 const { sendData } = useWebApp()
 const { showConfirm, showAlert } = useWebAppPopup()
 
+const carToWash = ref<CarToWash>()
 const isAdditionalServicesIncluded = ref<boolean>(false)
 
 const additionalServices = ref([])

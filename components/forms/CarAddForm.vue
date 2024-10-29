@@ -62,14 +62,21 @@
 
 <script setup lang="ts">
 import type { CarToWashDraft, ClassType, WashType } from '~/types/cars'
+import { useWebAppPopup } from 'vue-tg'
+
+const { showAlert } = useWebAppPopup()
 
 const emit = defineEmits(['includeAdditionalServices'])
 
 const isAdditionalServicesIncluded = defineModel<boolean>('isAdditionalServicesIncluded', { required: true })
 
 const onIncludeAdditionalServices = (): void => {
-  emit('includeAdditionalServices', carToWash)
-  isAdditionalServicesIncluded.value = true
+  if (isCarToWashValid.value) {
+    emit('includeAdditionalServices', carToWash.value)
+    isAdditionalServicesIncluded.value = true
+  } else {
+    showAlert?.('Заполните все необходимые поля')
+  }
 }
 
 const classTypeOptions: ClassType[] = [
@@ -104,6 +111,15 @@ const carToWash = ref<CarToWashDraft>({
   washType: undefined,
   windshieldWasherRefilledBottlePercentage: undefined,
 })
+
+const isCarToWashValid = computed((): boolean => {
+  return (
+    carToWash.value.number !== undefined
+    && carToWash.value.classType !== undefined
+    && carToWash.value.washType !== undefined
+  )
+})
+
 const isWindshieldWasherRefilled = ref<boolean>(false)
 const windshieldWasherRefilledBottlePercentageOptions: number[] = [10, 20, 30, 50, 70, 90, 100, 120]
 

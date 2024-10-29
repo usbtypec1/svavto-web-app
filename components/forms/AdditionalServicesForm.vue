@@ -274,7 +274,6 @@ const traverse = (services: (AdditionalServiceItem | AdditionalServiceParent)[])
 const additionalServicesModel = defineModel<IncludedAdditionalService[]>({ required: true })
 
 watch(additionalServices, () => {
-  additionalServicesModel.value = traverse(additionalServices)
-})
-
+  additionalServicesModel.value = traverse(additionalServices.value)
+}, { deep: true})
 </script>
