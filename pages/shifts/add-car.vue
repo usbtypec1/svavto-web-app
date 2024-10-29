@@ -1,52 +1,51 @@
 <template>
   <div>
-    <CarAddForm/>
-    <div v-if="!isAdditionalServicesEnabled">
-      <p class="font-semibold mb-1">Добавить доп.услуги?</p>
-      <div class="flex gap-x-3 justify-between">
+    <CarAddForm
+      v-model:is-additional-services-included="isAdditionalServicesIncluded"
+    />
+    <template v-if="isAdditionalServicesIncluded">
+      <AdditionalServicesForm/>
+      <div class="flex justify-between gap-x-3 my-5">
         <Button
-          @click="isAdditionalServicesEnabled = true"
-          label="Да"
-          class="flex-1"
+          @click="onConfirmAll"
+          label="Подтвердить все"
+          icon="pi pi-check"
+          class="w-full"
         />
         <Button
-          @click="onFinishCarAdd"
-          label="Добавить позже"
-          severity="secondary"
-          class="flex-1"
+          @click="isAdditionalServicesIncluded = false"
+          class="w-full"
+          severity="warn"
+          icon="pi pi-times"
+          label="Очистить доп.услуги"
         />
       </div>
-    </div>
-    <AdditionalServicesForm v-else/>
+    </template>
   </div>
+
 </template>
 
 <script setup lang="ts">
 import CarAddForm from '~/components/forms/CarAddForm.vue'
 import AdditionalServicesForm from '~/components/forms/AdditionalServicesForm.vue'
+import { useWebAppPopup, useWebApp } from 'vue-tg'
 
-const confirm = useConfirm()
-const toast = useToast()
+const { sendData } = useWebApp()
+const { showConfirm, showAlert } = useWebAppPopup()
 
-const isAdditionalServicesEnabled = ref<boolean>(false)
+const isAdditionalServicesIncluded = ref<boolean>(false)
 
-const finishCarAdd = () => {
-  toast.add({
-    severity: 'success',
-    summary: 'Автомобиль добавлен',
-    detail: 'Автомобиль {ГОС НОМЕР} записан. Добавить доп услуги или завершить автомобиль можно будет позже в главном меню',
-    life: 10000,
-  })
-}
-
-const onFinishCarAdd = () => {
-  confirm.require({
-    header: 'Подтвердите',
-    message: 'Вы уверены, что хотите завершить добавление автомобиля?',
-    accept: finishCarAdd,
-    rejectProps: {
-      severity: 'secondary',
-    },
+const onConfirmAll = () => {
+  showConfirm?.('Записать автомобиль в список выполненных?', (ok: boolean) => {
+    if (ok) {
+      showAlert?.('Данные по автомобилю {ГОС НОМЕР} записаны')
+    } else {
+      showConfirm?.('Вы уверены? Это действие удалит все ранее внесенные данные по автомобилю {НОМЕР}', (ok) => {
+        if (ok) {
+          showAlert?.('Удалено')
+        }
+      })
+    }
   })
 }
 </script>
