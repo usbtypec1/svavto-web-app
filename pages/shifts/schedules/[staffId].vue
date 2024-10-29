@@ -99,9 +99,18 @@ const route = useRoute()
 
 const staffId = Number(route.params.staffId as string)
 
+const transformToAvailableDate = (input: MonthAndYear[]): AvailableDate[] => {
+  return input.map((item) => ({
+    id: uuid4(),
+    value: new Date(item.year, item.month - 1)
+  }));
+}
+
+
 const staffStore = useStaffStore()
 let staff = staffStore.findById(staffId)
 if (staff === null) {
   staff = await staffStore.fetchById(staffId)
+  staffAvailableDates.value = transformToAvailableDate(staff?.available_dates ?? [])
 }
 </script>
