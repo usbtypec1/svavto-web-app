@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import CarAddForm from '~/components/forms/CarAddForm.vue'
 import AdditionalServicesForm from '~/components/forms/AdditionalServicesForm.vue'
-import { useWebAppPopup, useWebApp } from 'vue-tg'
+import { useWebAppPopup, useWebApp, MainButton } from 'vue-tg'
 import type { CarToWash } from '~/types/cars'
 
 const { sendData } = useWebApp()
