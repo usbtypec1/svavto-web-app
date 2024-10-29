@@ -42,10 +42,10 @@ const onConfirmAction = (ok: boolean) => {
   showAlert?.('Данные по автомобилю {ГОС НОМЕР} записаны')
   sendData?.(JSON.stringify({
     number: carToWash.value?.number,
-    classType: carToWash.value?.classType,
-    washType: carToWash.value?.washType,
-    windshieldWasherRefilledBottlePercentage: carToWash.value?.windshieldWasherRefilledBottlePercentage ?? 0,
-    additionalServices: additionalServices.value,
+    class_type: carToWash.value?.classType,
+    wash_type: carToWash.value?.washType,
+    windshield_washer_refilled_bottle_percentage: carToWash.value?.windshieldWasherRefilledBottlePercentage ?? 0,
+    additional_services: additionalServices.value,
   }))
 }
 
