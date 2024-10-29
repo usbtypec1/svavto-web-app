@@ -1,5 +1,7 @@
 <template>
-  <AdditionalServicesFormList v-model="additionalServices"/>
+  <AdditionalServicesFormList
+    v-model="additionalServices"
+  />
 </template>
 
 <script setup lang="ts">
@@ -269,8 +271,10 @@ const traverse = (services: (AdditionalServiceItem | AdditionalServiceParent)[])
   return includedServices
 }
 
+const additionalServicesModel = defineModel<IncludedAdditionalService[]>({ required: true })
 
-const includedAdditionalServices = computed((): IncludedAdditionalService[] => {
-  return traverse(additionalServices.value)
+watch(additionalServices, () => {
+  additionalServicesModel.value = traverse(additionalServices)
 })
+
 </script>

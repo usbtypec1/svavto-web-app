@@ -4,7 +4,7 @@
       v-model:is-additional-services-included="isAdditionalServicesIncluded"
     />
     <template v-if="isAdditionalServicesIncluded">
-      <AdditionalServicesForm/>
+      <AdditionalServicesForm v-model="additionalServices"/>
       <div class="flex justify-between gap-x-3 my-5">
         <Button
           @click="onConfirmAll"
@@ -35,16 +35,13 @@ const { showConfirm, showAlert } = useWebAppPopup()
 
 const isAdditionalServicesIncluded = ref<boolean>(false)
 
+const additionalServices = ref([])
+
 const onConfirmAll = () => {
   showConfirm?.('Записать автомобиль в список выполненных?', (ok: boolean) => {
     if (ok) {
       showAlert?.('Данные по автомобилю {ГОС НОМЕР} записаны')
-    } else {
-      showConfirm?.('Вы уверены? Это действие удалит все ранее внесенные данные по автомобилю {НОМЕР}', (ok) => {
-        if (ok) {
-          showAlert?.('Удалено')
-        }
-      })
+      sendData?.(JSON.stringify(additionalServices.value))
     }
   })
 }

@@ -16,8 +16,6 @@
           v-model="inputNumber"
           :input-id="inputNumberId"
           mode="decimal"
-          show-buttons
-          button-layout="horizontal"
           :min="1"
           :max="16"
         >
