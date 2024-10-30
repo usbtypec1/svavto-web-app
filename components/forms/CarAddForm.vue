@@ -44,7 +44,7 @@
       class="font-semibold mb-1"
       legend="Добавить доп.услуги?"
     >
-      <div class="flex gap-x-3 justify-between">
+      <div class="flex flex-col gap-y-3 justify-between">
         <Button
           @click="onIncludeAdditionalServices"
           label="Да"
@@ -66,13 +66,12 @@ import { useWebAppPopup } from 'vue-tg'
 
 const { showAlert } = useWebAppPopup()
 
-const emit = defineEmits(['includeAdditionalServices'])
+const carToWash = defineModel<CarToWashDraft>('carToWash', { required: true })
 
 const isAdditionalServicesIncluded = defineModel<boolean>('isAdditionalServicesIncluded', { required: true })
 
 const onIncludeAdditionalServices = (): void => {
   if (isCarToWashValid.value) {
-    emit('includeAdditionalServices', carToWash.value)
     isAdditionalServicesIncluded.value = true
   } else {
     showAlert?.('Заполните все необходимые поля')
@@ -104,13 +103,6 @@ const washTypeOptions: WashType[] = [
     value: 'urgent',
   },
 ]
-
-const carToWash = ref<CarToWashDraft>({
-  number: undefined,
-  classType: undefined,
-  washType: undefined,
-  windshieldWasherRefilledBottlePercentage: undefined,
-})
 
 const isCarToWashValid = computed((): boolean => {
   return (
