@@ -1,32 +1,47 @@
 <template>
   <div class="flex flex-col gap-y-3">
-    <Fieldset legend="Данные о машине">
-      <div class="flex flex-col gap-y-2">
-        <div>
-          <span class="font-semibold">Гос.номер: </span>
-          <span>{{ car.number }}</span>
+    <template v-if="status === 'success'">
+      <Fieldset legend="Данные о машине">
+        <div class="flex flex-col gap-y-2">
+          <div>
+            <span class="font-semibold">Гос.номер: </span>
+            <span>{{ car.number }}</span>
+          </div>
+          <div>
+            <span class="font-semibold">Класс: </span>
+            <span>{{ classType }}</span>
+          </div>
+          <div>
+            <span class="font-semibold">Вид мойки: </span>
+            <span>{{ washType }}</span>
+          </div>
+          <div>
+            <span class="font-semibold">Долив стеклоомывателя: </span>
+            <span>{{ windshieldWasherRefilledBottlePercentage }}</span>
+          </div>
         </div>
-        <div>
-          <span class="font-semibold">Класс: </span>
-          <span>{{ classType }}</span>
-        </div>
-        <div>
-          <span class="font-semibold">Вид мойки: </span>
-          <span>{{ washType }}</span>
-        </div>
-        <div>
-          <span class="font-semibold">Долив стеклоомывателя: </span>
-          <span>{{ windshieldWasherRefilledBottlePercentage }}</span>
-        </div>
-      </div>
-    </Fieldset>
-    <AdditionalServicesForm
-      v-model="additionalServices"
-    />
-    <MainButton
-      text="Сохранить"
-      @click="onConfirm"
-    />
+      </Fieldset>
+      <AdditionalServicesForm
+        v-model="additionalServices"
+      />
+      <MainButton
+        text="Сохранить"
+        @click="onConfirm"
+      />
+    </template>
+    <template v-else>
+      <Message
+        v-if="status === 'error'"
+        severity="error"
+        icon="pi pi-exclamation-triangle"
+      >
+        Не удалось загрузить данные об авто
+      </Message>
+      <MainButton
+        text="Закрыть"
+        @click="close"
+      />
+    </template>
   </div>
 </template>
 
@@ -35,7 +50,7 @@ import AdditionalServicesForm from '~/components/forms/AdditionalServicesForm.vu
 import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 
 const { showConfirm } = useWebAppPopup()
-const { sendData } = useWebApp()
+const { sendData, close } = useWebApp()
 
 const route = useRoute()
 
@@ -64,7 +79,7 @@ const windshieldWasherRefilledBottlePercentage = computed((): string => {
 
 const additionalServices = ref([])
 
-const { data: car } = await useFetch(`${runtimeConfig.public.apiBaseUrl}/shifts/cars/${carId}/`)
+const { data: car, status } = await useFetch(`${runtimeConfig.public.apiBaseUrl}/shifts/cars/${carId}/`)
 
 const serializedData = computed((): string => {
   return JSON.stringify({
