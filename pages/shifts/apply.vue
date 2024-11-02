@@ -37,10 +37,10 @@ const getLastDayOfMonth = (): Date => {
 const dates = ref<Date[]>([])
 
 const dateToYYYYMMDDD = (date: Date): string => {
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  return `${year}-${month}-${day}`
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 const serializedDataToSend = computed((): string => JSON.stringify(dates.value.map(dateToYYYYMMDDD)))
