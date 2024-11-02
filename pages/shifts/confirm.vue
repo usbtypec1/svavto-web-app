@@ -37,7 +37,6 @@
             :options="staffList"
             multiple
             optionLabel="staff_full_name"
-            option-value="shift_id"
             checkmark
             emptyMessage="Нет доступных сотрудников на эту дату"
           />
@@ -52,6 +51,7 @@
         </Message>
       </div>
 
+
     </BlockUI>
   </div>
 </template>
@@ -60,14 +60,13 @@
 import { useWebApp, useWebAppPopup } from 'vue-tg'
 
 const { close, sendData } = useWebApp()
-const { showConfirm, showAlert } = useWebAppPopup()
+const { showConfirm } = useWebAppPopup()
 
 const onSendToAllStaff = (): void => {
   showConfirm?.(
     'Вы уверены что хотите отправить запрос на подтверждение выхода на смену всем сотрудникам на выбранную дату?',
     (ok: boolean): void => {
       if (ok) {
-        showAlert?.('Запрос на подтверждение выхода на смену отправлен всем сотрудникам')
         sendData?.(JSON.stringify(staffList.value.map(staff => staff.shift_id)))
       }
     },
@@ -80,7 +79,6 @@ const onSendToSpecificStaff = (): void => {
     'Вы уверены что хотите отправить запрос выбранным сотрудникам на выбранную дату?',
     (ok: boolean) => {
       if (ok) {
-        showAlert?.('Запрос на подтверждение выхода на смену отправлен выбранным сотрудникам')
         sendData?.(JSON.stringify(selectedShiftIds.value))
       }
     },
