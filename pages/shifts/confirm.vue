@@ -99,6 +99,7 @@ const url = `${runtimeConfig.public.apiBaseUrl}/shifts/staff/`
 
 const { data, execute, status } = useFetch(url, {
   query: { date: formattedDate },
+  immediate: false,
 })
 
 const staffList = computed(() => {
