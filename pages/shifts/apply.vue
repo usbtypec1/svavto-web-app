@@ -8,8 +8,8 @@
         inline
         show-button-bar
         :showOtherMonths="false"
-        :min-date="new Date()"
-        :max-date="getLastDayOfMonth()"
+        :min-date="currentMonthDate"
+        :max-date="maxDate"
       />
       <p v-if="datesError" class="font-semibold">{{ datesError }}</p>
     </form>
@@ -25,14 +25,17 @@
 
 <script setup lang="ts">
 import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
+import type { MonthAndYear } from '~/types/schedules'
 
 const { sendData } = useWebApp()
 const { showConfirm } = useWebAppPopup()
 
-const getLastDayOfMonth = (): Date => {
-  const today = new Date()
-  return new Date(today.getFullYear(), today.getMonth() + 1, 0)
-}
+const route = useRoute()
+
+const { month, year }: MonthAndYear = route.query
+
+const currentMonthDate = new Date(Number(year), Number(month) - 1)
+const maxDate =  new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 0)
 
 const dates = ref<Date[]>([])
 
