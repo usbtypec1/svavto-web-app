@@ -80,7 +80,7 @@ const onSendToSpecificStaff = (): void => {
     'Вы уверены что хотите отправить запрос выбранным сотрудникам на выбранную дату?',
     (ok: boolean) => {
       if (ok) {
-        showAlert?.('Запрос на подтверждение выхода на смену отправлен выбранным сотрудникам')        sendData?.(JSON.stringify(staffList.value.map(staff => staff.shift_id)))
+        showAlert?.('Запрос на подтверждение выхода на смену отправлен выбранным сотрудникам')
         sendData?.(JSON.stringify(selectedShiftIds.value))
       }
     },
