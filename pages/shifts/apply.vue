@@ -21,7 +21,7 @@
     <MainButton
       @click="onSubmit"
       type="submit"
-      label="Подтвердить"
+      text="Подтвердить"
       raised
       :visible="dates.length > 0"
     />
