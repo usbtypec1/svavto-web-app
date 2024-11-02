@@ -16,19 +16,19 @@
         <Button
           class="grow"
           label="Да"
-          :disabled="specificRequest"
-          @click="onSendToAllPerformers"
+          :disabled="isSpecificStaffMode"
+          @click="onSendToAllStaff"
         />
-        <Button class="grow" label="Нет" severity="danger" @click="close" :disabled="specificRequest"/>
+        <Button class="grow" label="Нет" severity="danger" @click="close" :disabled="isSpecificStaffMode"/>
       </div>
       <ToggleButton
-        v-model="specificRequest"
+        v-model="isSpecificStaffMode"
         onLabel="Точечный запрос"
         offLabel="Точечный запрос"
       />
     </div>
 
-    <BlockUI v-if="specificRequest" :blocked="status === 'pending'">
+    <BlockUI v-if="isSpecificStaffMode" :blocked="status === 'pending'">
       <div class="flex flex-col gap-y-2 my-3">
         <template v-if="status === 'success'">
           <p>Выберите сотрудников</p>
@@ -44,7 +44,7 @@
           <Button
             :disabled="selectedStaffIds.length === 0"
             label="Отправить запрос"
-            @click="onSendToSpecificPerformers"
+            @click="onSendToSpecificStaff"
           />
         </template>
         <Message v-else-if="status === 'error'" severity="error" class="my-3">
@@ -57,65 +57,36 @@
 </template>
 
 <script setup lang="ts">
-import { useWebApp } from 'vue-tg'
-
-const toast = useToast()
-const confirm = useConfirm()
-
-const sendToAllPerformers = (): void => {
-  toast.add({
-    severity: 'success',
-    summary: 'Запрос отправлен',
-    detail: 'Запрос на подтверждение выхода на смену отправлен всем сотрудникам',
-    life: 3000,
-  })
-}
-
-const onSendToAllPerformers = (): void => {
-  confirm.require({
-    header: 'Отправить запрос?',
-    message: 'Вы уверены что хотите отправить запрос всем сотрудникам на выбранную дату?',
-    accept: sendToAllPerformers,
-    rejectProps: {
-      severity: 'secondary',
-    },
-  })
-}
-
-const sendToSpecificPerformers = (): void => {
-  toast.add({
-    severity: 'success',
-    summary: 'Запрос отправлен',
-    detail: 'Запрос на подтверждение выхода на смену отправлен выбранным сотрудникам',
-    life: 3000,
-  })
-}
-
-const onSendToSpecificPerformers = (): void => {
-  confirm.require({
-    header: 'Отправить запрос?',
-    message: 'Вы уверены что хотите отправить запрос выбранным сотрудникам на выбранную дату?',
-    accept: sendToSpecificPerformers,
-    rejectProps: {
-      severity: 'secondary',
-    },
-  })
-}
-
-const specificRequest = ref<boolean>(false)
+import { useWebApp, useWebAppPopup } from 'vue-tg'
 
 const { close } = useWebApp()
+const { showConfirm, showAlert } = useWebAppPopup()
 
-interface Performer {
-  id: number
-  full_name: string
+const onSendToAllStaff = (): void => {
+  showConfirm?.(
+    'Вы уверены что хотите отправить запрос на подтверждение выхода на смену всем сотрудникам на выбранную дату?',
+    (ok: boolean) => {
+      if (ok) {
+        showAlert?.('Запрос на подтверждение выхода на смену отправлен всем сотрудникам')
+      }
+    },
+  )
 }
 
-interface Shift {
-  id: number
-  performer: Performer
+
+const onSendToSpecificStaff = (): void => {
+  showConfirm?.(
+    'Вы уверены что хотите отправить запрос выбранным сотрудникам на выбранную дату?',
+    (ok: boolean) => {
+      if (ok) {
+        showAlert?.('Запрос на подтверждение выхода на смену отправлен выбранным сотрудникам')
+      }
+    },
+  )
 }
 
+
+const isSpecificStaffMode = ref<boolean>(false)
 
 const selectedStaffIds = ref<number[]>()
 
@@ -139,13 +110,13 @@ const staffList = computed(() => {
 
 watch(date, async () => {
   selectedStaffIds.value = []
-  if (date.value && specificRequest.value) {
+  if (date.value && isSpecificStaffMode.value) {
     await execute()
   }
 })
 
-watch(specificRequest, () => {
-  if (specificRequest.value) {
+watch(isSpecificStaffMode, () => {
+  if (isSpecificStaffMode.value) {
     selectedStaffIds.value = []
   }
 })
