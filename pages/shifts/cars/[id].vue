@@ -83,6 +83,7 @@ const { data: car, status } = await useFetch(`${runtimeConfig.public.apiBaseUrl}
 
 const serializedData = computed((): string => {
   return JSON.stringify({
+    car_id: carId,
     additional_services: additionalServices.value,
   })
 })
