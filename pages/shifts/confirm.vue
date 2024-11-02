@@ -27,23 +27,21 @@
         offLabel="Точечный запрос"
       />
     </div>
-    {{ staffList }}
-    {{ selectedShiftIds }}
 
     <BlockUI v-if="isSpecificStaffMode" :blocked="status === 'pending'">
       <div class="flex flex-col gap-y-2 my-3">
         <template v-if="status === 'success'">
           <p>Выберите сотрудников</p>
           <Listbox
-            v-model="selectedShiftIds"
-            :options="staffList"
+            v-model="selectedShifts"
+            :options="shiftConfirmations"
             multiple
             optionLabel="staff_full_name"
             checkmark
             emptyMessage="Нет доступных сотрудников на эту дату"
           />
           <Button
-            :disabled="selectedShiftIds.length === 0"
+            :disabled="selectedShifts.length === 0"
             label="Отправить запрос"
             @click="onSendToSpecificStaff"
           />
@@ -52,8 +50,6 @@
           Произошла ошибка при загрузке списка сотрудников
         </Message>
       </div>
-
-
     </BlockUI>
   </div>
 </template>
@@ -69,7 +65,7 @@ const onSendToAllStaff = (): void => {
     'Вы уверены что хотите отправить запрос на подтверждение выхода на смену всем сотрудникам на выбранную дату?',
     (ok: boolean): void => {
       if (ok) {
-        sendData?.(JSON.stringify(staffList.value))
+        sendData?.(JSON.stringify(shiftConfirmations.value))
       }
     },
   )
@@ -81,7 +77,7 @@ const onSendToSpecificStaff = (): void => {
     'Вы уверены что хотите отправить запрос выбранным сотрудникам на выбранную дату?',
     (ok: boolean) => {
       if (ok) {
-        sendData?.(JSON.stringify(selectedShiftIds.value))
+        sendData?.(JSON.stringify(selectedShifts.value))
       }
     },
   )
@@ -89,7 +85,7 @@ const onSendToSpecificStaff = (): void => {
 
 const isSpecificStaffMode = ref<boolean>(false)
 
-const selectedShiftIds = ref<number[]>()
+const selectedShifts = ref<ShiftConfirmation[]>()
 
 const date = ref<Date>(new Date())
 
@@ -97,19 +93,20 @@ const formattedDate = useDateFormat(date, 'YYYY-MM-DD')
 
 const runtimeConfig = useRuntimeConfig()
 
-const url = `${runtimeConfig.public.apiBaseUrl}/shifts/staff/`
+interface ShiftConfirmation {
+  shift_id: number
+  staff_id: number
+  staff_full_name: string
+}
 
-const { data, execute, status } = useFetch(url, {
+const { data: shiftConfirmations, execute, status } = useFetch<ShiftConfirmation[]>('/shifts/staff/', {
   query: { date: formattedDate },
-  immediate: false,
-})
-
-const staffList = computed(() => {
-  return data.value.staff_list
+  baseURL: runtimeConfig.public.apiBaseUrl,
+  transform: (data: { staff_list: ShiftConfirmation[] }) => data.staff_list,
 })
 
 watch(date, async () => {
-  selectedShiftIds.value = []
+  selectedShifts.value = []
   if (date.value && isSpecificStaffMode.value) {
     await execute()
   }
@@ -117,7 +114,7 @@ watch(date, async () => {
 
 watch(isSpecificStaffMode, () => {
   if (isSpecificStaffMode.value) {
-    selectedShiftIds.value = []
+    selectedShifts.value = []
   }
 })
 
