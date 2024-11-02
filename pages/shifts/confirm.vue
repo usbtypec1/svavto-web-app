@@ -28,22 +28,31 @@
       />
     </div>
 
-    <div v-if="status === 'success' && specificRequest" class="my-3 flex flex-col justify-between gap-y-2">
-      <p>Выберите конкретных сотрудников кому отправить запрос</p>
-      <Listbox
-        v-model="selectedPerformerIds"
-        :options="data.shifts"
-        multiple
-        optionLabel="performer.full_name"
-        option-value="performer.id"
-        checkmark
-      />
-      <Button
-        :disabled="selectedPerformerIds.length === 0"
-        label="Отправить запрос"
-        @click="onSendToSpecificPerformers"
-      />
-    </div>
+    <BlockUI v-if="specificRequest" :blocked="status === 'pending'">
+      <div class="flex flex-col gap-y-2 my-3">
+        <template v-if="status === 'success'">
+          <p>Выберите сотрудников</p>
+          <Listbox
+            v-model="selectedPerformerIds"
+            :options="staffList"
+            multiple
+            optionLabel="staff_full_name"
+            option-value="shift_id"
+            checkmark
+            emptyMessage="Нет доступных сотрудников на эту дату"
+          />
+          <Button
+            :disabled="selectedPerformerIds.length === 0"
+            label="Отправить запрос"
+            @click="onSendToSpecificPerformers"
+          />
+        </template>
+        <Message v-else-if="status === 'error'" severity="error" class="my-3">
+          Произошла ошибка при загрузке списка сотрудников
+        </Message>
+      </div>
+
+    </BlockUI>
   </div>
 </template>
 
@@ -107,30 +116,30 @@ interface Shift {
   performer: Performer
 }
 
-interface PerformerShifts {
-  shifts: Shift[]
-  date: string
-}
 
 const selectedPerformerIds = ref<number[]>()
 
-const formatDate = (date: Date): string => {
-  return date.toISOString().split('T')[0]
-}
-
 const date = ref<Date>(new Date())
 
-const url = computed((): string => {
-  if (date.value) {
-    return `/api/shifts/${formatDate(date.value)}`
-  }
+const formattedDate = useDateFormat(date, 'YYYY-MM-DD')
+
+const runtimeConfig = useRuntimeConfig()
+
+const url = `${runtimeConfig.public.apiBaseUrl}/shifts/staff/`
+
+const { data, execute, status } = useFetch(url, {
+  query: { date: formattedDate },
+  immediate: false,
+  watch: false,
 })
 
-const { data, execute, status } = useFetch<PerformerShifts>(url)
+const staffList = computed(() => {
+  return data.value.staff_list
+})
 
 watch(date, async () => {
   selectedPerformerIds.value = []
-  if (date.value) {
+  if (date.value && specificRequest.value) {
     await execute()
   }
 })

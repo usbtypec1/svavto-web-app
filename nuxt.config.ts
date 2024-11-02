@@ -93,6 +93,7 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@pinia/nuxt',
     '@formkit/auto-animate/nuxt',
+    '@vueuse/nuxt',
   ],
   primevue: {
     options: {
