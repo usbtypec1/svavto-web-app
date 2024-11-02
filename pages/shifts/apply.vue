@@ -6,17 +6,12 @@
         v-model="dates"
         selection-mode="multiple"
         inline
-        :min-date="new Date()"
         show-button-bar
+        :showOtherMonths="false"
+        :min-date="new Date()"
+        :max-date="getLastDayOfMonth()"
       />
       <p v-if="datesError" class="font-semibold">{{ datesError }}</p>
-      <Button
-        v-if="dates.length"
-        @click="onClearDates"
-        label="Очистить"
-        icon="pi pi-trash"
-        outlined
-      />
     </form>
     <MainButton
       @click="onSubmit"
@@ -34,23 +29,27 @@ import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 const { sendData } = useWebApp()
 const { showConfirm } = useWebAppPopup()
 
-const dates = ref<string[]>([])
-
-const onConfirm = (ok: boolean): void => {
-  if (ok) {
-    sendData?.(JSON.stringify({ event: 'shift_apply', dates }))
-  }
+const getLastDayOfMonth = (): Date => {
+  const today = new Date()
+  return new Date(today.getFullYear(), today.getMonth() + 1, 0)
 }
+
+const dates = ref<Date[]>([])
+
+const dateToYYYYMMDDD = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return `${year}-${month}-${day}`
+}
+
+const serializedDataToSend = computed((): string => JSON.stringify(dates.value.map(dateToYYYYMMDDD)))
 
 const onSubmit = () => {
   showConfirm?.(
     'Вы уверены, что хотите записаться на выбранные даты?',
-    onConfirm,
+    (ok: boolean) => ok && sendData?.(serializedDataToSend.value),
   )
-}
-
-const onClearDates = (): void => {
-  dates.value = []
 }
 
 const datesError = computed((): string | null => {
