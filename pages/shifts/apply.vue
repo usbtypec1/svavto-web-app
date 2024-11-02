@@ -20,8 +20,6 @@
       raised
       :visible="dates.length > 0"
     />
-    {{ currentMonthDate }}
-    {{ maxDate }}
   </div>
 </template>
 
