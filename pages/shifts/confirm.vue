@@ -27,6 +27,8 @@
         offLabel="Точечный запрос"
       />
     </div>
+    {{ staffList }}
+    {{ selectedShiftIds }}
 
     <BlockUI v-if="isSpecificStaffMode" :blocked="status === 'pending'">
       <div class="flex flex-col gap-y-2 my-3">
