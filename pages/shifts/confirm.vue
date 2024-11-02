@@ -67,7 +67,7 @@ const onSendToAllStaff = (): void => {
     'Вы уверены что хотите отправить запрос на подтверждение выхода на смену всем сотрудникам на выбранную дату?',
     (ok: boolean): void => {
       if (ok) {
-        sendData?.(JSON.stringify(staffList.value.map(staff => staff.shift_id)))
+        sendData?.(JSON.stringify(staffList.value))
       }
     },
   )
