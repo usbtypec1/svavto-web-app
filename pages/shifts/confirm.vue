@@ -1,7 +1,7 @@
 <template>
   <div class="mb-6">
     <form class="flex flex-col gap-y-4" @submit.prevent>
-      <h3 class="text-center font-semibold text-2xl">Сегодня в смене</h3>
+      <h3 class="text-center font-semibold text-xl">Сегодня в смене</h3>
       <DatePicker
         v-model="date"
         inline
@@ -33,7 +33,7 @@
         <template v-if="status === 'success'">
           <p>Выберите сотрудников</p>
           <Listbox
-            v-model="selectedStaffIds"
+            v-model="selectedShiftIds"
             :options="staffList"
             multiple
             optionLabel="staff_full_name"
@@ -42,7 +42,7 @@
             emptyMessage="Нет доступных сотрудников на эту дату"
           />
           <Button
-            :disabled="selectedStaffIds.length === 0"
+            :disabled="selectedShiftIds.length === 0"
             label="Отправить запрос"
             @click="onSendToSpecificStaff"
           />
@@ -59,15 +59,16 @@
 <script setup lang="ts">
 import { useWebApp, useWebAppPopup } from 'vue-tg'
 
-const { close } = useWebApp()
+const { close, sendData } = useWebApp()
 const { showConfirm, showAlert } = useWebAppPopup()
 
 const onSendToAllStaff = (): void => {
   showConfirm?.(
     'Вы уверены что хотите отправить запрос на подтверждение выхода на смену всем сотрудникам на выбранную дату?',
-    (ok: boolean) => {
+    (ok: boolean): void => {
       if (ok) {
         showAlert?.('Запрос на подтверждение выхода на смену отправлен всем сотрудникам')
+        sendData?.(JSON.stringify(staffList.value.map(staff => staff.shift_id)))
       }
     },
   )
@@ -79,16 +80,16 @@ const onSendToSpecificStaff = (): void => {
     'Вы уверены что хотите отправить запрос выбранным сотрудникам на выбранную дату?',
     (ok: boolean) => {
       if (ok) {
-        showAlert?.('Запрос на подтверждение выхода на смену отправлен выбранным сотрудникам')
+        showAlert?.('Запрос на подтверждение выхода на смену отправлен выбранным сотрудникам')        sendData?.(JSON.stringify(staffList.value.map(staff => staff.shift_id)))
+        sendData?.(JSON.stringify(selectedShiftIds.value))
       }
     },
   )
 }
 
-
 const isSpecificStaffMode = ref<boolean>(false)
 
-const selectedStaffIds = ref<number[]>()
+const selectedShiftIds = ref<number[]>()
 
 const date = ref<Date>(new Date())
 
@@ -101,7 +102,6 @@ const url = `${runtimeConfig.public.apiBaseUrl}/shifts/staff/`
 const { data, execute, status } = useFetch(url, {
   query: { date: formattedDate },
   immediate: false,
-  watch: false,
 })
 
 const staffList = computed(() => {
@@ -109,7 +109,7 @@ const staffList = computed(() => {
 })
 
 watch(date, async () => {
-  selectedStaffIds.value = []
+  selectedShiftIds.value = []
   if (date.value && isSpecificStaffMode.value) {
     await execute()
   }
@@ -117,7 +117,7 @@ watch(date, async () => {
 
 watch(isSpecificStaffMode, () => {
   if (isSpecificStaffMode.value) {
-    selectedStaffIds.value = []
+    selectedShiftIds.value = []
   }
 })
 
