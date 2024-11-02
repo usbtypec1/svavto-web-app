@@ -33,7 +33,7 @@
         <template v-if="status === 'success'">
           <p>Выберите сотрудников</p>
           <Listbox
-            v-model="selectedPerformerIds"
+            v-model="selectedStaffIds"
             :options="staffList"
             multiple
             optionLabel="staff_full_name"
@@ -42,7 +42,7 @@
             emptyMessage="Нет доступных сотрудников на эту дату"
           />
           <Button
-            :disabled="selectedPerformerIds.length === 0"
+            :disabled="selectedStaffIds.length === 0"
             label="Отправить запрос"
             @click="onSendToSpecificPerformers"
           />
@@ -117,7 +117,7 @@ interface Shift {
 }
 
 
-const selectedPerformerIds = ref<number[]>()
+const selectedStaffIds = ref<number[]>()
 
 const date = ref<Date>(new Date())
 
@@ -138,7 +138,7 @@ const staffList = computed(() => {
 })
 
 watch(date, async () => {
-  selectedPerformerIds.value = []
+  selectedStaffIds.value = []
   if (date.value && specificRequest.value) {
     await execute()
   }
@@ -146,7 +146,7 @@ watch(date, async () => {
 
 watch(specificRequest, () => {
   if (specificRequest.value) {
-    selectedPerformerIds.value = []
+    selectedStaffIds.value = []
   }
 })
 
