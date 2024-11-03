@@ -54,11 +54,11 @@
 </template>
 
 <script setup lang="ts">
+import { userIdKey } from '~/utils/keys'
+
 const datesRange = ref<Date[]>([])
 
 const runtimeConfig = useRuntimeConfig()
-
-const route = useRoute()
 
 const rangeInDays = computed((): number => {
   const [start, end] = datesRange.value
@@ -81,7 +81,7 @@ const dateToYYYYMMDDD = (date: Date): string => {
   return `${year}-${month}-${day}`;
 }
 
-const staffId = Number(route.params.staffId as string)
+const staffId = inject(userIdKey)
 
 const queryParams = computed((): Record<string, string> | undefined => {
     const [start, end] = datesRange.value
@@ -117,9 +117,9 @@ const fieldToName = {
 const totalStatistics = computed(() => {
   const periodStatistics = data.value?.period_totals ?? {}
   const financialStatistics = data.value?.financial_stats ?? {}
-  const totals = {...periodStatistics, ...financialStatistics}
+  const totals = { ...periodStatistics, ...financialStatistics }
   const result = []
-  for (const [ key, value ] of Object.entries(totals)) {
+  for (const [key, value] of Object.entries(totals)) {
     result.push({ key: fieldToName[key] ?? key, value })
   }
   return result
