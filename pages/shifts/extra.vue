@@ -25,7 +25,7 @@ const { notificationOccurred } = useWebAppHapticFeedback()
 
 const date = ref<Date>()
 
-const humanizedDate = useDateFormat(date, 'YYYY-MM-DD')
+const humanizedDate = useDateFormat(date, 'DD.MM.YYYY')
 const ISODate = useDateFormat(date, 'YYYY-MM-DD')
 
 const onSubmit = (): void => {
