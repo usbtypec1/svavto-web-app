@@ -50,6 +50,12 @@
         <Column header="Значение" field="value"/>
       </DataTable>
     </div>
+    <Message
+      v-else-if="status === 'error'"
+      severity="error"
+    >
+      Произошла ошибка при загрузке данных
+    </Message>
   </div>
 </template>
 
