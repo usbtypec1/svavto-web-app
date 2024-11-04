@@ -3,6 +3,7 @@
     <CarAddForm
       v-model:car-to-wash="carToWash"
       v-model:is-additional-services-included="isAdditionalServicesIncluded"
+      @confirm="onConfirmAll"
     />
     <template v-if="isAdditionalServicesIncluded">
       <AdditionalServicesForm v-model="additionalServices"/>
@@ -49,7 +50,7 @@ const serializedData = computed((): string => {
 
 const onConfirmAction = (ok: boolean) => {
   if (!ok) return
-  showAlert?.('Данные по автомобилю {ГОС НОМЕР} записаны')
+  showAlert?.(`Данные по автомобилю ${carToWash.value.number} записаны`)
   sendData?.(serializedData.value)
 }
 

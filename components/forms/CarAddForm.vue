@@ -51,6 +51,7 @@
           class="flex-1"
         />
         <Button
+          @click="emit('confirm')"
           label="Добавить позже"
           severity="secondary"
           class="flex-1"
@@ -65,6 +66,8 @@ import type { CarToWashDraft, ClassType, WashType } from '~/types/cars'
 import { useWebAppPopup } from 'vue-tg'
 
 const { showAlert } = useWebAppPopup()
+
+const emit = defineEmits(['confirm'])
 
 const carToWash = defineModel<CarToWashDraft>('carToWash', { required: true })
 
