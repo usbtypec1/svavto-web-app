@@ -2,7 +2,6 @@
   <div>
     <Fieldset legend="Регистрация">
       <Form
-        ref="formElement"
         v-slot="$form"
         :initialValues
         :resolver
@@ -44,18 +43,11 @@
             {{ $form.consolePhoneNumber.error?.message }}
           </Message>
         </div>
-        <DevOnly>
-          <Button
-            type="submit"
-            label="Зарегистрироваться"
-            :disabled="!$form.valid"
-          />
-        </DevOnly>
-        <MainButton
-          @click="submitForm"
+        <Button
           type="submit"
-          text="Зарегистрироваться"
-          :visible="$form.valid"
+          label="Зарегистрироваться"
+          :disabled="!$form.valid"
+          :raised="$form.valid"
         />
       </Form>
     </Fieldset>
@@ -64,19 +56,14 @@
 
 <script setup lang="ts">
 import { Form } from '@primevue/forms'
-import { MainButton } from 'vue-tg'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod';
 import { useWebApp, useWebAppHapticFeedback } from 'vue-tg'
-
-const formElement = ref<HTMLFormElement | null>(null);
-
 
 const { notificationOccurred } = useWebAppHapticFeedback()
 const { sendData } = useWebApp()
 
 const phoneNumberRegExp = new RegExp('^\\+7\\s\\(\\d{3}\\)\\s\\d{3}-\\d{2}-\\d{2}$')
-
 
 const resolver = ref(zodResolver(
   z.object({
@@ -97,11 +84,6 @@ const initialValues = ref({
   carSharingPhoneNumber: '',
   consolePhoneNumber: '',
 });
-
-
-const submitForm = () => {
-  formElement.value?.submit()
-}
 
 const onFormSubmit = ({ valid, values }) => {
   if (!valid) return
