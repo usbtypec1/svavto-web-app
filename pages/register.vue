@@ -2,6 +2,7 @@
   <div>
     <Fieldset legend="Регистрация">
       <Form
+        ref="formElement"
         v-slot="$form"
         :initialValues
         :resolver
@@ -17,8 +18,14 @@
         </div>
         <div class="flex flex-col gap-1">
           <label for="carSharingPhoneNumber">Номер телефона, привязанный к аккаунту в каршеринге</label>
-          <InputMask id="carSharingPhoneNumber" name="carSharingPhoneNumber" mask="+7 (999) 999-99-99"
-                     placeholder="+7 (351) 240-04-40" fluid/>
+          <InputMask
+            id="carSharingPhoneNumber"
+            name="carSharingPhoneNumber"
+            mask="+7 (999) 999-99-99"
+            placeholder="+7 (351) 240-04-40"
+            fluid
+            inputmode="tel"
+          />
           <Message v-if="$form.carSharingPhoneNumber?.invalid" severity="error" size="small" variant="simple">
             {{ $form.carSharingPhoneNumber.error?.message }}
           </Message>
@@ -30,22 +37,24 @@
             name="consolePhoneNumber"
             mask="+7 (999) 999-99-99"
             placeholder="+7 (351) 240-04-40"
+            inputmode="tel"
             fluid
           />
           <Message v-if="$form.consolePhoneNumber?.invalid" severity="error" size="small" variant="simple">
             {{ $form.consolePhoneNumber.error?.message }}
           </Message>
         </div>
-          <Button
-            type="submit"
-            label="Зарегистрироваться"
-            :disabled="!$form.valid"
-          />
-<!--        <MainButton-->
-<!--          type="submit"-->
-<!--          text="Зарегистрироваться"-->
-<!--          :visible="$form.valid"-->
-<!--        />-->
+        <Button
+          type="submit"
+          label="Зарегистрироваться"
+          :disabled="!$form.valid"
+        />
+        <MainButton
+          @click="formElement.submit()"
+          type="submit"
+          text="Зарегистрироваться"
+          :visible="$form.valid"
+        />
       </Form>
     </Fieldset>
   </div>
@@ -57,6 +66,8 @@ import { MainButton } from 'vue-tg'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod';
 import { useWebApp, useWebAppHapticFeedback } from 'vue-tg'
+
+const formElement = ref<HTMLFormElement | null>(null);
 
 
 const { notificationOccurred } = useWebAppHapticFeedback()
