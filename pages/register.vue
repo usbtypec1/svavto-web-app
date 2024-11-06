@@ -44,13 +44,15 @@
             {{ $form.consolePhoneNumber.error?.message }}
           </Message>
         </div>
-        <Button
-          type="submit"
-          label="Зарегистрироваться"
-          :disabled="!$form.valid"
-        />
+        <DevOnly>
+          <Button
+            type="submit"
+            label="Зарегистрироваться"
+            :disabled="!$form.valid"
+          />
+        </DevOnly>
         <MainButton
-          @click="formElement.submit()"
+          @click="submitForm"
           type="submit"
           text="Зарегистрироваться"
           :visible="$form.valid"
@@ -96,6 +98,10 @@ const initialValues = ref({
   consolePhoneNumber: '',
 });
 
+
+const submitForm = () => {
+  formElement.value?.submit()
+}
 
 const onFormSubmit = ({ valid, values }) => {
   if (!valid) return
