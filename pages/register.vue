@@ -36,18 +36,16 @@
             {{ $form.consolePhoneNumber.error?.message }}
           </Message>
         </div>
-        <DevOnly>
           <Button
             type="submit"
             label="Зарегистрироваться"
             :disabled="!$form.valid"
           />
-        </DevOnly>
-        <MainButton
-          type="submit"
-          text="Зарегистрироваться"
-          :visible="$form.valid"
-        />
+<!--        <MainButton-->
+<!--          type="submit"-->
+<!--          text="Зарегистрироваться"-->
+<!--          :visible="$form.valid"-->
+<!--        />-->
       </Form>
     </Fieldset>
   </div>
