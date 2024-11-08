@@ -9,7 +9,13 @@
       name="number"
     >
       <Fieldset legend="Гос.номер">
-        <InputText id="number" type="text" placeholder="а111аа799" fluid/>
+        <InputText
+          id="number"
+          fluid
+          placeholder="а111аа799"
+          type="text"
+          :disabled="isAdditionalServicesIncluded"
+        />
         <Message v-if="$number?.invalid" severity="error" size="small" variant="simple">
           {{ $number.error?.message }}
         </Message>
@@ -25,6 +31,7 @@
           :options="classTypeOptions"
           option-label="label"
           option-value="value"
+          :disabled="isAdditionalServicesIncluded"
         />
         <Message v-if="$classType?.invalid" severity="error" size="small" variant="simple">
           {{ $classType.error?.message }}
@@ -41,6 +48,7 @@
           :options="washTypeOptions"
           option-label="label"
           option-value="value"
+          :disabled="isAdditionalServicesIncluded"
         />
         <Message v-if="$washType?.invalid" severity="error" size="small" variant="simple">
           {{ $washType.error?.message }}
@@ -48,7 +56,7 @@
       </Fieldset>
     </FormField>
 
-    <Fieldset legend="Осуществлен долив стеклоомывателя">
+    <Fieldset legend="Долив воды/незамерзающей жидкости">
       <FormField
         v-slot="$windshieldWasher"
         name="windshieldWasher"
@@ -63,6 +71,7 @@
               size="large"
               :value="windshieldWasherOption"
               :input-id="windshieldWasherOption"
+              :disabled="isAdditionalServicesIncluded"
             />
             <label :for="windshieldWasherOption" class="text-md">{{ windshieldWasherOption }}</label>
           </div>
@@ -78,6 +87,7 @@
           <FormField
             v-slot="$windshieldWasherRefilledBottlePercentage"
             name="windshieldWasherRefilledBottlePercentage"
+            :initial-value="0"
           >
             <div v-show="$windshieldWasher.value === 'Незамерзающая жидкость'">
               <label for="windshield_washer_refilled_bottle_percentage">
@@ -87,8 +97,10 @@
                 :options="windshieldWasherRefilledBottlePercentageOptions"
                 input-id="windshield_washer_refilled_bottle_percentage"
                 fluid
+                :default-value="0"
                 class="mt-1"
                 name="windshieldWasherRefilledBottlePercentage"
+                :disabled="isAdditionalServicesIncluded"
               />
               <Message
                 v-if="$windshieldWasherRefilledBottlePercentage?.invalid"
@@ -198,8 +210,9 @@ const resolver = ref(zodResolver(
 
 const windshieldWasherRefilledBottlePercentageOptions: number[] = [10, 20, 30, 50, 70, 90, 100, 120]
 
-const onSubmit = ({ isValid, values, originalEvent }: FormSubmitEvent) => {
-  if (!isValid) {
+const onSubmit = ({ valid, values, originalEvent }: FormSubmitEvent) => {
+  if (!valid) {
+    console.log(`Invalid car add form: values=${JSON.stringify(values)}`)
     return
   }
   if (originalEvent.submitter.id === 'create-without-additional-services') {
