@@ -1,90 +1,109 @@
 <template>
   <Form
-    v-slot="$form"
     :resolver
-    :initial-values="initialValues"
     @submit="onSubmit"
     class="flex flex-col gap-y-4"
   >
-    <Fieldset legend="Гос.номер">
-      <InputText id="number" name="number" type="text" placeholder="а111аа799" fluid/>
-      <Message v-if="$form.number?.invalid" severity="error" size="small" variant="simple">
-        {{ $form.number.error?.message }}
-      </Message>
-    </Fieldset>
-    <Fieldset legend="Класс автомобиля">
-      <SelectButton
-        :options="classTypeOptions"
-        option-label="label"
-        option-value="value"
-        name="classType"
-      />
-      <Message v-if="$form.classType?.invalid" severity="error" size="small" variant="simple">
-        {{ $form.classType.error?.message }}
-      </Message>
-    </Fieldset>
-    <Fieldset legend="Вид мойки">
-      <SelectButton
-        :options="washTypeOptions"
-        option-label="label"
-        option-value="value"
-        name="washType"
-      />
-      <Message v-if="$form.washType?.invalid" severity="error" size="small" variant="simple">
-        {{ $form.washType.error?.message }}
-      </Message>
-    </Fieldset>
+    <FormField
+      v-slot="$number"
+      name="number"
+    >
+      <Fieldset legend="Гос.номер">
+        <InputText id="number" type="text" placeholder="а111аа799" fluid/>
+        <Message v-if="$number?.invalid" severity="error" size="small" variant="simple">
+          {{ $number.error?.message }}
+        </Message>
+      </Fieldset>
+    </FormField>
+
+    <FormField
+      v-slot="$classType"
+      name="classType"
+    >
+      <Fieldset legend="Класс автомобиля">
+        <SelectButton
+          :options="classTypeOptions"
+          option-label="label"
+          option-value="value"
+        />
+        <Message v-if="$classType?.invalid" severity="error" size="small" variant="simple">
+          {{ $classType.error?.message }}
+        </Message>
+      </Fieldset>
+    </FormField>
+
+    <FormField
+      v-slot="$washType"
+      name="washType"
+    >
+      <Fieldset legend="Вид мойки">
+        <SelectButton
+          :options="washTypeOptions"
+          option-label="label"
+          option-value="value"
+        />
+        <Message v-if="$washType?.invalid" severity="error" size="small" variant="simple">
+          {{ $washType.error?.message }}
+        </Message>
+      </Fieldset>
+    </FormField>
+
     <Fieldset legend="Осуществлен долив стеклоомывателя">
-      <div class="flex flex-col gap-y-2">
-        {{ initialValues}}
-        <RadioButtonGroup
-          name="windshieldWasher"
-          class="flex flex-col gap-y-3"
-        >
+      <FormField
+        v-slot="$windshieldWasher"
+        name="windshieldWasher"
+      >
+        <RadioButtonGroup class="flex flex-col gap-y-2">
           <div
-            v-for="{ label, value } in windshieldWasherOptions"
-            :key="value"
+            v-for="windshieldWasherOption in windshieldWasherOptions"
+            :key="windshieldWasherOption"
             class="flex items-center gap-x-2"
           >
             <RadioButton
               size="large"
-              :value
-              :input-id="value"
-              name="windshieldWasher"
+              :value="windshieldWasherOption"
+              :input-id="windshieldWasherOption"
             />
-            <label :for="value" class="text-md">{{ label }}</label>
+            <label :for="windshieldWasherOption" class="text-md">{{ windshieldWasherOption }}</label>
           </div>
-        </RadioButtonGroup>
-        <Message
-          v-if="$form.windshieldWasher?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-        >
-          {{ $form.windshieldWasher.error?.message }}
-        </Message>
-        <div v-if="windshieldWasher === 'antifreeze'">
-          <label for="windshield_washer_refilled_bottle_percentage">
-            Сколько % от бутылки было залито?
-          </label>
-          <Select
-            :options="windshieldWasherRefilledBottlePercentageOptions"
-            input-id="windshield_washer_refilled_bottle_percentage"
-            fluid
-            class="mt-1"
-            name="windshieldWasherRefilledBottlePercentage"
-          />
           <Message
-            v-if="$form.windshieldWasherRefilledBottlePercentage?.invalid"
+            v-if="$windshieldWasher?.invalid"
             severity="error"
             size="small"
             variant="simple"
           >
-            {{ $form.windshieldWasherRefilledBottlePercentage.error.message }}
+            {{ $windshieldWasher.error.message }}
           </Message>
-        </div>
-      </div>
+
+          <FormField
+            v-slot="$windshieldWasherRefilledBottlePercentage"
+            name="windshieldWasherRefilledBottlePercentage"
+          >
+            <div v-show="$windshieldWasher.value === 'Незамерзающая жидкость'">
+              <label for="windshield_washer_refilled_bottle_percentage">
+                Сколько % от бутылки было залито?
+              </label>
+              <Select
+                :options="windshieldWasherRefilledBottlePercentageOptions"
+                input-id="windshield_washer_refilled_bottle_percentage"
+                fluid
+                class="mt-1"
+                name="windshieldWasherRefilledBottlePercentage"
+              />
+              <Message
+                v-if="$windshieldWasherRefilledBottlePercentage?.invalid"
+                severity="error"
+                size="small"
+                variant="simple"
+              >
+                {{ $windshieldWasherRefilledBottlePercentage.error.message }}
+              </Message>
+            </div>
+          </FormField>
+        </RadioButtonGroup>
+      </FormField>
     </Fieldset>
+
     <Fieldset
       v-if="!isAdditionalServicesIncluded"
       class="font-semibold mb-1"
@@ -113,29 +132,13 @@
 
 <script setup lang="ts">
 import type { CarToWashDraft, ClassType, WashType } from '~/types/cars'
-import { Form } from '@primevue/forms'
+import { Form, FormField, type FormSubmitEvent } from '@primevue/forms'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod';
 
-const carNumberRegExp = new RegExp(/^[А-Яа-я]\d{3}[А-Яа-я]{2}\d{3}$/)
+const emit = defineEmits(['submitWithoutAdditionalServices', 'submitWithAdditionalServices'])
 
 const isAdditionalServicesIncluded = ref<boolean>(false)
-
-const windshieldWasher = ref<string>()
-const windshieldWasherOptions = [
-  {
-    label: 'Без долива',
-    value: 'not_refilled',
-  },
-  {
-    label: 'Вода',
-    value: 'water',
-  },
-  {
-    label: 'Незамерзающая жидкость',
-    value: 'antifreeze',
-  },
-]
 
 const initialValues = ref<CarToWashDraft>({})
 
@@ -165,39 +168,44 @@ const washTypeOptions: WashType[] = [
   },
 ]
 
+const windshieldWasherOptions: string[] = [
+  'Без долива',
+  'Вода',
+  'Незамерзающая жидкость',
+]
+
+const carNumberRegExp = new RegExp(/^[А-Яа-я]\d{3}[А-Яа-я]{2}\d{3}$/)
 
 const resolver = ref(zodResolver(
   z.object({
-    number: z.string({ required_error: 'Введите гос.номер' })
+    number: z.string({ message: 'Введите гос.номер' })
       .length(9, { message: 'Гос.номер должен быть длиной 9 символов' })
-      .regex(
-        carNumberRegExp,
-        { message: 'Гос.номер должен быть в формате а111бв799 (буквы на кириллице и цифры)' },
-      ),
+      .regex(carNumberRegExp, { message: 'Гос.номер должен быть в формате а111бв799 (буквы на кириллице и цифры)' }),
     classType: z.enum(classTypeOptions.map(({ value }) => value), {
-      required_error: 'Выберите одно из опций',
-      invalid_type_error: 'Выберите одно из опций',
+      message: 'Выберите одно из опций',
     }),
     washType: z.enum(washTypeOptions.map(({ value }) => value), {
-      required_error: 'Выберите одно из опций',
-      invalid_type_error: 'Выберите одно из опций',
+      message: 'Выберите одно из опций',
     }),
-    windshieldWasher: z.enum(windshieldWasherOptions.map(({ value }) => value), {
-      required_error: 'Выберите одно из опций',
-      invalid_type_error: 'Выберите одно из опций',
+    windshieldWasher: z.enum(windshieldWasherOptions, {
+      message: 'Выберите одно из опций',
     }),
-    windshieldWasherRefilledBottlePercentage: z.number(),
+    windshieldWasherRefilledBottlePercentage: z.number({
+      message: 'Выберите % от бутылки, который был залит',
+    }),
   }),
 ))
 
 const windshieldWasherRefilledBottlePercentageOptions: number[] = [10, 20, 30, 50, 70, 90, 100, 120]
 
-const onSubmit = (data) => {
-  console.log(data)
-  // console.log(isValid, values)
-  // if (originalEvent.submitter.id === 'create-without-additional-services') {
-  // } else if (originalEvent.submitter.id === 'create-with-additional-services') {
-  //
-  // }
+const onSubmit = ({ isValid, values, originalEvent }: FormSubmitEvent) => {
+  if (!isValid) {
+    return
+  }
+  if (originalEvent.submitter.id === 'create-without-additional-services') {
+    emit('submitWithoutAdditionalServices', values)
+  } else if (originalEvent.submitter.id === 'create-with-additional-services') {
+    emit('submitWithAdditionalServices', values)
+  }
 }
 </script>
