@@ -86,6 +86,7 @@ const initialValues = ref({
 });
 
 const onFormSubmit = ({ valid, values }) => {
+  console.log(`Register form submit: isValid=${valid} values=${JSON.stringify(values)}`)
   if (!valid) return
   notificationOccurred?.('success')
   sendData?.(JSON.stringify({
