@@ -25,9 +25,11 @@ const anyButtonError = computed((): boolean => {
     .reduce((anyErrors, isError) => anyErrors || isError, false)
 })
 
+const serializedButtons = computed((): string => {
+  return JSON.stringify(buttons.value.map(({ text, url }) => ({ text, url })))
+})
+
 const onSubmit = () => {
-  sendData?.(JSON.stringify({ event: 'attach_reply_markup', buttons: buttons.value }))
+  sendData?.(serializedButtons.value)
 }
-
-
 </script>
