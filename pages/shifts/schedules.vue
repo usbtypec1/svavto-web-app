@@ -144,14 +144,17 @@ const onUpdate = async (updatedDates: Date[]): Promise<void> => {
   const confirmMessage = getShiftDeleteConfirmMessage(shift)
 
   showConfirm?.(confirmMessage, async (ok: boolean): Promise<void> => {
-    if (!ok) return
-    isDisabled.value = true
-    try {
-      await deleteShift(shift.id)
+    if (!ok) {
       await refreshShifts()
-      impactOccurred?.('light')
-    } finally {
-      isDisabled.value = false
+    } else {
+      isDisabled.value = true
+      try {
+        await deleteShift(shift.id)
+        await refreshShifts()
+        impactOccurred?.('light')
+      } finally {
+        isDisabled.value = false
+      }
     }
   })
 }
@@ -161,14 +164,17 @@ const onDateSelect = async (value: Date): Promise<void> => {
   showConfirm?.(
     `Вы уверены что хотите добавить смену на дату ${dateToYYYYMMDDD(value)}?`,
     async (ok: boolean): Promise<void> => {
-      if (!ok) return
-      isDisabled.value = true
-      try {
-        await createShift(staff.value!.id, dateToYYYYMMDDD(value))
+      if (!ok) {
         await refreshShifts()
-        impactOccurred?.('light')
-      } finally {
-        isDisabled.value = false
+      } else {
+        isDisabled.value = true
+        try {
+          await createShift(staff.value!.id, dateToYYYYMMDDD(value))
+          await refreshShifts()
+          impactOccurred?.('light')
+        } finally {
+          isDisabled.value = false
+        }
       }
     },
   )
