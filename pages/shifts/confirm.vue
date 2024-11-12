@@ -1,127 +1,181 @@
 <template>
-  <div class="mb-6">
-    <form class="flex flex-col gap-y-4" @submit.prevent>
-      <h3 class="text-center font-semibold text-xl">Сегодня в смене</h3>
-      <DatePicker
-        v-model="date"
-        inline
-        date-format="dd/mm/yy"
-        :min-date="new Date()"
-      />
-      <p v-if="datesError" class="font-semibold">{{ datesError }}</p>
-    </form>
-    <p class="font-semibold my-3">Отправить запрос на подтверждение выхода на смену?</p>
-    <div class="flex flex-col gap-y-2">
-      <div class="flex gap-x-2">
-        <Button
-          class="grow"
-          label="Да"
-          :disabled="isSpecificStaffMode"
-          @click="onSendToAllStaff"
-        />
-        <Button class="grow" label="Нет" severity="danger" @click="close" :disabled="isSpecificStaffMode"/>
+  <div class="flex flex-col gap-y-3">
+    <h3 class="text-center font-semibold text-2xl">Сегодня в смене</h3>
+    <div v-auto-animate>
+      <div
+        v-if="!onlySpecificStaff"
+        class="flex flex-col gap-y-1"
+      >
+        <div class="flex flex-col gap-y-2">
+          <label class="font-semibold">Дата на которую поставили смены</label>
+          <DatePicker
+            v-model="date"
+            date-format="dd.mm.yy"
+            :min-date="new Date()"
+            fluid
+            inline
+          />
+        </div>
+        <ProgressSpinner v-if="staffListForSpecificDateStatus === 'pending'"/>
+        <div
+          v-else-if="staffListForSpecificDateStatus === 'success'"
+          class="flex flex-col gap-y-2"
+        >
+          <p></p>
+          <p class="font-semibold">Список сотрудников которые поставили смену на выбранную дату</p>
+          <Listbox
+            :options="shifts!"
+            option-label="staff.full_name"
+            option-value="shift_id"
+            empty-message="Нет запланированных на эту дату смен"
+          />
+        </div>
       </div>
+    </div>
+
+    <div class="flex flex-col gap-y-2">
+      <Button
+        @click="close"
+        label="Закрыть"
+        severity="danger"
+        outlined
+        icon="pi pi-times"
+      />
       <ToggleButton
-        v-model="isSpecificStaffMode"
-        onLabel="Точечный запрос"
-        offLabel="Точечный запрос"
+        v-model="onlySpecificStaff"
+        on-label="Точечный запрос"
+        off-label="Точечный запрос"
+        on-icon="pi pi-check"
       />
     </div>
 
-    <BlockUI v-if="isSpecificStaffMode" :blocked="status === 'pending'">
-      <div class="flex flex-col gap-y-2 my-3">
-        <template v-if="status === 'success'">
-          <p>Выберите сотрудников</p>
+    <div v-auto-animate>
+      <div
+        v-if="onlySpecificStaff"
+      >
+        <ProgressSpinner v-if="staffListStatus === 'pending'"/>
+        <div
+          v-else-if="staffListStatus === 'success'"
+          class="flex flex-col gap-y-2"
+        >
+          <p class="font-semibold text-lg">Список сотрудников для точечной отправки запроса</p>
           <Listbox
-            v-model="selectedShifts"
-            :options="shiftConfirmations"
-            multiple
-            optionLabel="staff_full_name"
+            v-model="selectedStaffIds"
+            :options="staffList!"
             checkmark
-            emptyMessage="Нет доступных сотрудников на эту дату"
+            multiple
+            option-label="full_name"
+            option-value="id"
+            empty-message="Нет сотрудников"
           />
-          <Button
-            :disabled="selectedShifts.length === 0"
-            label="Отправить запрос"
-            @click="onSendToSpecificStaff"
-          />
-        </template>
-        <Message v-else-if="status === 'error'" severity="error" class="my-3">
-          Произошла ошибка при загрузке списка сотрудников
+        </div>
+        <Message
+          v-else-if="staffListStatus"
+          severity="error"
+          icon="pi pi-exclamation-triangle"
+        >
+          Не удалось загрузить список сотрудников
         </Message>
       </div>
-    </BlockUI>
+    </div>
+
+    <MainButton
+      @click="onConfirm"
+      text="Подтвердить"
+      :visible="isMainButtonVisible"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useWebApp, useWebAppPopup } from 'vue-tg'
+import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
+import type { Staff } from '~/types/staff'
+import type { Shift, ShiftWithStaff } from '~/types/shifts'
 
 const { close, sendData } = useWebApp()
-const { showConfirm } = useWebAppPopup()
+const { showConfirm, showAlert } = useWebAppPopup()
 
-const onSendToAllStaff = (): void => {
-  showConfirm?.(
-    'Вы уверены что хотите отправить запрос на подтверждение выхода на смену всем сотрудникам на выбранную дату?',
-    (ok: boolean): void => {
-      if (ok) {
-        sendData?.(JSON.stringify(shiftConfirmations.value))
-      }
-    },
-  )
-}
-
-
-const onSendToSpecificStaff = (): void => {
-  showConfirm?.(
-    'Вы уверены что хотите отправить запрос выбранным сотрудникам на выбранную дату?',
-    (ok: boolean) => {
-      if (ok) {
-        sendData?.(JSON.stringify(selectedShifts.value))
-      }
-    },
-  )
-}
-
-const isSpecificStaffMode = ref<boolean>(false)
-
-const selectedShifts = ref<ShiftConfirmation[]>()
+const selectedStaffIds = ref<number[]>([])
 
 const date = ref<Date>(new Date())
+
+const humanizedDate = useDateFormat(date, 'DD.MM.YYYY')
 
 const formattedDate = useDateFormat(date, 'YYYY-MM-DD')
 
 const runtimeConfig = useRuntimeConfig()
 
-interface ShiftConfirmation {
-  shift_id: number
-  staff_id: number
-  staff_full_name: string
-}
+const onlySpecificStaff = ref<boolean>(false)
 
-const { data: shiftConfirmations, execute, status } = useFetch<ShiftConfirmation[]>('/shifts/staff/', {
+watch(onlySpecificStaff, async () => {
+  if (onlySpecificStaff.value) {
+    await refreshStaffList()
+  }
+})
+
+const {
+  data: staffList,
+  status: staffListStatus,
+  refresh: refreshStaffList,
+} = useFetch('/staff/', {
+  baseURL: runtimeConfig.public.apiBaseUrl,
+  query: {
+    order_by: '-created_at',
+  },
+  transform(data: { staff: Staff[] }) {
+    return data.staff
+  },
+  deep: false,
+  immediate: false,
+})
+
+const {
+  data: shifts,
+  refresh: shiftsStatus,
+  status: staffListForSpecificDateStatus,
+} = useFetch('/shifts/specific-date/', {
   query: { date: formattedDate },
   baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { staff_list: ShiftConfirmation[] }) => data.staff_list,
+  transform: (data: { shifts: ShiftWithStaff[] }) => data.shifts,
 })
 
 watch(date, async () => {
-  selectedShifts.value = []
-  if (date.value && isSpecificStaffMode.value) {
-    await execute()
+  if (date.value) {
+    await shiftsStatus()
   }
 })
 
-watch(isSpecificStaffMode, () => {
-  if (isSpecificStaffMode.value) {
-    selectedShifts.value = []
+const isMainButtonVisible = computed((): boolean => {
+  if (onlySpecificStaff.value) {
+    return selectedStaffIds.value.length > 0
   }
+  return !!date.value
 })
 
-const datesError = computed((): string | null => {
-  if (!date.value) {
-    return 'Выберите дату'
+const confirmationText = computed((): string => {
+  if (onlySpecificStaff.value) {
+    return 'Вы уверены что хотите отправить запрос выбранным сотрудникам?'
   }
-  return null
+  return `Отправить запрос на дату ${humanizedDate.value} всем сотрудникам?`
 })
+
+const staffIdsToSend = computed((): number[] => {
+  if (onlySpecificStaff.value) {
+    return selectedStaffIds.value
+  }
+  return shifts.value?.map((shift: ShiftWithStaff): number => shift.staff.id) ?? []
+})
+
+const serializedData = computed((): string => JSON.stringify(staffIdsToSend.value))
+
+const onConfirm = (): void => {
+  showConfirm?.(confirmationText.value, (ok: boolean) => {
+    if (!ok) return
+    if (staffIdsToSend.value.length === 0) {
+      showAlert?.('Не выбраны сотрудники для отправки запроса')
+    } else {
+      sendData?.(serializedData.value)
+    }
+  })
+}
 </script>
