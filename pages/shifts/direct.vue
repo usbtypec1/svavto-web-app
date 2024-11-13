@@ -40,6 +40,8 @@
 import { MainButton, useWebApp, useWebAppHapticFeedback, useWebAppPopup } from 'vue-tg'
 import type { Staff } from '~/types/staff'
 
+const { showConfirm } = useWebAppPopup()
+
 const date = ref<Date>(new Date())
 
 const { sendData } = useWebApp()
@@ -57,9 +59,13 @@ const { data: staffList, status } = await useFetch('/staff/', {
   deep: false,
 })
 
-const buttonText = computed((): string => `Отправить запрос ${selectedStaffIds.value.length} сотрудникам`)
+const buttonText = computed((): string => `Подтвердить`)
 
 const onSubmit = (): void => {
-  sendData?.(JSON.stringify(selectedStaffIds.value))
+  showConfirm?.(`Отправить запрос ${selectedStaffIds.value.length} сотрудникам`, (ok: boolean) => {
+    if (ok) {
+      sendData?.(JSON.stringify(selectedStaffIds.value))
+    }
+  })
 }
 </script>
