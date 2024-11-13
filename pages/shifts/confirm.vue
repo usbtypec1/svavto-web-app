@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-y-3">
     <h3 class="text-center font-semibold text-2xl">Сегодня в смене</h3>
     <div class="flex flex-col gap-y-2">
-      <label class="font-semibold">Дата на которую поставили смены</label>
+      <label class="font-semibold">{{ calendarLabel }}</label>
       <DatePicker
         v-model="date"
         date-format="dd.mm.yy"
@@ -16,17 +16,16 @@
         v-if="!onlySpecificStaff"
         class="flex flex-col gap-y-1"
       >
-        <ProgressSpinner v-if="staffListForSpecificDateStatus === 'pending'"/>
+        <ProgressSpinner v-if="shiftsStatus === 'pending'"/>
         <div
-          v-else-if="staffListForSpecificDateStatus === 'success'"
+          v-else-if="shiftsStatus === 'success'"
           class="flex flex-col gap-y-2"
         >
-          <p></p>
           <p class="font-semibold">Список сотрудников которые поставили смену на выбранную дату</p>
           <Listbox
             :options="shifts!"
             option-label="staff.full_name"
-            option-value="shift_id"
+            option-value="staff.id"
             empty-message="Нет запланированных на эту дату смен"
           />
         </div>
@@ -60,12 +59,12 @@
         >
           <p class="font-semibold">Список сотрудников для точечной отправки запроса</p>
           <Listbox
-            v-model="selectedStaff"
+            v-model="selectedStaffIds"
             :options="staffList!"
             checkmark
             multiple
             option-label="full_name"
-            :option-value="(staffItem) => ({ id: staffItem.id, full_name: staffItem.full_name })"
+            option-value="id"
             empty-message="Нет сотрудников"
           />
         </div>
@@ -78,7 +77,6 @@
         </Message>
       </div>
     </div>
-
     <DevOnly>
       <Button
         @click="onConfirm"
@@ -98,12 +96,12 @@
 <script setup lang="ts">
 import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 import type { Staff, StaffIdAndName } from '~/types/staff'
-import type { ShiftWithStaff } from '~/types/shifts'
+import type { ShiftListItem, ShiftsConfirmation } from '~/types/shifts'
 
 const { close, sendData } = useWebApp()
 const { showConfirm } = useWebAppPopup()
 
-const selectedStaff = ref<StaffIdAndName[]>([])
+const selectedStaffIds = ref<number[]>([])
 
 const date = ref<Date>(new Date())
 
@@ -144,23 +142,23 @@ const {
 
 const {
   data: shifts,
-  refresh: shiftsStatus,
-  status: staffListForSpecificDateStatus,
-} = useFetch('/shifts/specific-date/', {
-  query: { date: formattedDate },
+  refresh: refreshShifts,
+  status: shiftsStatus,
+} = useFetch('/shifts/', {
+  query: { date_from: formattedDate, date_to: formattedDate, limit: 1000 },
   baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { shifts: ShiftWithStaff[] }) => data.shifts,
+  transform: (data: { shifts: ShiftListItem[] }) => data.shifts,
 })
 
 watch(date, async () => {
   if (date.value) {
-    await shiftsStatus()
+    await refreshShifts()
   }
 })
 
 const isMainButtonVisible = computed((): boolean => {
   if (onlySpecificStaff.value) {
-    return selectedStaff.value.length > 0
+    return selectedStaffIds.value.length > 0
   }
   return !!date.value
 })
@@ -172,25 +170,30 @@ const confirmationText = computed((): string => {
   return `Отправить запрос на дату ${humanizedDate.value} всем сотрудникам?`
 })
 
-const shiftsForDateToSend = computed((): { date: string, staff: StaffIdAndName[] } => {
+const shiftsForDateToSend = computed((): ShiftsConfirmation => {
   if (onlySpecificStaff.value) {
     return {
       date: formattedDate.value,
-      staff: selectedStaff.value,
+      staffIds: selectedStaffIds.value,
     }
   }
   return {
     date: formattedDate.value,
-    staff: shifts.value?.map((shift: ShiftWithStaff) => getStaffIdAndName(shift.staff)) ?? [],
+    staffIds: shifts.value?.map((shift: ShiftListItem) => shift.staff.id) ?? [],
   }
+})
+
+const calendarLabel = computed((): string => {
+  return onlySpecificStaff.value ? 'Дата на которую поставить смены' : 'Дата на которую поставили смены'
 })
 
 const serializedData = computed((): string => JSON.stringify(shiftsForDateToSend.value))
 
 const onConfirm = (): void => {
-  showConfirm?.(confirmationText.value, (ok: boolean) => {
-    if (!ok) return
-    sendData?.(serializedData.value)
-  })
+  console.log(serializedData.value)
+  // showConfirm?.(confirmationText.value, (ok: boolean) => {
+  //   if (!ok) return
+  //   sendData?.(serializedData.value)
+  // })
 }
 </script>
