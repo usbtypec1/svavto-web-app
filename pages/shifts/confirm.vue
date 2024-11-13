@@ -79,6 +79,14 @@
       </div>
     </div>
 
+    <DevOnly>
+      <Button
+        @click="onConfirm"
+        label="Подтвердить"
+        :disabled="!isMainButtonVisible"
+        fluid
+      />
+    </DevOnly>
     <MainButton
       @click="onConfirm"
       text="Подтвердить"
@@ -97,6 +105,9 @@ const { close, sendData } = useWebApp()
 const { showConfirm, showAlert } = useWebAppPopup()
 
 const selectedStaffIds = ref<number[]>([])
+
+const now = useNow()
+const formattedNow = useDateFormat(now, 'YYYY-MM-DD')
 
 const date = ref<Date>(new Date())
 
@@ -162,15 +173,14 @@ const confirmationText = computed((): string => {
 
 const shiftsForDateToSend = computed((): { date: string, staff_ids: number[] } => {
   if (onlySpecificStaff.value) {
-    const today = dayjs(new Date()).format('YYYY-MM-DD')
     return {
-      date: today,
+      date: formattedNow.value,
       staff_ids: selectedStaffIds.value,
     }
   }
   return {
     date: formattedDate.value,
-    staff_ids: staffList.value?.map((staff) => staff.id) ?? [],
+    staff_ids: shifts.value?.map((shift: ShiftWithStaff) => shift.staff.id) ?? [],
   }
 })
 
