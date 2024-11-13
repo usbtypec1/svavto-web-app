@@ -60,12 +60,12 @@
         >
           <p class="font-semibold">Список сотрудников для точечной отправки запроса</p>
           <Listbox
-            v-model="selectedStaffIds"
+            v-model="selectedStaff"
             :options="staffList!"
             checkmark
             multiple
             option-label="full_name"
-            option-value="id"
+            :option-value="(staffItem) => ({ id: staffItem.id, full_name: staffItem.full_name })"
             empty-message="Нет сотрудников"
           />
         </div>
@@ -97,14 +97,13 @@
 
 <script setup lang="ts">
 import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
-import type { Staff } from '~/types/staff'
+import type { Staff, StaffIdAndName } from '~/types/staff'
 import type { ShiftWithStaff } from '~/types/shifts'
-import * as dayjs from 'dayjs'
 
 const { close, sendData } = useWebApp()
-const { showConfirm, showAlert } = useWebAppPopup()
+const { showConfirm } = useWebAppPopup()
 
-const selectedStaffIds = ref<number[]>([])
+const selectedStaff = ref<StaffIdAndName[]>([])
 
 const date = ref<Date>(new Date())
 
@@ -120,6 +119,11 @@ watch(onlySpecificStaff, async () => {
   if (onlySpecificStaff.value) {
     await refreshStaffList()
   }
+})
+
+const getStaffIdAndName = (staff: { id: number, full_name: string }): StaffIdAndName => ({
+  id: staff.id,
+  full_name: staff.full_name,
 })
 
 const {
@@ -156,7 +160,7 @@ watch(date, async () => {
 
 const isMainButtonVisible = computed((): boolean => {
   if (onlySpecificStaff.value) {
-    return selectedStaffIds.value.length > 0
+    return selectedStaff.value.length > 0
   }
   return !!date.value
 })
@@ -168,25 +172,26 @@ const confirmationText = computed((): string => {
   return `Отправить запрос на дату ${humanizedDate.value} всем сотрудникам?`
 })
 
-const shiftsForDateToSend = computed((): { date: string, staff_ids: number[] } => {
+const shiftsForDateToSend = computed((): { date: string, staff: StaffIdAndName[] } => {
   if (onlySpecificStaff.value) {
     return {
       date: formattedDate.value,
-      staff_ids: selectedStaffIds.value,
+      staff: selectedStaff.value,
     }
   }
   return {
     date: formattedDate.value,
-    staff_ids: shifts.value?.map((shift: ShiftWithStaff) => shift.staff.id) ?? [],
+    staff: shifts.value?.map((shift: ShiftWithStaff) => getStaffIdAndName(shift.staff)) ?? [],
   }
 })
 
 const serializedData = computed((): string => JSON.stringify(shiftsForDateToSend.value))
 
 const onConfirm = (): void => {
-  showConfirm?.(confirmationText.value, (ok: boolean) => {
-    if (!ok) return
-    sendData?.(serializedData.value)
-  })
+  console.log(shiftsForDateToSend.value)
+  // showConfirm?.(confirmationText.value, (ok: boolean) => {
+  //   if (!ok) return
+  //   sendData?.(serializedData.value)
+  // })
 }
 </script>

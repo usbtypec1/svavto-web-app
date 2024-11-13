@@ -6,3 +6,8 @@ export interface Staff {
   is_banned: boolean
   created_at: string
 }
+
+export interface StaffIdAndName {
+  id: number
+  full_name: string
+}
