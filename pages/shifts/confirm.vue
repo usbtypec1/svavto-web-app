@@ -90,7 +90,8 @@
 <script setup lang="ts">
 import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 import type { Staff } from '~/types/staff'
-import type { Shift, ShiftWithStaff } from '~/types/shifts'
+import type { ShiftWithStaff } from '~/types/shifts'
+import * as dayjs from 'dayjs'
 
 const { close, sendData } = useWebApp()
 const { showConfirm, showAlert } = useWebAppPopup()
@@ -159,19 +160,26 @@ const confirmationText = computed((): string => {
   return `Отправить запрос на дату ${humanizedDate.value} всем сотрудникам?`
 })
 
-const staffIdsToSend = computed((): number[] => {
+const shiftsForDateToSend = computed((): { date: string, staff_ids: number[] } => {
   if (onlySpecificStaff.value) {
-    return selectedStaffIds.value
+    const today = dayjs(new Date()).format('YYYY-MM-DD')
+    return {
+      date: today,
+      staff_ids: selectedStaffIds.value,
+    }
   }
-  return shifts.value?.map((shift: ShiftWithStaff): number => shift.staff.id) ?? []
+  return {
+    date: formattedDate.value,
+    staff_ids: staffList.value?.map((staff) => staff.id) ?? [],
+  }
 })
 
-const serializedData = computed((): string => JSON.stringify(staffIdsToSend.value))
+const serializedData = computed((): string => JSON.stringify(shiftsForDateToSend.value))
 
 const onConfirm = (): void => {
   showConfirm?.(confirmationText.value, (ok: boolean) => {
     if (!ok) return
-    if (staffIdsToSend.value.length === 0) {
+    if (shiftsForDateToSend.value.staff_ids.length === 0) {
       showAlert?.('Не выбраны сотрудники для отправки запроса')
     } else {
       sendData?.(serializedData.value)
