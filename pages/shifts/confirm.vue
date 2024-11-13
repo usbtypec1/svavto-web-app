@@ -179,7 +179,7 @@ const serializedData = computed((): string => JSON.stringify(shiftsForDateToSend
 const onConfirm = (): void => {
   showConfirm?.(confirmationText.value, (ok: boolean) => {
     if (!ok) return
-    if (shiftsForDateToSend.value.staff_ids.length === 0) {
+    if (onlySpecificStaff.value && shiftsForDateToSend.value.staff_ids.length === 0) {
       showAlert?.('Не выбраны сотрудники для отправки запроса')
     } else {
       sendData?.(serializedData.value)
