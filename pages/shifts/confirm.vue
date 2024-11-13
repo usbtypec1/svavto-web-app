@@ -1,21 +1,21 @@
 <template>
   <div class="flex flex-col gap-y-3">
     <h3 class="text-center font-semibold text-2xl">Сегодня в смене</h3>
+    <div class="flex flex-col gap-y-2">
+      <label class="font-semibold">Дата на которую поставили смены</label>
+      <DatePicker
+        v-model="date"
+        date-format="dd.mm.yy"
+        :min-date="new Date()"
+        fluid
+        inline
+      />
+    </div>
     <div v-auto-animate>
       <div
         v-if="!onlySpecificStaff"
         class="flex flex-col gap-y-1"
       >
-        <div class="flex flex-col gap-y-2">
-          <label class="font-semibold">Дата на которую поставили смены</label>
-          <DatePicker
-            v-model="date"
-            date-format="dd.mm.yy"
-            :min-date="new Date()"
-            fluid
-            inline
-          />
-        </div>
         <ProgressSpinner v-if="staffListForSpecificDateStatus === 'pending'"/>
         <div
           v-else-if="staffListForSpecificDateStatus === 'success'"
@@ -58,7 +58,7 @@
           v-else-if="staffListStatus === 'success'"
           class="flex flex-col gap-y-2"
         >
-          <p class="font-semibold text-lg">Список сотрудников для точечной отправки запроса</p>
+          <p class="font-semibold">Список сотрудников для точечной отправки запроса</p>
           <Listbox
             v-model="selectedStaffIds"
             :options="staffList!"
@@ -105,9 +105,6 @@ const { close, sendData } = useWebApp()
 const { showConfirm, showAlert } = useWebAppPopup()
 
 const selectedStaffIds = ref<number[]>([])
-
-const now = useNow()
-const formattedNow = useDateFormat(now, 'YYYY-MM-DD')
 
 const date = ref<Date>(new Date())
 
@@ -174,7 +171,7 @@ const confirmationText = computed((): string => {
 const shiftsForDateToSend = computed((): { date: string, staff_ids: number[] } => {
   if (onlySpecificStaff.value) {
     return {
-      date: formattedNow.value,
+      date: formattedDate.value,
       staff_ids: selectedStaffIds.value,
     }
   }
