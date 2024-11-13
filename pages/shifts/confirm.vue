@@ -188,10 +188,9 @@ const shiftsForDateToSend = computed((): { date: string, staff: StaffIdAndName[]
 const serializedData = computed((): string => JSON.stringify(shiftsForDateToSend.value))
 
 const onConfirm = (): void => {
-  console.log(shiftsForDateToSend.value)
-  // showConfirm?.(confirmationText.value, (ok: boolean) => {
-  //   if (!ok) return
-  //   sendData?.(serializedData.value)
-  // })
+  showConfirm?.(confirmationText.value, (ok: boolean) => {
+    if (!ok) return
+    sendData?.(serializedData.value)
+  })
 }
 </script>
