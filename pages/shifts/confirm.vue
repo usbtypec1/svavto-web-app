@@ -174,12 +174,12 @@ const shiftsForDateToSend = computed((): ShiftsConfirmation => {
   if (onlySpecificStaff.value) {
     return {
       date: formattedDate.value,
-      staffIds: selectedStaffIds.value,
+      staff_ids: selectedStaffIds.value,
     }
   }
   return {
     date: formattedDate.value,
-    staffIds: shifts.value?.map((shift: ShiftListItem) => shift.staff.id) ?? [],
+    staff_ids: shifts.value?.map((shift: ShiftListItem) => shift.staff.id) ?? [],
   }
 })
 
@@ -191,9 +191,9 @@ const serializedData = computed((): string => JSON.stringify(shiftsForDateToSend
 
 const onConfirm = (): void => {
   console.log(serializedData.value)
-  // showConfirm?.(confirmationText.value, (ok: boolean) => {
-  //   if (!ok) return
-  //   sendData?.(serializedData.value)
-  // })
+  showConfirm?.(confirmationText.value, (ok: boolean) => {
+    if (!ok) return
+    sendData?.(serializedData.value)
+  })
 }
 </script>

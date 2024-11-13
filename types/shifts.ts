@@ -23,5 +23,5 @@ export interface ShiftListItem {
 
 export interface ShiftsConfirmation {
   date: string
-  staffIds: number[]
+  staff_ids: number[]
 }
