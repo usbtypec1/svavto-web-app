@@ -37,12 +37,15 @@
 </template>
 
 <script setup lang="ts">
-import { MainButton, useWebApp, useWebAppHapticFeedback, useWebAppPopup } from 'vue-tg'
+import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 import type { Staff } from '~/types/staff'
 
 const { showConfirm } = useWebAppPopup()
 
 const date = ref<Date>(new Date())
+
+const humanizedDate = useDateFormat(date, 'DD.MM.YYYY')
+const formattedDate = useDateFormat(date, 'YYYY-MM-DD')
 
 const { sendData } = useWebApp()
 
@@ -61,11 +64,20 @@ const { data: staffList, status } = await useFetch('/staff/', {
 
 const buttonText = computed((): string => `Подтвердить`)
 
-const onSubmit = (): void => {
-  showConfirm?.(`Отправить запрос ${selectedStaffIds.value.length} сотрудникам`, (ok: boolean) => {
-    if (ok) {
-      sendData?.(JSON.stringify(selectedStaffIds.value))
-    }
+const serializedData = computed((): string => {
+  return JSON.stringify({
+    staff_ids: selectedStaffIds.value,
+    date: formattedDate.value,
   })
+})
+
+const onSubmit = (): void => {
+  showConfirm?.(
+    `Отправить запрос ${selectedStaffIds.value.length} сотрудникам на дату ${humanizedDate.value}`,
+    (ok: boolean) => {
+      if (ok) {
+        sendData?.(serializedData.value)
+      }
+    })
 }
 </script>
