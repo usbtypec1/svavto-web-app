@@ -11,8 +11,10 @@
   </div>
   <Message
     v-if="penalties.length === 0"
+    icon="pi pi-face-smile"
+    severity="success"
   >
-
+    <p>Нет штрафов</p>
   </Message>
 </template>
 
