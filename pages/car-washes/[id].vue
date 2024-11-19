@@ -8,25 +8,48 @@
       <div
         @click="onUpdateCarWashServiceModelValue(carWashService)"
         v-if="carWashService.is_countable !== undefined"
-        class="flex items-center gap-x-2"
+        class="flex justify-between items-center gap-x-2"
       >
-        <ToggleSwitch
-          :input-id="carWashService.id"
-          :model-value="flattenCarWashServiceIds.includes(carWashService.id)"
-          readonly
-        />
         <label
           class="cursor-pointer"
           :for="carWashService.id"
         >
           {{ carWashService.name }}
         </label>
+        <ToggleSwitch
+          :input-id="carWashService.id"
+          :model-value="flattenCarWashServiceIds.includes(carWashService.id)"
+          readonly
+        />
       </div>
-      <Fieldset
-        v-if="carWashService.children !== undefined"
-        :legend="carWashService.name"
-      >
-      </Fieldset>
+      <Card v-if="carWashService.children !== undefined">
+        <template #title>
+          <p>{{ carWashService.name }}</p>
+          <Divider/>
+        </template>
+        <template #content>
+          <div class="flex flex-col gap-y-4">
+            <div
+              v-for="carWashService in carWashService.children"
+              :key="carWashService.id"
+              @click="onUpdateCarWashServiceModelValue(carWashService)"
+              class="flex justify-between items-center gap-x-2"
+            >
+              <label
+                class="cursor-pointer"
+                :for="carWashService.id"
+              >
+                {{ carWashService.name }}
+              </label>
+              <ToggleSwitch
+                :input-id="carWashService.id"
+                :model-value="flattenCarWashServiceIds.includes(carWashService.id)"
+                readonly
+              />
+            </div>
+          </div>
+        </template>
+      </Card>
     </template>
     <CarWashServicePriceUpdateDialog
       :car-wash-service="carWashService"
@@ -59,6 +82,20 @@ const {
 const { data: allCarWashServices, status: allCarWashServicesStatus } = await useFetch('/car-washes/services/', {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
+})
+
+const carWashServicesWithChildren = computed((): CarWashService[] => {
+  if (!carWashServices.value) {
+    return []
+  }
+  return carWashServices.value.filter((service) => service.children && service.children.length > 0)
+})
+
+const carWashServicesWithoutChildren = computed((): CarWashService[] => {
+  if (!carWashServices.value) {
+    return []
+  }
+  return carWashServices.value.filter((service) => !service.children || service.children.length === 0)
 })
 
 const flattenCarWashServiceIds = computed((): string[] => {
