@@ -21,10 +21,18 @@
             :key="carWashService.id"
           >
             <label
-              class="cursor-pointer"
+              class="cursor-pointer flex flex-col"
               :for="carWashService.id"
             >
-              {{ carWashService.name }}
+              <span>{{ carWashService.name }}</span>
+              <Message
+                v-if="carWashServiceIdToPrice[carWashService.id]"
+                size="small"
+                variant="simple"
+                severity="secondary"
+              >
+                {{ carWashServiceIdToPrice[carWashService.id] }} рублей
+              </Message>
             </label>
             <ToggleSwitch
               :input-id="carWashService.id"
@@ -38,7 +46,6 @@
 
     <CarWashServicePriceUpdateDialog
       :car-wash-service="carWashService"
-      :price="1"
       v-model:visible="isDialogVisible"
       @submit="onUpdateCarWashServicePrice"
     />
@@ -69,6 +76,17 @@ const { data: allCarWashServices, status: allCarWashServicesStatus } = await use
   baseURL: runtimeConfig.public.apiBaseUrl,
   query: { flat: true },
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
+})
+
+const carWashServiceIdToPrice = computed((): Record<string, number> => {
+  if (carWashServices.value === null) {
+    return {}
+  }
+  const idToPrice = {}
+  carWashServices.value.forEach((service) => {
+    idToPrice[service.id] = service.price
+  })
+  return idToPrice
 })
 
 const carWashServiceIdToName = computed((): Record<string, string> => {

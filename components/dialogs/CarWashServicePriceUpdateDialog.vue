@@ -16,6 +16,14 @@
         />
         <label :for="priceInputId">Цена</label>
       </FloatLabel>
+      <Message
+        v-if="price === null"
+        variant="simple"
+        severity="error"
+        size="small"
+      >
+        Введите цену
+      </Message>
     </div>
     <template #footer>
       <div class="w-full flex gap-x-2">
@@ -34,6 +42,7 @@
           icon="pi pi-check"
           type="submit"
           autofocus
+          :disabled="price === null"
         />
       </div>
     </template>
@@ -51,10 +60,9 @@ const visible = defineModel('visible', { required: true, default: false })
 
 const props = defineProps<{
   carWashService?: CarWashService,
-  price: number,
 }>()
 
-const price = ref<number>(props.price)
+const price = ref<number | null>(null)
 
 const onSubmit = (): void => {
   visible.value = false
@@ -62,5 +70,6 @@ const onSubmit = (): void => {
     carWashServiceId: props.carWashService.id,
     price: price.value,
   })
+  price.value = null
 }
 </script>
