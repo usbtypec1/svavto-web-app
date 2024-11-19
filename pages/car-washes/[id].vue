@@ -1,56 +1,41 @@
 <template>
   <div class="flex flex-col gap-y-4">
     <h3 class="text-xl font-semibold">Прайс-лист в автомойке</h3>
-    <template
-      v-for="carWashService in allCarWashServices"
-      :key="carWashService.id"
+    <Card
+      v-for="[parentId, carWashServices] in Object.entries(carWashServicesGroupedByParent)"
+      :key="parentId"
     >
-      <div
-        @click="onUpdateCarWashServiceModelValue(carWashService)"
-        v-if="carWashService.is_countable !== undefined"
-        class="flex justify-between items-center gap-x-2"
+      <template
+        v-if="parentId !== 'undefined'"
+        #title
       >
-        <label
-          class="cursor-pointer"
-          :for="carWashService.id"
-        >
-          {{ carWashService.name }}
-        </label>
-        <ToggleSwitch
-          :input-id="carWashService.id"
-          :model-value="flattenCarWashServiceIds.includes(carWashService.id)"
-          readonly
-        />
-      </div>
-      <Card v-if="carWashService.children !== undefined">
-        <template #title>
-          <p>{{ carWashService.name }}</p>
-          <Divider/>
-        </template>
-        <template #content>
-          <div class="flex flex-col gap-y-4">
-            <div
-              v-for="carWashService in carWashService.children"
-              :key="carWashService.id"
-              @click="onUpdateCarWashServiceModelValue(carWashService)"
-              class="flex justify-between items-center gap-x-2"
+        <p>{{ carWashServiceIdToName[parentId] }}</p>
+        <Divider/>
+      </template>
+      <template #content>
+        <div class="flex flex-col gap-y-4">
+          <div
+            @click="onUpdateCarWashServiceModelValue(carWashService)"
+            class="flex justify-between items-center gap-x-2"
+            v-for="carWashService in carWashServices"
+            :key="carWashService.id"
+          >
+            <label
+              class="cursor-pointer"
+              :for="carWashService.id"
             >
-              <label
-                class="cursor-pointer"
-                :for="carWashService.id"
-              >
-                {{ carWashService.name }}
-              </label>
-              <ToggleSwitch
-                :input-id="carWashService.id"
-                :model-value="flattenCarWashServiceIds.includes(carWashService.id)"
-                readonly
-              />
-            </div>
+              {{ carWashService.name }}
+            </label>
+            <ToggleSwitch
+              :input-id="carWashService.id"
+              :model-value="flattenCarWashServiceIds.includes(carWashService.id)"
+              readonly
+            />
           </div>
-        </template>
-      </Card>
-    </template>
+        </div>
+      </template>
+    </Card>
+
     <CarWashServicePriceUpdateDialog
       :car-wash-service="carWashService"
       :price="1"
@@ -77,25 +62,39 @@ const {
   refresh,
 } = await useFetch(`/car-washes/${carWashId}/services/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
+  query: { flat: true },
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
 })
 const { data: allCarWashServices, status: allCarWashServicesStatus } = await useFetch('/car-washes/services/', {
   baseURL: runtimeConfig.public.apiBaseUrl,
+  query: { flat: true },
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
 })
 
-const carWashServicesWithChildren = computed((): CarWashService[] => {
-  if (!carWashServices.value) {
-    return []
+const carWashServiceIdToName = computed((): Record<string, string> => {
+  if (allCarWashServices.value === null) {
+    return {}
   }
-  return carWashServices.value.filter((service) => service.children && service.children.length > 0)
+  const idToName = {}
+  allCarWashServices.value.forEach((service) => {
+    idToName[service.id] = service.name
+  })
+  return idToName
 })
 
-const carWashServicesWithoutChildren = computed((): CarWashService[] => {
-  if (!carWashServices.value) {
-    return []
+const carWashServicesGroupedByParent = computed((): Record<string, CarWashService[]> => {
+  if (allCarWashServices.value === null) {
+    return {}
   }
-  return carWashServices.value.filter((service) => !service.children || service.children.length === 0)
+  const grouped = {}
+  allCarWashServices.value.forEach((service) => {
+    if (!grouped[service.parent?.id]) {
+      grouped[service.parent?.id] = []
+    }
+    grouped[service.parent?.id].push(service)
+
+  })
+  return grouped
 })
 
 const flattenCarWashServiceIds = computed((): string[] => {
