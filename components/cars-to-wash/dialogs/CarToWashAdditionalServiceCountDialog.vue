@@ -6,7 +6,7 @@
     :header="carWashService?.name"
   >
     <div class="flex flex-col gap-y-1">
-      <label :for="countInputId" class="font-semibold">Цена</label>
+      <label :for="countInputId" class="font-semibold">Количество</label>
       <InputNumber
         v-model.number="count"
         :min="0"
