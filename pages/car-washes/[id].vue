@@ -49,12 +49,18 @@
       v-model:visible="isDialogVisible"
       @submit="onUpdateCarWashServicePrice"
     />
+
+    <MainButton
+      text="Закрыть"
+      @click="close"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { CarWashService } from '~/types/car-wash-services'
 import CarWashServicePriceUpdateDialog from '~/components/dialogs/CarWashServicePriceUpdateDialog.vue'
+import { useWebAppHapticFeedback, useWebAppPopup, useWebApp, MainButton } from 'vue-tg'
 
 const route = useRoute()
 
@@ -62,10 +68,12 @@ const runtimeConfig = useRuntimeConfig()
 
 const carWashId = Number(route.params.id as string)
 
+const { close } = useWebApp()
+const { notificationOccurred } = useWebAppHapticFeedback()
+const { showAlert } = useWebAppPopup()
 
 const {
   data: carWashServices,
-  status: carWashServicesStatus,
   refresh,
 } = await useFetch(`/car-washes/${carWashId}/services/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
@@ -137,20 +145,34 @@ const onUpdateCarWashServicePrice = async ({ carWashServiceId, price }: {
   carWashServiceId: string,
   price: number
 }): Promise<void> => {
-  await $fetch(`/car-washes/${carWashId}/services/${carWashServiceId}/`, {
-    method: 'PUT',
-    baseURL: runtimeConfig.public.apiBaseUrl,
-    body: { price },
-  })
-  await refresh()
+  try {
+    await $fetch(`/car-washes/${carWashId}/services/${carWashServiceId}/`, {
+      method: 'PUT',
+      baseURL: runtimeConfig.public.apiBaseUrl,
+      body: { price },
+    })
+    await refresh()
+    notificationOccurred?.('success')
+  } catch (error) {
+    console.error(error)
+    notificationOccurred?.('error')
+    showAlert?.('Ошибка при обновлении цены')
+  }
 }
 
 const deleteCarWashService = async (carWashServiceId: string): Promise<void> => {
-  await $fetch(`/car-washes/${carWashId}/services/${carWashServiceId}/`, {
-    method: 'DELETE',
-    baseURL: runtimeConfig.public.apiBaseUrl,
-  })
-  await refresh()
+  try {
+    await $fetch(`/car-washes/${carWashId}/services/${carWashServiceId}/`, {
+      method: 'DELETE',
+      baseURL: runtimeConfig.public.apiBaseUrl,
+    })
+    await refresh()
+    notificationOccurred?.('success')
+  } catch (error) {
+    console.error(error)
+    notificationOccurred?.('error')
+    showAlert?.('Ошибка при удалении услуги')
+  }
 }
 
 const onUpdateCarWashServiceModelValue = async (service: CarWashService): Promise<void> => {
