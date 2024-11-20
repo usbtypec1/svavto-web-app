@@ -51,6 +51,10 @@ import { getErrorCodes } from '~/utils/errors'
 import type { CarWash } from '~/types/car-washes'
 import type { ErrorResponseData } from '~/types/errors'
 
+const props = defineProps<{
+  staffId: number,
+}>()
+
 const emit = defineEmits(['submit'])
 
 const { showAlert } = useWebAppPopup()
@@ -60,8 +64,6 @@ const visible = defineModel('visible', { default: false })
 const selectedCarWashId = ref<number | null>(null)
 
 const currentCarWashId = ref<number | null>(null)
-
-const userId = inject(userIdKey)
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -87,7 +89,7 @@ const isValid = computed((): boolean => {
 
 const onSubmit = async (): Promise<void> => {
   try {
-    await $fetch(`/shifts/current/${userId}/car-washes/`, {
+    await $fetch(`/shifts/current/${props.staffId}/car-washes/`, {
       method: 'PATCH',
       body: { car_wash_id: selectedCarWashId.value },
       baseURL: runtimeConfig.public.apiBaseUrl,

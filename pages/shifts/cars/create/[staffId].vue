@@ -5,6 +5,7 @@
     <CarWashChooseDialog
       @submit="refreshCurrentShift"
       v-model:visible="isCarWashChooseDialogVisible"
+      :staff-id
     />
     <CarAddForm
       :is-additional-services-included="isAdditionalServicesIncluded"
