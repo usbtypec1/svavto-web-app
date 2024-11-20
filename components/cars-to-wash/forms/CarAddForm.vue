@@ -218,6 +218,7 @@ const onSubmit = ({ valid, values, originalEvent }: FormSubmitEvent) => {
   if (originalEvent.submitter.id === 'create-without-additional-services') {
     emit('submitWithoutAdditionalServices', values)
   } else if (originalEvent.submitter.id === 'create-with-additional-services') {
+    isAdditionalServicesIncluded.value = true
     emit('submitWithAdditionalServices', values)
   }
 }
