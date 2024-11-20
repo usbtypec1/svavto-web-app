@@ -3,9 +3,9 @@
     v-model:visible="visible"
     modal
     header="Выбрать мойку"
-    class="w-full"
+    class="w-full mx-4"
   >
-    <div class="flex flex-col gap-y-2">
+    <div class="flex flex-col gap-y-4">
       <Select
         v-model="selectedCarWashId"
         :options="carWashes ?? []"
@@ -17,7 +17,7 @@
         :loading="carWashesStatus !== 'success'"
       />
       <Message
-        v-if="currentCarWashId === selectedCarWashId"
+        v-if="isCarWashSameAsCurrent"
         severity="warn"
         icon="pi pi-exclamation-triangle"
       >
@@ -58,9 +58,11 @@ import { getErrorCodes } from '~/utils/errors'
 import type { CarWash } from '~/types/car-washes'
 import type { ErrorResponseData } from '~/types/errors'
 
+const emit = defineEmits(['submit'])
+
 const { showAlert } = useWebAppPopup()
 
-const visible = ref<boolean>(false)
+const visible = defineModel<boolean>('visible', { default: false })
 
 const selectedCarWashId = ref<number | null>(null)
 
@@ -76,7 +78,11 @@ const { data: carWashes, status: carWashesStatus } = await useFetch<CarWash[]>('
 })
 
 const isCarWashSameAsCurrent = computed((): boolean => {
-  return currentCarWashId.value === selectedCarWashId.value
+  return (
+    currentCarWashId.value === selectedCarWashId.value
+    && currentCarWashId.value !== null
+    && selectedCarWashId.value !== null
+  )
 })
 
 const isValid = computed((): boolean => {
@@ -93,9 +99,12 @@ const onSubmit = async (): Promise<void> => {
       body: { car_wash_id: selectedCarWashId.value },
       baseURL: runtimeConfig.public.apiBaseUrl,
     })
-    showAlert?.('Мойка успешно изменена', () => {
-      visible.value = false
-    })
+
+    emit('submit', selectedCarWashId.value)
+    visible.value = false
+    // showAlert('Мойка успешно изменена', () => {
+    //   visible.value = false
+    // })
   } catch (error) {
     const errorCodes = getErrorCodes(error.data as ErrorResponseData)
     if (errorCodes.includes('car_wash_same_as_current')) {
