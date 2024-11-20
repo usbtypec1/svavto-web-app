@@ -79,13 +79,14 @@ const onSubmitCarToWashWithAdditionalServices = (): void => {
 
 const runtimeConfig = useRuntimeConfig()
 
-const userId = inject(userIdKey)
+const route = useRoute()
+const staffId = Number(route.params.staffId as string)
 
 const {
   data: currentShift,
   error: currentShiftError,
   refresh: refreshCurrentShift,
-} = await useFetch<CurrentShift>(`/shifts/current/${userId}/`, {
+} = await useFetch<CurrentShift>(`/shifts/current/${staffId}/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
 })
 
