@@ -1,4 +1,4 @@
-import Aura from '@primevue/themes/aura';
+import Lara from '@primevue/themes/lara';
 
 const locale = {
   accept: 'Подтвердить',
@@ -98,7 +98,7 @@ export default defineNuxtConfig({
   primevue: {
     options: {
       theme: {
-        preset: Aura,
+        preset: Lara,
       },
       locale,
     },
