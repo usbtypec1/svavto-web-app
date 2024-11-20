@@ -4,6 +4,7 @@
     modal
     header="Выбрать мойку"
     class="w-full mx-4"
+    :closable="false"
   >
     <div class="flex flex-col gap-y-4">
       <Select
@@ -34,14 +35,6 @@
         <Button
           class="flex-1"
           type="button"
-          icon="pi pi-times"
-          label="Закрыть"
-          severity="secondary"
-          @click="visible = false"
-        />
-        <Button
-          class="flex-1"
-          type="button"
           icon="pi pi-check"
           label="Сохранить"
           @click="onSubmit"
@@ -62,7 +55,7 @@ const emit = defineEmits(['submit'])
 
 const { showAlert } = useWebAppPopup()
 
-const visible = defineModel<boolean>('visible', { default: false })
+const visible = defineModel('visible', { default: false })
 
 const selectedCarWashId = ref<number | null>(null)
 
@@ -101,10 +94,9 @@ const onSubmit = async (): Promise<void> => {
     })
 
     emit('submit', selectedCarWashId.value)
-    visible.value = false
-    // showAlert('Мойка успешно изменена', () => {
-    //   visible.value = false
-    // })
+    showAlert('Мойка успешно изменена', () => {
+      visible.value = false
+    })
   } catch (error) {
     const errorCodes = getErrorCodes(error.data as ErrorResponseData)
     if (errorCodes.includes('car_wash_same_as_current')) {
