@@ -11,12 +11,17 @@
       @submit-without-additional-services="onAddCarWithoutAdditionalServices"
       @submit-with-additional-services="onAddCarWithAdditionalServices"
     />
-    <CarToWashAdditionalServicesForm
-      v-if="isAdditionalServicesIncluded"
-      v-model:service-id-to-count="serviceIdToCount"
-      :car-wash-services="carWashServices"
-      class="my-6"
-    />
+    <template v-if="isAdditionalServicesIncluded">
+      <CarToWashAdditionalServicesForm
+        v-model:service-id-to-count="serviceIdToCount"
+        :car-wash-services="carWashServices"
+        class="my-6"
+      />
+      <MainButton
+        text="Подтвердить"
+        @click="onSubmitCarToWashWithAdditionalServices"
+      />
+    </template>
   </div>
 </template>
 
@@ -26,7 +31,7 @@ import CarWashChooseDialog from '~/components/car-washes/dialogs/CarWashChooseDi
 import type { CarWashService } from '~/types/car-wash-services'
 import CarAddForm from '~/components/cars-to-wash/forms/CarAddForm.vue'
 import type { CarToWash } from '~/types/cars'
-import { useWebAppPopup, useWebApp } from 'vue-tg'
+import { useWebAppPopup, useWebApp, MainButton } from 'vue-tg'
 import CarToWashAdditionalServicesForm from '~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue'
 import { getErrorCodes } from '~/utils/errors'
 
@@ -86,12 +91,10 @@ const {
 
 const {
   data: carWashServices,
-  refresh: refreshCarWashServices,
-} = useFetch('/car-washes/services/', {
+} = await useFetch('/car-washes/services/', {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
   query: { flat: true },
-  immediate: false,
 })
 
 watchEffect(async () => {
@@ -104,6 +107,5 @@ watchEffect(async () => {
     isCarWashChooseDialogVisible.value = true
     return
   }
-  await refreshCarWashServices()
 })
 </script>

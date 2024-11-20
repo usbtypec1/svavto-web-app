@@ -5,8 +5,13 @@
       v-model:service-id-to-count="serviceIdToCount"
       :car-wash-service="carWashServicePassedToDialog!"
     />
-
     <p class="text-xl font-semibold mb-2">Дополнительные услуги</p>
+    <Message
+      v-if="!carWashServices?.length"
+      severity="warn"
+    >
+      Нет доступных услуг
+    </Message>
     <div class="flex flex-col gap-y-6">
       <Card
         v-for="[serviceParentId, services] in Object.entries(allCarWashServicesGroupedByParentId)"
