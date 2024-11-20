@@ -5,17 +5,16 @@
     class="w-full mx-4"
     :header="carWashService?.name"
   >
-    <div class="py-2">
-      <FloatLabel variant="on">
-        <InputNumber
-          v-model.number="price"
-          :min="0"
-          :max="1_000_000"
-          :input-id="priceInputId"
-          fluid
-        />
-        <label :for="priceInputId">Цена</label>
-      </FloatLabel>
+    <div class="flex flex-col gap-y-1">
+      <label :for="priceInputId" class="font-semibold">Цена</label>
+      <InputNumber
+        v-model.number="price"
+        :min="0"
+        :max="1_000_000"
+        :input-id="priceInputId"
+        fluid
+        :invalid="price === null"
+      />
       <Message
         v-if="price === null"
         variant="simple"
