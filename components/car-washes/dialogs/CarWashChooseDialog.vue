@@ -92,11 +92,9 @@ const onSubmit = async (): Promise<void> => {
       body: { car_wash_id: selectedCarWashId.value },
       baseURL: runtimeConfig.public.apiBaseUrl,
     })
-
     emit('submit', selectedCarWashId.value)
-    showAlert('Мойка успешно изменена', () => {
-      visible.value = false
-    })
+    showAlert('Мойка успешно изменена')
+    visible.value = false
   } catch (error) {
     const errorCodes = getErrorCodes(error.data as ErrorResponseData)
     if (errorCodes.includes('car_wash_same_as_current')) {
