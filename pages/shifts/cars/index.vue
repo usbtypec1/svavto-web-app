@@ -45,7 +45,7 @@ const onAddCarWithoutAdditionalServices = (car: CarToWash): void => {
       class_type: car.classType,
       wash_type: car.washType,
       windshield_washer_refilled_bottle_percentage: car.windshieldWasherRefilledBottlePercentage,
-      additionalServices: [],
+      additional_services: [],
     }))
   })
 }

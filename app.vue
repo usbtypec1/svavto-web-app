@@ -28,7 +28,7 @@ import { userIdKey } from '~/utils/keys'
 
 const webApp = useWebApp()
 
-const userId = webApp?.initDataUnsafe?.user?.id ?? 6125802367
+const userId = webApp?.initDataUnsafe?.user?.id
 
 provide(userIdKey, userId)
 
