@@ -25,3 +25,13 @@ export interface ShiftsConfirmation {
   date: string
   staff_ids: number[]
 }
+
+export interface CurrentShift {
+  id: number
+  date: string
+  car_wash: CarWash | null
+  staff: Staff
+  is_started: boolean
+  is_finished: boolean
+  created_at: string
+}

@@ -3,7 +3,7 @@ export interface Staff {
   full_name: string
   car_sharing_phone_number: string
   console_phone_number: string
-  is_banned: boolean
+  banned_at: string | null
   created_at: string
 }
 
