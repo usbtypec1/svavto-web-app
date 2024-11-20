@@ -53,6 +53,7 @@
     <MainButton
       text="Закрыть"
       @click="close"
+      :visible="!isDialogVisible"
     />
   </div>
 </template>
