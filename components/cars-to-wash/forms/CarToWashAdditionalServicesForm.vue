@@ -1,5 +1,7 @@
 <template>
   <div>
+    {{ carWashServicesIdToName }}
+    {{ carWashServicesGroupedByParentId }}
     <CarToWashAdditionalServiceCountDialog
       v-model:visible="isCarToWashAdditionalServiceCountDialogVisible"
       v-model:service-id-to-count="serviceIdToCount"
@@ -14,14 +16,14 @@
     </Message>
     <div class="flex flex-col gap-y-6">
       <Card
-        v-for="[serviceParentId, services] in Object.entries(allCarWashServicesGroupedByParentId)"
+        v-for="[serviceParentId, services] in Object.entries(carWashServicesGroupedByParentId)"
         :key="serviceParentId"
       >
         <template
           #title
           v-if="serviceParentId !== 'undefined'"
         >
-          {{ allCarWashServicesIdToName[serviceParentId] }}
+          {{ carWashServicesIdToName[serviceParentId] }}
         </template>
         <template #content>
           <div class="flex flex-col gap-y-4">
@@ -29,10 +31,10 @@
               @click="onUpdateCarToWashAdditionalServiceCountModelValue(service)"
               v-for="service in services"
               :key="service.id"
-              class="flex justify-between items-center border-t border-gray-600 pt-4 cursor-pointer"
+              class="flex justify-between items-center border-t border-gray-200 dark:border-gray-600 pt-4 cursor-pointer"
               :class="{ 'first:border-0': serviceParentId === 'undefined'}"
             >
-              <label :for="service.id" class="flex flex-col cursor-pointer">
+              <label class="flex flex-col cursor-pointer select-none">
                 <span>{{ service.name }}</span>
                 <Message
                   v-if="service.is_countable && service.id in serviceIdToCount"
@@ -44,7 +46,6 @@
                 </Message>
               </label>
               <ToggleSwitch
-                :input-id="service.id"
                 :model-value="service.id in serviceIdToCount"
                 readonly
               />
@@ -71,8 +72,8 @@ const serviceIdToCount = defineModel('serviceIdToCount', { required: true, defau
 const isCarToWashAdditionalServiceCountDialogVisible = ref<boolean>(false)
 
 const {
-  groupedByParentId: allCarWashServicesGroupedByParentId,
-  idToName: allCarWashServicesIdToName,
+  groupedByParentId: carWashServicesGroupedByParentId,
+  idToName: carWashServicesIdToName,
 } = useTransformedCarWashServices(toRef(props, 'carWashServices'))
 
 const carWashServicePassedToDialog = ref<CarWashService | null>(null)
