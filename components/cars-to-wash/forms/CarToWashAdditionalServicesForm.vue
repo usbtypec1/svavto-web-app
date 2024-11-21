@@ -1,5 +1,17 @@
 <template>
   <div>
+    <p>
+      {{ allCarWashServices }}
+    </p>
+    <p>
+      {{ carWashServicesIdToName }}
+    </p>
+    <p>
+      {{ carWashServicesGroupedByParentId }}
+    </p>
+    <p>
+      {{ specificCarWashServices }}
+    </p>
     <CarToWashAdditionalServiceCountDialog
       v-model:visible="isCarToWashAdditionalServiceCountDialogVisible"
       v-model:service-id-to-count="serviceIdToCount"
