@@ -3,6 +3,7 @@
     <Title>Добавить машину</Title>
     <p class="text-xl font-semibold mb-2">Добавить авто</p>
     <CarWashChooseDialog
+      v-if="isCarWashChooseDialogVisible"
       @submit="refreshCurrentShift"
       v-model:visible="isCarWashChooseDialogVisible"
       :staff-id
@@ -93,10 +94,12 @@ const {
 
 const {
   data: carWashServices,
-} = await useFetch('/car-washes/services/', {
+  refresh: refreshCarWashServices,
+} = await useFetch((): string => `/car-washes/${currentShift.value.car_wash?.id}/services/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
   query: { flat: true },
+  immediate: false,
 })
 
 watchEffect(async () => {
@@ -109,5 +112,6 @@ watchEffect(async () => {
     isCarWashChooseDialogVisible.value = true
     return
   }
+  await refreshCarWashServices()
 })
 </script>
