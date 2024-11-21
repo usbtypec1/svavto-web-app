@@ -17,7 +17,6 @@
       <CarToWashAdditionalServicesForm
         v-model:service-id-to-count="serviceIdToCount"
         :specific-car-wash-services="specificCarWashServices"
-        :all-car-wash-services="allCarWashServices"
         class="my-6"
       />
       <MainButton
@@ -89,7 +88,7 @@ const {
   data: currentShift,
   error: currentShiftError,
   refresh: refreshCurrentShift,
-} = await useFetch<CurrentShift>(`/shifts/current/${staffId}/`, {
+} = await useFetch(`/shifts/current/${staffId}/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
 })
 
@@ -100,11 +99,6 @@ const {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
   immediate: false,
-})
-
-const { data: allCarWashServices } = await useFetch('/car-washes/services/', {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
 })
 
 watchEffect(async () => {

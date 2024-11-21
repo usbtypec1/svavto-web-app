@@ -3,7 +3,13 @@ import { groupCarWashServicesByParent, mapCarWashServiceIdToName } from '~/utils
 
 export const useTransformedCarWashServices = (carWashServices: Ref<CarWashService[] | null | undefined>) => {
   const groupedByParentId = computed(() => groupCarWashServicesByParent(carWashServices.value ?? []))
-  const idToName = computed(() => mapCarWashServiceIdToName(carWashServices.value ?? []))
+  const idToName = computed(() => {
+    if (!carWashServices.value) return []
+    const parents: CarWashService[] = carWashServices.value
+      .filter(service => !!service.parent)
+      .map(({ parent }) => parent!)
+    return mapCarWashServiceIdToName([...carWashServices.value, ...parents])
+  })
   const ids = computed((): string[] => carWashServices.value?.map((service) => service.id) ?? [])
 
   return {

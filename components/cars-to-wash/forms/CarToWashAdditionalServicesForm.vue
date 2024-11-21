@@ -1,17 +1,5 @@
 <template>
   <div>
-    <p>
-      {{ allCarWashServices }}
-    </p>
-    <p>
-      {{ carWashServicesIdToName }}
-    </p>
-    <p>
-      {{ carWashServicesGroupedByParentId }}
-    </p>
-    <p>
-      {{ specificCarWashServices }}
-    </p>
     <CarToWashAdditionalServiceCountDialog
       v-model:visible="isCarToWashAdditionalServiceCountDialogVisible"
       v-model:service-id-to-count="serviceIdToCount"
@@ -75,7 +63,6 @@ import CarToWashAdditionalServiceCountDialog
 
 const props = defineProps<{
   specificCarWashServices: CarWashService[] | null,
-  allCarWashServices: CarWashService[] | null,
 }>()
 
 const serviceIdToCount = defineModel('serviceIdToCount', { required: true, default: () => ({}) })
@@ -84,8 +71,8 @@ const isCarToWashAdditionalServiceCountDialogVisible = ref<boolean>(false)
 
 const {
   groupedByParentId: carWashServicesGroupedByParentId,
+  idToName: carWashServicesIdToName,
 } = useTransformedCarWashServices(toRef(props, 'specificCarWashServices'))
-const { idToName: carWashServicesIdToName } = useTransformedCarWashServices(toRef(props, 'allCarWashServices'))
 
 const carWashServicePassedToDialog = ref<CarWashService | null>(null)
 

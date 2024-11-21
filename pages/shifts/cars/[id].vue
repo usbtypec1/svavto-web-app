@@ -10,7 +10,6 @@
     <CarToWashAdditionalServicesForm
       v-model:service-id-to-count="serviceIdToCount"
       :specific-car-wash-services="specificCarWashServices"
-      :all-car-wash-services="allCarWashServices"
       class="my-6"
     />
     <MainButton
@@ -51,12 +50,6 @@ const {
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
   immediate: false,
 })
-
-const { data: allCarWashServices } = await useFetch('/car-washes/services/', {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
-})
-
 
 const serializedData = computed((): string => {
   return JSON.stringify({
