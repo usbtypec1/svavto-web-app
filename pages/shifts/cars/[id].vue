@@ -1,104 +1,88 @@
 <template>
-  <div class="flex flex-col gap-y-3">
-    <template v-if="status === 'success'">
-      <Fieldset legend="Данные о машине">
-        <div class="flex flex-col gap-y-2">
-          <div>
-            <span class="font-semibold">Гос.номер: </span>
-            <span>{{ car.number }}</span>
-          </div>
-          <div>
-            <span class="font-semibold">Класс: </span>
-            <span>{{ classType }}</span>
-          </div>
-          <div>
-            <span class="font-semibold">Вид мойки: </span>
-            <span>{{ washType }}</span>
-          </div>
-          <div>
-            <span class="font-semibold">Долив стеклоомывателя: </span>
-            <span>{{ windshieldWasherRefilledBottlePercentage }}</span>
-          </div>
-        </div>
-      </Fieldset>
-      <AdditionalServicesForm
-        v-model="additionalServices"
-      />
-      <MainButton
-        text="Сохранить"
-        @click="onConfirm"
-      />
-    </template>
-    <template v-else>
-      <Message
-        v-if="status === 'error'"
-        severity="error"
-        icon="pi pi-exclamation-triangle"
-      >
-        Не удалось загрузить данные об авто
-      </Message>
-      <MainButton
-        text="Закрыть"
-        @click="close"
-      />
-    </template>
+  <div>
+    <Title>Редактировать доп.услуги</Title>
+    <p class="text-xl font-semibold mb-2">Редактировать доп.услуги</p>
+    <ProgressSpinner v-if="carToWashStatus === 'pending'"/>
+    <CarToWashDetailCard
+      v-else-if="carToWashStatus === 'success'"
+      :car-to-wash="carToWash"
+    />
+    <CarToWashAdditionalServicesForm
+      v-model:service-id-to-count="serviceIdToCount"
+      :car-wash-services="carWashServices"
+      class="my-6"
+    />
+    <MainButton
+      text="Подтвердить"
+      @click="onSubmitCarToWashWithAdditionalServices"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import AdditionalServicesForm from '~/components/forms/AdditionalServicesForm.vue'
+import type { CarWashService } from '~/types/car-wash-services'
 import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
+import CarToWashAdditionalServicesForm from '~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue'
+import CarToWashDetailCard from '~/components/cars-to-wash/cards/CarToWashDetailCard.vue'
 
-const { showConfirm } = useWebAppPopup()
-const { sendData, close } = useWebApp()
+const { showAlert, showConfirm } = useWebAppPopup()
+const { sendData } = useWebApp()
 
-const route = useRoute()
+const isCarWashChooseDialogVisible = ref<boolean>(false)
 
-const carId = Number(route.params.id as string)
+const serviceIdToCount = ref<Record<string, number>>({})
+
+
 const runtimeConfig = useRuntimeConfig()
 
-const washType = computed((): string => {
-  return {
-    'planned': 'плановая',
-    'urgent': 'срочная',
-  }[car.value.wash_type]
+const route = useRoute()
+const carId = Number(route.params.id as string)
+
+const { data: carToWash, status: carToWashStatus } = await useFetch(`/shifts/cars/${carId}/`, {
+  baseURL: runtimeConfig.public.apiBaseUrl,
 })
 
-const classType = computed((): string => {
-  return {
-    'comfort': 'комфорт',
-    'business': 'бизнес',
-    'van': 'фургон',
-  }[car.value.class_type]
+const {
+  data: carWashServices,
+  refresh: refreshCarWashServices,
+} = await useFetch((): string => `/car-washes/${carToWash.value.car_wash?.id}/services/`, {
+  baseURL: runtimeConfig.public.apiBaseUrl,
+  transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
+  query: { flat: true },
+  immediate: false,
 })
-
-const windshieldWasherRefilledBottlePercentage = computed((): string => {
-  const percentage = car.value.windshield_washer_refilled_bottle_percentage
-  return percentage === 0 ? 'нет' : `${percentage}%`
-})
-
-const additionalServices = ref([])
-
-const { data: car, status } = await useFetch(`${runtimeConfig.public.apiBaseUrl}/shifts/cars/${carId}/`)
 
 const serializedData = computed((): string => {
   return JSON.stringify({
-    car_id: carId,
-    additional_services: additionalServices.value,
+    id: carToWash.value.id,
+    additional_services: Object.entries(serviceIdToCount.value).map(([id, count]) => ({ id, count })),
   })
 })
 
-const onConfirm = (): void => {
-  if (additionalServices.value.length === 0) {
-    showConfirm?.(
-      'Вы уверены? Вы не выбрали ни одну услугу и это действие удалит все ранее внесенные данные по автомобилю ${car.value.number}',
-      (ok) => ok && sendData?.(serializedData.value),
-    )
-  } else {
-    showConfirm?.(
-      `Вы уверены? Это действие удалит все ранее внесенные данные по автомобилю ${car.value.number}`,
-      (ok) => ok && sendData?.(serializedData.value),
-    )
+
+const submitConfirmMessage = computed((): string => {
+  if (Object.keys(serviceIdToCount.value).length === 0) {
+    return `Вы уверены? Вы не выбрали ни одну услугу и это действие удалит все ранее внесенные данные по автомобилю ${carToWash.value.number}`
   }
+  return `Вы уверены? Это действие удалит все ранее внесенные данные по автомобилю ${carToWash.value.number}`
+})
+
+const onSubmitCarToWashWithAdditionalServices = (): void => {
+  showConfirm?.(submitConfirmMessage.value, (ok: boolean): void => {
+    if (!ok) return
+    showAlert?.(`Данные по автомобилю ${carToWash.value!.number} записаны`)
+    sendData?.(serializedData.value)
+  })
 }
+
+watchEffect(async () => {
+  if (carToWash.value!.car_wash === null) {
+    isCarWashChooseDialogVisible.value = true
+    return
+  }
+  await refreshCarWashServices()
+  serviceIdToCount.value = Object.fromEntries(
+    carToWash.value.additional_services.map((service) => [service.id, service.count]),
+  )
+})
 </script>

@@ -143,42 +143,17 @@
 </template>
 
 <script setup lang="ts">
-import type { CarToWashDraft, ClassType, WashType } from '~/types/cars'
+import type { CarToWashDraft } from '~/types/cars'
 import { Form, FormField, type FormSubmitEvent } from '@primevue/forms'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod';
+import { classTypeOptions, washTypeOptions } from '~/utils/car-wash-services'
 
 const emit = defineEmits(['submitWithoutAdditionalServices', 'submitWithAdditionalServices'])
 
 const isAdditionalServicesIncluded = ref<boolean>(false)
 
 const initialValues = ref<CarToWashDraft>({})
-
-const classTypeOptions: ClassType[] = [
-  {
-    label: 'Комфорт',
-    value: 'comfort',
-  },
-  {
-    label: 'Бизнес',
-    value: 'business',
-  },
-  {
-    label: 'Фургон',
-    value: 'van',
-  },
-]
-
-const washTypeOptions: WashType[] = [
-  {
-    label: 'Плановая',
-    value: 'planned',
-  },
-  {
-    label: 'Срочная',
-    value: 'urgent',
-  },
-]
 
 const windshieldWasherOptions: string[] = [
   'Без долива',

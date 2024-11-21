@@ -12,3 +12,9 @@ export interface AdditionalServiceParent {
   isIncluded: boolean,
   children: AdditionalServiceItem[]
 }
+
+
+export interface AdditionalService {
+  id: string
+  count: number
+}
