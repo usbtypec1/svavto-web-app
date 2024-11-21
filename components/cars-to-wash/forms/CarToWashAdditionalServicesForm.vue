@@ -64,7 +64,8 @@ import CarToWashAdditionalServiceCountDialog
   from '~/components/cars-to-wash/dialogs/CarToWashAdditionalServiceCountDialog.vue'
 
 const props = defineProps<{
-  carWashServices: CarWashService[] | null,
+  specificCarWashServices: CarWashService[] | null,
+  allCarWashServices: CarWashService[] | null,
 }>()
 
 const serviceIdToCount = defineModel('serviceIdToCount', { required: true, default: () => ({}) })
@@ -73,8 +74,8 @@ const isCarToWashAdditionalServiceCountDialogVisible = ref<boolean>(false)
 
 const {
   groupedByParentId: carWashServicesGroupedByParentId,
-  idToName: carWashServicesIdToName,
-} = useTransformedCarWashServices(toRef(props, 'carWashServices'))
+} = useTransformedCarWashServices(toRef(props, 'specificCarWashServices'))
+const { idToName: carWashServicesIdToName } = useTransformedCarWashServices(toRef(props, 'allCarWashServices'))
 
 const carWashServicePassedToDialog = ref<CarWashService | null>(null)
 

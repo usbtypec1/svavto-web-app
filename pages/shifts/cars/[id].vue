@@ -9,7 +9,8 @@
     />
     <CarToWashAdditionalServicesForm
       v-model:service-id-to-count="serviceIdToCount"
-      :car-wash-services="carWashServices"
+      :specific-car-wash-services="specificCarWashServices"
+      :all-car-wash-services="allCarWashServices"
       class="my-6"
     />
     <MainButton
@@ -43,14 +44,19 @@ const { data: carToWash, status: carToWashStatus } = await useFetch(`/shifts/car
 })
 
 const {
-  data: carWashServices,
-  refresh: refreshCarWashServices,
+  data: specificCarWashServices,
+  refresh: refreshSpecificCarWashServices,
 } = await useFetch((): string => `/car-washes/${carToWash.value.car_wash?.id}/services/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
-  query: { flat: true },
   immediate: false,
 })
+
+const { data: allCarWashServices } = await useFetch('/car-washes/services/', {
+  baseURL: runtimeConfig.public.apiBaseUrl,
+  transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
+})
+
 
 const serializedData = computed((): string => {
   return JSON.stringify({
@@ -80,7 +86,7 @@ watchEffect(async () => {
     isCarWashChooseDialogVisible.value = true
     return
   }
-  await refreshCarWashServices()
+  await refreshSpecificCarWashServices()
   serviceIdToCount.value = Object.fromEntries(
     carToWash.value.additional_services.map((service) => [service.id, service.count]),
   )

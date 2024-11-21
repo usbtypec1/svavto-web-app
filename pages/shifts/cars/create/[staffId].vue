@@ -16,7 +16,8 @@
     <template v-if="isAdditionalServicesIncluded">
       <CarToWashAdditionalServicesForm
         v-model:service-id-to-count="serviceIdToCount"
-        :car-wash-services="carWashServices"
+        :specific-car-wash-services="specificCarWashServices"
+        :all-car-wash-services="allCarWashServices"
         class="my-6"
       />
       <MainButton
@@ -33,7 +34,7 @@ import CarWashChooseDialog from '~/components/car-washes/dialogs/CarWashChooseDi
 import type { CarWashService } from '~/types/car-wash-services'
 import CarAddForm from '~/components/cars-to-wash/forms/CarAddForm.vue'
 import type { CarToWash } from '~/types/cars'
-import { useWebAppPopup, useWebApp, MainButton } from 'vue-tg'
+import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 import CarToWashAdditionalServicesForm from '~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue'
 import { getErrorCodes } from '~/utils/errors'
 
@@ -93,13 +94,17 @@ const {
 })
 
 const {
-  data: carWashServices,
-  refresh: refreshCarWashServices,
+  data: specificCarWashServices,
+  refresh: refreshSpecificCarWashServices,
 } = await useFetch((): string => `/car-washes/${currentShift.value.car_wash?.id}/services/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
-  query: { flat: true },
   immediate: false,
+})
+
+const { data: allCarWashServices } = await useFetch('/car-washes/services/', {
+  baseURL: runtimeConfig.public.apiBaseUrl,
+  transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
 })
 
 watchEffect(async () => {
@@ -112,6 +117,6 @@ watchEffect(async () => {
     isCarWashChooseDialogVisible.value = true
     return
   }
-  await refreshCarWashServices()
+  await refreshSpecificCarWashServices()
 })
 </script>
