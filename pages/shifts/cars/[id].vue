@@ -7,11 +7,27 @@
       v-else-if="carToWashStatus === 'success'"
       :car-to-wash="carToWash"
     />
+    <Message
+      v-if="carToWashStatus === 'error'"
+      severity="error"
+      class="my-2"
+    >
+      Ошибка загрузки данных о машине
+    </Message>
     <CarToWashAdditionalServicesForm
+      v-if="specificCarWashServicesStatus === 'success'"
       v-model:service-id-to-count="serviceIdToCount"
       :specific-car-wash-services="specificCarWashServices"
       class="my-6"
     />
+    <ProgressSpinner v-else-if="specificCarWashServicesStatus === 'pending'"/>
+    <Message
+      v-else-if="specificCarWashServicesStatus === 'error'"
+      severity="error"
+      class="my-2"
+    >
+      Ошибка загрузки доп.услуг
+    </Message>
     <MainButton
       text="Подтвердить"
       @click="onSubmitCarToWashWithAdditionalServices"
@@ -44,6 +60,7 @@ const { data: carToWash, status: carToWashStatus } = await useFetch(`/shifts/car
 
 const {
   data: specificCarWashServices,
+  status: specificCarWashServicesStatus,
   refresh: refreshSpecificCarWashServices,
 } = await useFetch((): string => `/car-washes/${carToWash.value.car_wash?.id}/services/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
