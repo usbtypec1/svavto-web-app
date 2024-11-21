@@ -1,7 +1,5 @@
 <template>
   <div>
-    {{ carWashServicesIdToName }}
-    {{ carWashServicesGroupedByParentId }}
     <CarToWashAdditionalServiceCountDialog
       v-model:visible="isCarToWashAdditionalServiceCountDialogVisible"
       v-model:service-id-to-count="serviceIdToCount"
@@ -9,7 +7,7 @@
     />
     <p class="text-xl font-semibold mb-2">Дополнительные услуги</p>
     <Message
-      v-if="!carWashServices?.length"
+      v-if="!specificCarWashServices?.length"
       severity="warn"
     >
       Нет доступных услуг
