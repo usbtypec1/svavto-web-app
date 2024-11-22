@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-y-4">
     <h3 class="text-xl font-semibold">Прайс-лист в автомойке</h3>
     <Card
-      v-for="[parentId, carWashServices] in Object.entries(carWashServicesGroupedByParent)"
+      v-for="[parentId, carWashServices] in Object.entries(carWashServicesToGroupedByParent)"
       :key="parentId"
     >
       <template
@@ -10,15 +10,16 @@
         #title
       >
         <p>{{ carWashServiceIdToName[parentId] }}</p>
-        <Divider/>
       </template>
       <template #content>
         <div class="flex flex-col gap-y-4">
           <div
             @click="onUpdateCarWashServiceModelValue(carWashService)"
-            class="flex justify-between items-center gap-x-2"
+            class="flex justify-between items-center gap-x-2 border-t border-gray-200 dark:border-gray-600 pt-4 cursor-pointer"
             v-for="carWashService in carWashServices"
             :key="carWashService.id"
+            :class="{ 'first:border-0': parentId === 'undefined'}"
+
           >
             <label
               class="cursor-pointer flex flex-col"
@@ -36,7 +37,7 @@
             </label>
             <ToggleSwitch
               :input-id="carWashService.id"
-              :model-value="flattenCarWashServiceIds.includes(carWashService.id)"
+              :model-value="specificCarWashServiceIds.includes(carWashService.id)"
               readonly
             />
           </div>
@@ -74,70 +75,26 @@ const { notificationOccurred } = useWebAppHapticFeedback()
 const { showAlert } = useWebAppPopup()
 
 const {
-  data: carWashServices,
+  data: specificCarWashServices,
   refresh,
 } = await useFetch(`/car-washes/${carWashId}/services/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
-  query: { flat: true },
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
 })
-const { data: allCarWashServices, status: allCarWashServicesStatus } = await useFetch('/car-washes/services/', {
+const { data: allCarWashServices } = await useFetch('/car-washes/services/', {
   baseURL: runtimeConfig.public.apiBaseUrl,
-  query: { flat: true },
   transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
 })
 
-const carWashServiceIdToPrice = computed((): Record<string, number> => {
-  if (carWashServices.value === null) {
-    return {}
-  }
-  const idToPrice = {}
-  carWashServices.value.forEach((service) => {
-    idToPrice[service.id] = service.price
-  })
-  return idToPrice
-})
+const {
+  idToName: carWashServiceIdToName,
+  groupedByParentId: carWashServicesToGroupedByParent,
+  idToPrice: carWashServiceIdToPrice,
+} = useTransformedCarWashServices(allCarWashServices)
 
-const carWashServiceIdToName = computed((): Record<string, string> => {
-  if (allCarWashServices.value === null) {
-    return {}
-  }
-  const idToName = {}
-  allCarWashServices.value.forEach((service) => {
-    idToName[service.id] = service.name
-  })
-  return idToName
-})
-
-const carWashServicesGroupedByParent = computed((): Record<string, CarWashService[]> => {
-  if (allCarWashServices.value === null) {
-    return {}
-  }
-  const grouped = {}
-  allCarWashServices.value.forEach((service) => {
-    if (!grouped[service.parent?.id]) {
-      grouped[service.parent?.id] = []
-    }
-    grouped[service.parent?.id].push(service)
-
-  })
-  return grouped
-})
-
-const flattenCarWashServiceIds = computed((): string[] => {
-  if (!carWashServices.value) {
-    return []
-  }
-  const ids = []
-  const extractIds = (service) => {
-    ids.push(service.id)
-    if (service.children && service.children.length > 0) {
-      service.children.forEach(extractIds)
-    }
-  }
-  carWashServices.value.forEach(extractIds)
-  return ids
-})
+const {
+  ids: specificCarWashServiceIds,
+} = useTransformedCarWashServices(specificCarWashServices)
 
 const isDialogVisible = ref<boolean>(false)
 const carWashService = ref<CarWashService>()
@@ -177,7 +134,7 @@ const deleteCarWashService = async (carWashServiceId: string): Promise<void> => 
 }
 
 const onUpdateCarWashServiceModelValue = async (service: CarWashService): Promise<void> => {
-  const isToggled = flattenCarWashServiceIds.value.includes(service.id)
+  const isToggled = specificCarWashServiceIds.value.includes(service.id)
   if (!isToggled) {
     carWashService.value = service
     isDialogVisible.value = true

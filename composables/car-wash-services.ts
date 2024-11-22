@@ -12,9 +12,19 @@ export const useTransformedCarWashServices = (carWashServices: Ref<CarWashServic
   })
   const ids = computed((): string[] => carWashServices.value?.map((service) => service.id) ?? [])
 
+  const idToPrice = computed(() => {
+    if (!carWashServices.value) return []
+    return Object.fromEntries(
+      carWashServices.value
+        .filter(({ price }) => !!price)
+        .map(({ id, price }) => [id, price]),
+    )
+  })
+
   return {
     groupedByParentId,
     idToName,
     ids,
+    idToPrice,
   }
 }
