@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { useWebAppPopup } from 'vue-tg'
 import { getErrorCodes } from '~/utils/errors'
-import type { CarWash } from '~/types/car-washes'
+import type { CarWashListItem } from '~/types/car-washes'
 import type { ErrorResponseData } from '~/types/errors'
 
 const props = defineProps<{
@@ -67,9 +67,9 @@ const currentCarWashId = ref<number | null>(null)
 
 const runtimeConfig = useRuntimeConfig()
 
-const { data: carWashes, status: carWashesStatus } = await useFetch<CarWash[]>('/car-washes/', {
+const { data: carWashes, status: carWashesStatus } = await useFetch<CarWashListItem[]>('/car-washes/', {
   baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { car_washes: CarWash[] }): CarWash[] => data.car_washes,
+  transform: (data: { car_washes: CarWashListItem[] }): CarWashListItem[] => data.car_washes,
 })
 
 const isCarWashSameAsCurrent = computed((): boolean => {

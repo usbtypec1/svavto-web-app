@@ -1,4 +1,4 @@
-import type { CarWash } from '~/types/car-washes'
+import type { CarWashListItem } from '~/types/car-washes'
 import type { Staff } from '~/types/staff'
 
 export interface Shift {
@@ -8,13 +8,13 @@ export interface Shift {
   started_at: string | null
   finished_at: string | null
   created_at: string
-  car_wash: CarWash
+  car_wash: CarWashListItem
 }
 
 export interface ShiftListItem {
   id: number
   date: string
-  car_wash: CarWash | null
+  car_wash: CarWashListItem | null
   staff: Staff
   is_started: boolean
   is_finished: boolean
@@ -29,7 +29,7 @@ export interface ShiftsConfirmation {
 export interface CurrentShift {
   id: number
   date: string
-  car_wash: CarWash | null
+  car_wash: CarWashListItem | null
   staff: Staff
   is_started: boolean
   is_finished: boolean
