@@ -61,19 +61,19 @@ const fields = [
     initialValue: "Ул. Пушкина, д. Колотушкина",
   },
   {
-    name: "comfort_class_car_transfer_price",
+    name: "comfort_class_car_washing_price",
     label: "Комплекс комфорт класс",
     type: "number",
     initialValue: 0,
   },
   {
-    name: "business_class_car_transfer_price",
+    name: "business_class_car_washing_price",
     label: "Комплекс бизнес класс",
     type: "number",
     initialValue: 0,
   },
   {
-    name: "van_transfer_price",
+    name: "van_washing_price",
     label: "Комплекс фургонов",
     type: "number",
     initialValue: 0,
@@ -93,13 +93,13 @@ const resolver = ref(
         .string()
         .min(1, { message: "Минимальная длина названия - 1 символ" })
         .max(100, { message: "Максимальная длина названия - 100 символов" }),
-      comfort_class_car_transfer_price: z
+      comfort_class_car_washing_price: z
         .number({ message: "Введите цену " })
         .min(0),
-      business_class_car_transfer_price: z
+      business_class_car_washing_price: z
         .number({ message: "Введите цену " })
         .min(0),
-      van_transfer_price: z.number({ message: "Введите цену " }).min(0),
+      van_washing_price: z.number({ message: "Введите цену " }).min(0),
       windshield_washer_price_per_bottle: z
         .number({ message: "Введите цену " })
         .min(0),

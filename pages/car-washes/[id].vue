@@ -134,10 +134,9 @@ const services = computed(() => carWash?.value?.services ?? [])
 const {
   idToName: carWashServiceIdToName,
   groupedByParentId: carWashServicesToGroupedByParent,
-  idToPrice: carWashServiceIdToPrice,
 } = useTransformedCarWashServices(allCarWashServices)
 
-const { ids: specificCarWashServiceIds } =
+const { ids: specificCarWashServiceIds, idToPrice: carWashServiceIdToPrice } =
   useTransformedCarWashServices(services)
 
 const isDialogVisible = ref<boolean>(false)
