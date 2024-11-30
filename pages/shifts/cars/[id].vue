@@ -2,16 +2,12 @@
   <div>
     <Title>Редактировать доп.услуги</Title>
     <p class="text-xl font-semibold mb-2">Редактировать доп.услуги</p>
-    <ProgressSpinner v-if="carToWashStatus === 'pending'"/>
+    <ProgressSpinner v-if="carToWashStatus === 'pending'" />
     <CarToWashDetailCard
       v-else-if="carToWashStatus === 'success'"
       :car-to-wash="carToWash"
     />
-    <Message
-      v-if="carToWashStatus === 'error'"
-      severity="error"
-      class="my-2"
-    >
+    <Message v-if="carToWashStatus === 'error'" severity="error" class="my-2">
       Ошибка загрузки данных о машине
     </Message>
     <CarToWashAdditionalServicesForm
@@ -20,7 +16,7 @@
       :specific-car-wash-services="specificCarWashServices"
       class="my-6"
     />
-    <ProgressSpinner v-else-if="specificCarWashServicesStatus === 'pending'"/>
+    <ProgressSpinner v-else-if="specificCarWashServicesStatus === 'pending'" />
     <Message
       v-else-if="specificCarWashServicesStatus === 'error'"
       severity="error"
@@ -36,10 +32,10 @@
 </template>
 
 <script setup lang="ts">
-import type { CarWashService } from '~/types/car-wash-services'
-import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
-import CarToWashAdditionalServicesForm from '~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue'
-import CarToWashDetailCard from '~/components/cars-to-wash/cards/CarToWashDetailCard.vue'
+import type { CarWashService } from "~/types/car-wash-services"
+import { MainButton, useWebApp, useWebAppPopup } from "vue-tg"
+import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
+import CarToWashDetailCard from "~/components/cars-to-wash/cards/CarToWashDetailCard.vue"
 
 const { showAlert, showConfirm } = useWebAppPopup()
 const { sendData } = useWebApp()
@@ -48,33 +44,40 @@ const isCarWashChooseDialogVisible = ref<boolean>(false)
 
 const serviceIdToCount = ref<Record<string, number>>({})
 
-
 const runtimeConfig = useRuntimeConfig()
 
 const route = useRoute()
 const carId = Number(route.params.id as string)
 
-const { data: carToWash, status: carToWashStatus } = await useFetch(`/shifts/cars/${carId}/`, {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-})
+const { data: carToWash, status: carToWashStatus } = await useFetch(
+  `/shifts/cars/${carId}/`,
+  {
+    baseURL: runtimeConfig.public.apiBaseUrl,
+  },
+)
 
 const {
   data: specificCarWashServices,
   status: specificCarWashServicesStatus,
   refresh: refreshSpecificCarWashServices,
-} = await useFetch((): string => `/car-washes/${carToWash.value.car_wash?.id}/services/`, {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
-  immediate: false,
-})
+} = await useFetch(
+  (): string => `/car-washes/${carToWash.value.car_wash?.id}/`,
+  {
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    transform: (data: { services: CarWashService[] }): CarWashService[] =>
+      data.services,
+    immediate: false,
+  },
+)
 
 const serializedData = computed((): string => {
   return JSON.stringify({
     id: carToWash.value.id,
-    additional_services: Object.entries(serviceIdToCount.value).map(([id, count]) => ({ id, count })),
+    additional_services: Object.entries(serviceIdToCount.value).map(
+      ([id, count]) => ({ id, count }),
+    ),
   })
 })
-
 
 const submitConfirmMessage = computed((): string => {
   if (Object.keys(serviceIdToCount.value).length === 0) {
@@ -98,7 +101,10 @@ watchEffect(async () => {
   }
   await refreshSpecificCarWashServices()
   serviceIdToCount.value = Object.fromEntries(
-    carToWash.value.additional_services.map((service) => [service.id, service.count]),
+    carToWash.value.additional_services.map((service) => [
+      service.id,
+      service.count,
+    ]),
   )
 })
 </script>
