@@ -1,5 +1,10 @@
 import type { CarWashService } from '~/types/car-wash-services'
 
+export interface CarWashIdAndName {
+  id: number
+  name: string
+}
+
 export interface CarWashListItem {
   id: number
   name: string

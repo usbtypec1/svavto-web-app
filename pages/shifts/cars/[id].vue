@@ -5,20 +5,20 @@
     <ProgressSpinner v-if="carToWashStatus === 'pending'" />
     <CarToWashDetailCard
       v-else-if="carToWashStatus === 'success'"
-      :car-to-wash="carToWash"
+      :car-to-wash="carToWash!"
     />
     <Message v-if="carToWashStatus === 'error'" severity="error" class="my-2">
       Ошибка загрузки данных о машине
     </Message>
     <CarToWashAdditionalServicesForm
-      v-if="specificCarWashServicesStatus === 'success'"
+      v-if="carWashStatus === 'success'"
       v-model:service-id-to-count="serviceIdToCount"
-      :specific-car-wash-services="specificCarWashServices"
+      :specific-car-wash-services="carWash!.services"
       class="my-6"
     />
-    <ProgressSpinner v-else-if="specificCarWashServicesStatus === 'pending'" />
+    <ProgressSpinner v-else-if="carWashStatus === 'pending'" />
     <Message
-      v-else-if="specificCarWashServicesStatus === 'error'"
+      v-else-if="carWashStatus === 'error'"
       severity="error"
       class="my-2"
     >
@@ -32,10 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import type { CarWashService } from "~/types/car-wash-services"
 import { MainButton, useWebApp, useWebAppPopup } from "vue-tg"
 import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
 import CarToWashDetailCard from "~/components/cars-to-wash/cards/CarToWashDetailCard.vue"
+import type { CarToWashDetail } from "~/types/cars"
+import type { CarWashWithServices } from "~/types/car-washes"
 
 const { showAlert, showConfirm } = useWebAppPopup()
 const { sendData } = useWebApp()
@@ -49,30 +50,26 @@ const runtimeConfig = useRuntimeConfig()
 const route = useRoute()
 const carId = Number(route.params.id as string)
 
-const { data: carToWash, status: carToWashStatus } = await useFetch(
-  `/shifts/cars/${carId}/`,
-  {
+const { data: carToWash, status: carToWashStatus } =
+  await useFetch<CarToWashDetail>(`/shifts/cars/${carId}/`, {
     baseURL: runtimeConfig.public.apiBaseUrl,
-  },
-)
+  })
 
 const {
-  data: specificCarWashServices,
-  status: specificCarWashServicesStatus,
-  refresh: refreshSpecificCarWashServices,
-} = await useFetch(
-  (): string => `/car-washes/${carToWash.value.car_wash?.id}/`,
+  data: carWash,
+  status: carWashStatus,
+  refresh: refreshCarWash,
+} = await useFetch<CarWashWithServices>(
+  (): string => `/car-washes/${carToWash.value!.car_wash?.id}/`,
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
-    transform: (data: { services: CarWashService[] }): CarWashService[] =>
-      data.services,
     immediate: false,
   },
 )
 
 const serializedData = computed((): string => {
   return JSON.stringify({
-    id: carToWash.value.id,
+    id: carToWash.value!.id,
     additional_services: Object.entries(serviceIdToCount.value).map(
       ([id, count]) => ({ id, count }),
     ),
@@ -81,9 +78,9 @@ const serializedData = computed((): string => {
 
 const submitConfirmMessage = computed((): string => {
   if (Object.keys(serviceIdToCount.value).length === 0) {
-    return `Вы уверены? Вы не выбрали ни одну услугу и это действие удалит все ранее внесенные данные по автомобилю ${carToWash.value.number}`
+    return `Вы уверены? Вы не выбрали ни одну услугу и это действие удалит все ранее внесенные данные по автомобилю ${carToWash.value!.number}`
   }
-  return `Вы уверены? Это действие удалит все ранее внесенные данные по автомобилю ${carToWash.value.number}`
+  return `Вы уверены? Это действие удалит все ранее внесенные данные по автомобилю ${carToWash.value!.number}`
 })
 
 const onSubmitCarToWashWithAdditionalServices = (): void => {
@@ -95,11 +92,12 @@ const onSubmitCarToWashWithAdditionalServices = (): void => {
 }
 
 watchEffect(async () => {
-  if (carToWash.value!.car_wash === null) {
+  if (carToWash.value === null) return
+  if (carToWash.value.car_wash === null) {
     isCarWashChooseDialogVisible.value = true
     return
   }
-  await refreshSpecificCarWashServices()
+  await refreshCarWash()
   serviceIdToCount.value = Object.fromEntries(
     carToWash.value.additional_services.map((service) => [
       service.id,

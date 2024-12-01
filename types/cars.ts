@@ -1,4 +1,5 @@
 import type { AdditionalService } from '~/types/additional-services'
+import type { CarWashIdAndName } from '~/types/car-washes'
 
 export type ClassTypeValue = 'comfort' | 'business' | 'van'
 export type WashTypeValue = 'planned' | 'urgent'
@@ -31,4 +32,5 @@ export interface CarToWashDetail {
   windshield_washer_refilled_bottle_percentage: number
   created_at: string
   additional_services: AdditionalService[]
+  car_wash: CarWashIdAndName
 }
