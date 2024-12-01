@@ -16,7 +16,7 @@
     <template v-if="isAdditionalServicesIncluded">
       <CarToWashAdditionalServicesForm
         v-model:service-id-to-count="serviceIdToCount"
-        :specific-car-wash-services="specificCarWashServices"
+        :specific-car-wash-services="carWash?.services"
         class="my-6"
       />
       <MainButton
@@ -28,14 +28,15 @@
 </template>
 
 <script setup lang="ts">
-import type { CurrentShift } from '~/types/shifts'
-import CarWashChooseDialog from '~/components/car-washes/dialogs/CarWashChooseDialog.vue'
-import type { CarWashService } from '~/types/car-wash-services'
-import CarAddForm from '~/components/cars-to-wash/forms/CarAddForm.vue'
-import type { CarToWash } from '~/types/cars'
-import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
-import CarToWashAdditionalServicesForm from '~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue'
-import { getErrorCodes } from '~/utils/errors'
+import CarWashChooseDialog from "~/components/car-washes/dialogs/CarWashChooseDialog.vue"
+import type { CarWashService } from "~/types/car-wash-services"
+import type { CarToWash } from "~/types/cars"
+import type { CarWashWithServices } from "~/types/car-washes"
+import CarAddForm from "~/components/cars-to-wash/forms/CarAddForm.vue"
+import { MainButton, useWebApp, useWebAppPopup } from "vue-tg"
+import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
+import { getErrorCodes } from "~/utils/errors"
+import type { CurrentShift } from "~/types/shifts"
 
 const { showAlert, showConfirm } = useWebAppPopup()
 const { sendData } = useWebApp()
@@ -44,17 +45,23 @@ const isCarWashChooseDialogVisible = ref<boolean>(false)
 const isAdditionalServicesIncluded = ref<boolean>(false)
 
 const onAddCarWithoutAdditionalServices = (car: CarToWash): void => {
-  showConfirm?.(`Записать автомобиль ${car.number} в список выполненных?`, (ok: boolean): void => {
-    if (!ok) return
-    showAlert?.(`Данные по автомобилю ${car.number} записаны`)
-    sendData?.(JSON.stringify({
-      number: car.number,
-      class_type: car.classType,
-      wash_type: car.washType,
-      windshield_washer_refilled_bottle_percentage: car.windshieldWasherRefilledBottlePercentage,
-      additional_services: [],
-    }))
-  })
+  showConfirm?.(
+    `Записать автомобиль ${car.number} в список выполненных?`,
+    (ok: boolean): void => {
+      if (!ok) return
+      showAlert?.(`Данные по автомобилю ${car.number} записаны`)
+      sendData?.(
+        JSON.stringify({
+          number: car.number,
+          class_type: car.classType,
+          wash_type: car.washType,
+          windshield_washer_refilled_bottle_percentage:
+            car.windshieldWasherRefilledBottlePercentage,
+          additional_services: [],
+        }),
+      )
+    },
+  )
 }
 
 const carToWash = ref<CarToWash>()
@@ -66,17 +73,25 @@ const onAddCarWithAdditionalServices = (car: CarToWash): void => {
 }
 
 const onSubmitCarToWashWithAdditionalServices = (): void => {
-  showConfirm?.(`Записать автомобиль ${carToWash.value!.number} в список выполненных?`, (ok: boolean): void => {
-    if (!ok) return
-    showAlert?.(`Данные по автомобилю ${carToWash.value!.number} записаны`)
-    sendData?.(JSON.stringify({
-      number: carToWash.value!.number,
-      class_type: carToWash.value!.classType,
-      wash_type: carToWash.value!.washType,
-      windshield_washer_refilled_bottle_percentage: carToWash.value!.windshieldWasherRefilledBottlePercentage,
-      additional_services: Object.entries(serviceIdToCount.value).map(([id, count]) => ({ id, count })),
-    }))
-  })
+  showConfirm?.(
+    `Записать автомобиль ${carToWash.value!.number} в список выполненных?`,
+    (ok: boolean): void => {
+      if (!ok) return
+      showAlert?.(`Данные по автомобилю ${carToWash.value!.number} записаны`)
+      sendData?.(
+        JSON.stringify({
+          number: carToWash.value!.number,
+          class_type: carToWash.value!.classType,
+          wash_type: carToWash.value!.washType,
+          windshield_washer_refilled_bottle_percentage:
+            carToWash.value!.windshieldWasherRefilledBottlePercentage,
+          additional_services: Object.entries(serviceIdToCount.value).map(
+            ([id, count]) => ({ id, count }),
+          ),
+        }),
+      )
+    },
+  )
 }
 
 const runtimeConfig = useRuntimeConfig()
@@ -88,29 +103,32 @@ const {
   data: currentShift,
   error: currentShiftError,
   refresh: refreshCurrentShift,
-} = await useFetch(`/shifts/current/${staffId}/`, {
+} = await useFetch<CurrentShift>(`/shifts/current/${staffId}/`, {
   baseURL: runtimeConfig.public.apiBaseUrl,
 })
 
 const {
-  data: specificCarWashServices,
-  refresh: refreshSpecificCarWashServices,
-} = await useFetch((): string => `/car-washes/${currentShift.value.car_wash?.id}/services/`, {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { services: CarWashService[] }): CarWashService[] => data.services,
-  immediate: false,
-})
+  data: carWash,
+  status: carWashStatus,
+  refresh: refreshCarWash,
+} = await useFetch<CarWashWithServices>(
+  (): string => `/car-washes/${currentShift.value!.car_wash?.id}/`,
+  {
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    immediate: false,
+  },
+)
 
 watchEffect(async () => {
   const errorCodes = getErrorCodes(currentShiftError.value?.data)
-  if (errorCodes.includes('staff_has_no_active_shift')) {
-    await navigateTo({ name: 'shifts-no-active' })
+  if (errorCodes.includes("staff_has_no_active_shift")) {
+    await navigateTo({ name: "shifts-no-active" })
     return
   }
   if (currentShift.value!.car_wash === null) {
     isCarWashChooseDialogVisible.value = true
     return
   }
-  await refreshSpecificCarWashServices()
+  await refreshCarWash()
 })
 </script>
