@@ -42,8 +42,8 @@ const selectedShiftId = ref<number | null>(null)
 
 const serializedData = computed((): string =>
   JSON.stringify({
-    staffId,
-    shiftId: selectedShiftId.value,
+    staff_id: staffId,
+    shift_id: selectedShiftId.value,
   }),
 )
 
