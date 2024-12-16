@@ -2,6 +2,7 @@
   <div>
     <Title>Добавить машину</Title>
     <p class="text-xl font-semibold mb-2">Добавить авто</p>
+    <p class="text-lg font-semibold mb-2">{{  carWash?.name  }}</p>
     <CarWashChooseDialog
       v-if="isCarWashChooseDialogVisible"
       @submit="refreshCurrentShift"
