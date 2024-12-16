@@ -2,6 +2,7 @@
   <div>
     <Title>Редактировать доп.услуги</Title>
     <p class="text-xl font-semibold mb-2">Редактировать доп.услуги</p>
+    <p class="text-lg font-semibold mb-2">{{  carWash?.name  }}</p>
     <ProgressSpinner v-if="carToWashStatus === 'pending'" />
     <CarToWashDetailCard
       v-else-if="carToWashStatus === 'success'"
