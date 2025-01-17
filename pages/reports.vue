@@ -26,13 +26,24 @@
       >
         Данные не найдены
       </Message>
-      <div class="flex flex-col gap-y-3 my-3">
-        <ReportCardItem
-          v-for="shiftStatistics in data![0].shifts_statistics"
-          :shift-statistics="shiftStatistics"
-          :key="shiftStatistics.shift_date"
-        />
-      </div>
+      <template v-else>
+        <Message
+          v-if="data![0].shifts_statistics.length === 0"
+          severity="warn"
+          variant="simple"
+          class="my-2"
+          size="large"
+        >
+          У вас не было смен за выбранный период
+        </Message>
+        <div class="flex flex-col gap-y-3 my-3">
+          <ReportCardItem
+            v-for="shiftStatistics in data![0].shifts_statistics"
+            :shift-statistics="shiftStatistics"
+            :key="shiftStatistics.shift_date"
+          />
+        </div>
+      </template>
     </template>
   </div>
 </template>
