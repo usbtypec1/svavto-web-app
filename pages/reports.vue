@@ -16,9 +16,9 @@
       />
     </div>
 
-    <template v-if="status === 'success'">
+    <template v-if="staffShiftsStatisticsStatus === 'success'">
       <Message
-        v-if="data!.length === 0"
+        v-if="staffShiftsStatistics!.length === 0"
         severity="error"
         variant="simple"
         class="my-2"
@@ -28,7 +28,7 @@
       </Message>
       <template v-else>
         <Message
-          v-if="data![0].shifts_statistics.length === 0"
+          v-if="staffShiftsStatistics![0].shifts_statistics.length === 0"
           severity="warn"
           variant="simple"
           class="my-2"
@@ -38,18 +38,28 @@
         </Message>
         <div class="flex flex-col gap-y-3 my-3">
           <ReportCardItem
-            v-for="shiftStatistics in data![0].shifts_statistics"
+            v-for="shiftStatistics in staffShiftsStatistics![0].shifts_statistics"
             :shift-statistics="shiftStatistics"
             :key="shiftStatistics.shift_date"
           />
         </div>
       </template>
     </template>
+    <Message
+      v-else-if="staffShiftsStatisticsStatus === 'error'"
+      severity="error"
+      variant="simple"
+      class="my-2"
+      size="large"
+    >
+      Произошла ошибка при загрузке данных
+    </Message>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { ReportPeriod } from "~/types/report-periods"
+import type { StaffShiftsStatistics } from "~/types/reports"
 
 const formatPeriod = ({ fromDate, toDate }: ReportPeriod): string => {
   return `${dateToDDMMYYYY(fromDate)}-${dateToDDMMYYYY(toDate)}`
@@ -85,15 +95,15 @@ const queryParams = computed(() => ({
   staff_ids: userId,
 }))
 const selectedReportPeriod = ref<ReportPeriod>()
-const { data, execute, status } = useFetch(
-  "/economics/reports/staff-shifts-statistics/",
-  {
+const { data: staffShiftsStatistics, status: staffShiftsStatisticsStatus } =
+  useFetch("/economics/reports/staff-shifts-statistics/", {
     baseURL: runtimeConfig.public.apiBaseUrl,
     immediate: false,
     query: queryParams,
-    transform(data: { staff_list: any[] }): any[] {
+    transform(data: {
+      staff_list: StaffShiftsStatistics[]
+    }): StaffShiftsStatistics[] {
       return data.staff_list
     },
-  },
-)
+  })
 </script>
