@@ -14,7 +14,7 @@
     "@pinia/nuxt": "^0.5.5",
     "@primevue/forms": "^4.2.1",
     "@primevue/themes": "^4.2.1",
-    "dayjs": "^1.11.13",
+    "date-fns": "^4.1.0",
     "nuxt": "^3.13.0",
     "pinia": "^2.2.4",
     "primeicons": "^7.0.0",

@@ -1,4 +1,4 @@
 export interface ReportPeriod {
-    fromDate: Date
-    toDate: Date
+    from_date: string
+    to_date: string
 }

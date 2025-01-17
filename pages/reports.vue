@@ -1,22 +1,60 @@
 <template>
   <div>
-    <p class="font-semibold text-lg">Выберите промежуток отчетного периода</p>
-    <DatePicker
-      v-model="reportPeriodDates"
-      selection-mode="range"
-      :manual-input="false"
-      fluid
-    />
-    <div v-if="reportPeriods.length > 0" class="my-3">
-      <p class="font-semibold text-md">Выберите отчетный период</p>
-      <Listbox
-        v-model="selectedReportPeriod"
-        :options="reportPeriods"
-        :option-label="formatPeriod"
-      />
-    </div>
+    <template v-if="reportPeriodsStatus === 'pending'">
+      <Skeleton v-for="key in 3" :key="key" height="2rem" class="mb-2" />
+    </template>
+    <template v-else-if="reportPeriodsStatus === 'success'">
+      <section v-if="reportPeriods!.length > 0" class="flex flex-col gap-y-3">
+        <p class="font-semibold text-lg">Выберите отчетный период</p>
+        <Listbox
+          v-model="reportPeriod"
+          :options="reportPeriods!"
+          :option-label="formatPeriod"
+        />
+      </section>
+      <Message
+        v-else
+        severity="error"
+        variant="simple"
+        class="my-2"
+        size="large"
+      >
+        У вас не было смен за выбранный период
+      </Message>
+    </template>
+    <Message
+      v-else-if="reportPeriodsStatus === 'error'"
+      severity="error"
+      variant="simple"
+      class="my-2"
+      size="large"
+    >
+      Произошла ошибка при загрузке данных
+    </Message>
 
     <template v-if="staffShiftsStatisticsStatus === 'success'">
+      <template v-if="staffShiftsStatistics!.length > 0">
+        <ReportCardTotalStatistics
+          :shifts-statistics="staffShiftsStatistics![0].shifts_statistics"
+          class="my-3"
+        />
+        <Inplace>
+          <template #display>
+            <span class="pi pi-list mr-1.5"></span>
+            <span class="text-lg">Подробнее</span>
+          </template>
+          <template #content>
+            <div class="flex flex-col gap-y-3 my-3">
+              <ReportCardItem
+                v-for="shiftStatistics in staffShiftsStatistics![0].shifts_statistics"
+                :shift-statistics="shiftStatistics"
+                :key="shiftStatistics.shift_date"
+              />
+            </div>
+          </template>
+        </Inplace>
+      </template>
+
       <Message
         v-if="staffShiftsStatistics!.length === 0"
         severity="error"
@@ -26,30 +64,15 @@
       >
         Данные не найдены
       </Message>
-      <template v-else>
-        <Message
-          v-if="staffShiftsStatistics![0].shifts_statistics.length === 0"
-          severity="warn"
-          variant="simple"
-          class="my-2"
-          size="large"
-        >
-          У вас не было смен за выбранный период
-        </Message>
-        <div class="flex flex-col gap-y-3 my-3">
-          <ReportCardItem
-            v-for="shiftStatistics in staffShiftsStatistics![0].shifts_statistics"
-            :shift-statistics="shiftStatistics"
-            :key="shiftStatistics.shift_date"
-          />
-        </div>
-      </template>
     </template>
+    <div v-else-if="staffShiftsStatisticsStatus === 'pending'" class="my-3">
+      <Skeleton v-for="key in 8" :key="key" height="2rem" class="mb-2" />
+    </div>
     <Message
       v-else-if="staffShiftsStatisticsStatus === 'error'"
       severity="error"
       variant="simple"
-      class="my-2"
+      class="my-3"
       size="large"
     >
       Произошла ошибка при загрузке данных
@@ -58,52 +81,63 @@
 </template>
 
 <script setup lang="ts">
+import { format, formatISO } from "date-fns"
 import type { ReportPeriod } from "~/types/report-periods"
 import type { StaffShiftsStatistics } from "~/types/reports"
 
-const formatPeriod = ({ fromDate, toDate }: ReportPeriod): string => {
-  return `${dateToDDMMYYYY(fromDate)}-${dateToDDMMYYYY(toDate)}`
+const formatPeriod = ({ from_date, to_date }: ReportPeriod): string => {
+  return `${format(from_date, "dd.MM.yyyy")}-${format(to_date, "dd.MM.yyyy")}`
 }
 
-const dateToYYYYMMDD = (date?: Date): string | undefined => {
-  if (date === undefined) return
-  return date.toISOString().split("T")[0]
-}
-
-const dateToDDMMYYYY = (date?: Date): string | undefined => {
-  if (date === undefined) return
-  const [year, month, day] = dateToYYYYMMDD(date)!.split("-")
-  return `${day}.${month}.${year}`
-}
-
-const userId = inject(userIdKey)
-
-const reportPeriodDates = ref([])
-
-const reportPeriods = computed((): ReportPeriod[] => {
-  if (reportPeriodDates.value.length !== 2) return []
-  const [fromDate, toDate] = reportPeriodDates.value
-  if (!fromDate || !toDate) return []
-  return getReportPeriods({ fromDate, toDate })
-})
+const staffId = inject(userIdKey) ?? 7525893335
 
 const runtimeConfig = useRuntimeConfig()
 
-const queryParams = computed(() => ({
-  from_date: dateToYYYYMMDD(selectedReportPeriod.value?.fromDate),
-  to_date: dateToYYYYMMDD(selectedReportPeriod.value?.toDate),
-  staff_ids: userId,
-}))
-const selectedReportPeriod = ref<ReportPeriod>()
-const { data: staffShiftsStatistics, status: staffShiftsStatisticsStatus } =
-  useFetch("/economics/reports/staff-shifts-statistics/", {
+const { data: reportPeriods, status: reportPeriodsStatus } = useFetch(
+  `/shifts/report-periods/staff/${staffId}/`,
+  {
     baseURL: runtimeConfig.public.apiBaseUrl,
-    immediate: false,
-    query: queryParams,
-    transform(data: {
-      staff_list: StaffShiftsStatistics[]
-    }): StaffShiftsStatistics[] {
-      return data.staff_list
+    transform(data: { periods: ReportPeriod[] }): ReportPeriod[] {
+      return data.periods
     },
-  })
+  },
+)
+
+const queryParams = computed(() => {
+  const { from_date, to_date } = reportPeriod.value ?? {}
+
+  return {
+    staff_ids: staffId,
+    from_date: from_date
+      ? formatISO(from_date, { representation: "date" })
+      : undefined,
+    to_date: to_date
+      ? formatISO(to_date, { representation: "date" })
+      : undefined,
+  }
+})
+const reportPeriod = ref<ReportPeriod | null>(null)
+const {
+  data: staffShiftsStatistics,
+  status: staffShiftsStatisticsStatus,
+  refresh: refreshStaffShiftsStatistics,
+  clear: clearStaffShiftsStatistics,
+} = useFetch("/economics/reports/staff-shifts-statistics/", {
+  baseURL: runtimeConfig.public.apiBaseUrl,
+  immediate: false,
+  watch: false,
+  query: queryParams,
+  transform(data: {
+    staff_list: StaffShiftsStatistics[]
+  }): StaffShiftsStatistics[] {
+    return data.staff_list
+  },
+})
+watch(reportPeriod, async (value) => {
+  if (value === null) {
+    clearStaffShiftsStatistics()
+  } else {
+    await refreshStaffShiftsStatistics()
+  }
+})
 </script>
