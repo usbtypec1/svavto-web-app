@@ -55,7 +55,7 @@ const dateToDDMMYYYY = (date?: Date): string | undefined => {
   return `${day}.${month}.${year}`
 }
 
-const userId = 7525893335
+const userId = inject(userIdKey)
 
 const reportPeriodDates = ref([])
 
@@ -75,7 +75,7 @@ const queryParams = computed(() => ({
 }))
 const selectedReportPeriod = ref<ReportPeriod>()
 const { data, execute, status } = useFetch(
-  "https://avtomoykabot.store/api/economics/reports/staff-shifts-statistics/",
+  "/economics/reports/staff-shifts-statistics/",
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
     immediate: false,
