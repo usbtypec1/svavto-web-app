@@ -89,7 +89,7 @@ const formatPeriod = ({ from_date, to_date }: ReportPeriod): string => {
   return `${format(from_date, "dd.MM.yyyy")}-${format(to_date, "dd.MM.yyyy")}`
 }
 
-const staffId = inject(userIdKey) ?? 7525893335
+const staffId = inject(userIdKey)
 
 const runtimeConfig = useRuntimeConfig()
 
