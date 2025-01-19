@@ -1,75 +1,43 @@
-# Nuxt 3 Minimal Starter
+# Запуск проекта
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+### Установка зависимостей
 
-## Setup
+Перед началом работы необходимо установить все зависимости. Для этого выполните команду:
 
-Make sure to install the dependencies:
-
-```bash
-# npm
+```sh
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+### Запуск в режиме разработки
 
-Start the development server on `http://localhost:3000`:
+Для запуска проекта в режиме разработки выполните команду:
 
-```bash
-# npm
+```sh
 npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+### Сборка проекта
 
-Build the application for production:
+Для сборки проекта выполните команду:
 
-```bash
-# npm
+```sh
 npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+### Запуск проекта
 
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
+```sh
+node .output/server/index.mjs
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### Переменные окружения
+
+Убедитесь, что у вас есть файл `.env` с необходимыми переменными окружения. Пример содержимого файла `.env`:
+
+```
+NUXT_API_BASE_URL=https://api.example.com
+```
+
+### Дополнительная информация
+
+Для корректной работы проекта требуется Node.js версии 14 или выше.
