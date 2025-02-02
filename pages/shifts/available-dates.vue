@@ -1,6 +1,7 @@
 <template>
   <div>
     <p class="text-lg font-semibold mb-3">Месяцы доступные в графике</p>
+    {{ error }}
     <div
       v-if="data.available_dates.length"
       class="flex flex-col gap-y-2"
@@ -40,7 +41,6 @@
       @click="isDialogVisible = true"
       text="Добавить месяц"
     >
-
     </MainButton>
     <AvailableDateCreateDialog
       v-model:visible="isDialogVisible"
@@ -65,7 +65,7 @@ interface AvailableDate extends MonthAndYear {
 }
 
 const runtimeConfig = useRuntimeConfig()
-const { data, refresh } = await useFetch<{ available_dates: AvailableDate[] }>('/shifts/available-dates/', {
+const { data, error, refresh } = await useFetch<{ available_dates: AvailableDate[] }>('/shifts/available-dates/', {
   baseURL: runtimeConfig.public.apiBaseUrl,
 })
 
