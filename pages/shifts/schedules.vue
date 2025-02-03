@@ -29,7 +29,6 @@
           @date-select="onDateSelect"
           selection-mode="multiple"
           inline
-          :min-date="new Date()"
           :disabled="isDisabled && shiftsStatus === 'success'"
         />
         <template v-if="shiftsStatus === 'error'">
