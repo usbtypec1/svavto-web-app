@@ -11,6 +11,9 @@
           :options="staffList!"
           option-label="full_name"
           input-id="staff"
+          filter
+          filter-placeholder="Поиск по ФИО, ID"
+          :filter-fields="['full_name', 'id']"
           empty-selection-message="Выберите сотрудника"
           empty-message="Нет доступных сотрудников"
         />
