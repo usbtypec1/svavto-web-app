@@ -6,7 +6,7 @@
       <DatePicker
         v-model="date"
         date-format="dd.mm.yy"
-        :min-date="new Date()"
+        :min-date="minDate"
         fluid
         inline
       />
@@ -90,13 +90,20 @@
       text="Подтвердить"
       :visible="isMainButtonVisible"
     />
+    <SecondaryButton
+      text="Закрыть"
+      :visible="isMainButtonVisible"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
+import { MainButton, SecondaryButton, useWebApp, useWebAppPopup } from 'vue-tg'
 import type { Staff, StaffIdAndName } from '~/types/staff'
 import type { ShiftListItem, ShiftsConfirmation } from '~/types/shifts'
+import { subDays } from 'date-fns';
+
+const minDate = subDays(new Date(), 1)
 
 const { close, sendData } = useWebApp()
 const { showConfirm } = useWebAppPopup()
