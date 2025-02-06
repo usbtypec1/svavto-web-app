@@ -4,9 +4,11 @@
       Список сотрудников которые поставили смену на выбранную дату
     </p>
     <Listbox
-      :options="selectedStaffList"
-      option-label="staff.full_name"
-      option-value="staff.id"
+      v-model="selectedStaffList"
+      :options="staffList"
+      checkmark
+      multiple
+      option-label="full_name"
       empty-message="Нет запланированных на эту дату смен"
     />
   </div>

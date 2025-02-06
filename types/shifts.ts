@@ -1,5 +1,5 @@
 import type { CarWashListItem } from '~/types/car-washes'
-import type { Staff } from '~/types/staff'
+import type { Staff, StaffIdAndName } from '~/types/staff'
 
 export interface Shift {
   id: number
@@ -22,7 +22,7 @@ export interface ShiftListItem {
 
 export interface ShiftsConfirmation {
   date: string
-  staff_ids: number[]
+  staff_list: StaffIdAndName[]
 }
 
 export interface CurrentShift {

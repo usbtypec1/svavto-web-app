@@ -13,10 +13,13 @@
     </div>
     <div v-auto-animate>
       <div v-if="!onlySpecificStaff" class="flex flex-col gap-y-1">
-        <ProgressSpinner v-if="shiftsStatus === 'pending'" />
+        <ProgressSpinner
+          v-if="staffListOnSpecificShiftDateStatus === 'pending'"
+        />
         <ShiftRequestPlannedOnDateStaffList
-          v-else-if="shiftsStatus === 'success'"
-          v-model="selectedStaffIds"
+          v-else-if="staffListOnSpecificShiftDateStatus === 'success'"
+          v-model="selectedStaffList"
+          :staff-list="staffListOnSpecificShiftDate!"
         />
       </div>
     </div>
@@ -38,13 +41,14 @@
 
     <div v-auto-animate>
       <div v-if="onlySpecificStaff">
-        <ProgressSpinner v-if="staffListStatus === 'pending'" />
+        <ProgressSpinner v-if="allStaffListStatus === 'pending'" />
         <ShiftRequestTargetedStaffList
-          v-else-if="staffListStatus === 'success'"
-          v-model="selectedStaffIds"
+          v-else-if="allStaffListStatus === 'success'"
+          v-model="selectedStaffList"
+          :staff-list="allStaffList!"
         />
         <Message
-          v-else-if="staffListStatus"
+          v-else-if="allStaffListStatus === 'error'"
           severity="error"
           icon="pi pi-exclamation-triangle"
         >
@@ -81,7 +85,7 @@ const minDate = subDays(new Date(), 1)
 const { close, sendData } = useWebApp()
 const { showConfirm } = useWebAppPopup()
 
-const selectedStaffIds = ref<number[]>([])
+const selectedStaffList = ref<StaffIdAndName[]>([])
 
 const date = ref<Date>(new Date())
 
@@ -93,47 +97,51 @@ const runtimeConfig = useRuntimeConfig()
 
 const onlySpecificStaff = ref<boolean>(false)
 
-watch(onlySpecificStaff, async () => {
-  if (onlySpecificStaff.value) {
-    await refreshStaffList()
-  }
-})
 
 const {
-  data: staffList,
-  status: staffListStatus,
-  refresh: refreshStaffList,
+  data: allStaffList,
+  status: allStaffListStatus,
 } = useFetch("/staff/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
   query: {
     order_by: "-created_at",
   },
-  transform(data: { staff: Staff[] }) {
-    return data.staff
+  transform(data: { staff: Staff[] }): StaffIdAndName[] {
+    return data.staff.map((staff: Staff) => ({
+      id: staff.id,
+      full_name: staff.full_name,
+    }))
   },
-  deep: false,
-  immediate: false,
 })
 
 const {
-  data: shifts,
-  refresh: refreshShifts,
-  status: shiftsStatus,
+  data: staffListOnSpecificShiftDate,
+  refresh: refreshStaffListOnSpecificShiftDate,
+  status: staffListOnSpecificShiftDateStatus,
 } = useFetch("/shifts/", {
   query: { date_from: formattedDate, date_to: formattedDate, limit: 1000 },
   baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { shifts: ShiftListItem[] }) => data.shifts,
+  transform(data: { shifts: ShiftListItem[] }): StaffIdAndName[] {
+    return data.shifts.map((shift: ShiftListItem) => ({
+      id: shift.staff.id,
+      full_name: shift.staff.full_name,
+    }))
+  },
 })
 
 watch(date, async () => {
   if (date.value) {
-    await refreshShifts()
+    await refreshStaffListOnSpecificShiftDate()
   }
+})
+
+watch(onlySpecificStaff, (): void => {
+  selectedStaffList.value = []
 })
 
 const isMainButtonVisible = computed((): boolean => {
   if (onlySpecificStaff.value) {
-    return selectedStaffIds.value.length > 0
+    return selectedStaffList.value.length > 0
   }
   return !!date.value
 })
@@ -146,16 +154,9 @@ const confirmationText = computed((): string => {
 })
 
 const shiftsForDateToSend = computed((): ShiftsConfirmation => {
-  if (onlySpecificStaff.value) {
-    return {
-      date: formattedDate.value,
-      staff_ids: selectedStaffIds.value,
-    }
-  }
   return {
     date: formattedDate.value,
-    staff_ids:
-      shifts.value?.map((shift: ShiftListItem) => shift.staff.id) ?? [],
+    staff_list: selectedStaffList.value,
   }
 })
 
