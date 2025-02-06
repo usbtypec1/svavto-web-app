@@ -4,7 +4,13 @@
       <Fieldset>
         <template #legend>
           <div class="flex items-center gap-x-2">
-            <i v-tooltip.right="'Если в сервисном приложении нажать на номер, он скопируется и не придется печатать его вручную.'" class="pi pi-info-circle"></i>
+            <i
+             tabindex="1" 
+             v-tooltip.focus.right="{ value: 'Если в сервисном приложении нажать на номер, он скопируется и не придется печатать его вручную.', autoHide: false }" 
+             class="pi pi-info-circle" 
+             @mouseover="event => event.target!.focus" 
+             @mouseleave="event => event.target!.blur"
+            ></i>
             <span>Гос.номер</span>
           </div>
         </template>
