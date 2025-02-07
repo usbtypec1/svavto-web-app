@@ -10,6 +10,10 @@
       multiple
       option-label="full_name"
       empty-message="Нет запланированных на эту дату смен"
+      filter
+      :filter-fields="['full_name']"
+      filter-placeholder="Поиск сотрудника"
+      empty-filter-message="Нет сотрудников по запросу"
     />
   </div>
 </template>

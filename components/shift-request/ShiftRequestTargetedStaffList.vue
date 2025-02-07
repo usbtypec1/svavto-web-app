@@ -10,6 +10,10 @@
       multiple
       option-label="full_name"
       empty-message="Нет сотрудников"
+      filter
+      :filter-fields="['full_name']"
+      filter-placeholder="Поиск сотрудника"
+      empty-filter-message="Нет сотрудников по запросу"
     />
   </div>
 </template>
@@ -17,9 +21,10 @@
 <script setup lang="ts">
 import type { StaffIdAndName } from "~/types/staff"
 
-const selectedStaffList = defineModel<StaffIdAndName[]>()
+const selectedStaffList = defineModel<StaffIdAndName[]>("selectedStaffList")
 
 defineProps<{
-  staffList: StaffIdAndName[]
+  staffList: StaffIdAndName[],
+  staffIdsWithShiftForDate: number[],
 }>()
 </script>

@@ -12,14 +12,12 @@
       />
     </div>
     <div v-auto-animate>
-      <div v-if="!onlySpecificStaff" class="flex flex-col gap-y-1">
-        <ProgressSpinner
-          v-if="staffListOnSpecificShiftDateStatus === 'pending'"
-        />
+      <div v-if="!isTargetedStaffMode" class="flex flex-col gap-y-1">
+        <ProgressSpinner v-if="shiftsStatus === 'pending'" />
         <ShiftRequestPlannedOnDateStaffList
-          v-else-if="staffListOnSpecificShiftDateStatus === 'success'"
+          v-else-if="shiftsStatus === 'success'"
           v-model="selectedStaffList"
-          :staff-list="staffListOnSpecificShiftDate!"
+          :staff-list="staffListForDate"
         />
       </div>
     </div>
@@ -32,20 +30,20 @@
         icon="pi pi-times"
       />
       <ToggleButton
-        v-model="onlySpecificStaff"
+        v-model="isTargetedStaffMode"
         on-label="Точечный запрос"
         off-label="Точечный запрос"
         on-icon="pi pi-check"
       />
     </div>
-
     <div v-auto-animate>
-      <div v-if="onlySpecificStaff">
+      <div v-if="isTargetedStaffMode">
         <ProgressSpinner v-if="allStaffListStatus === 'pending'" />
         <ShiftRequestTargetedStaffList
           v-else-if="allStaffListStatus === 'success'"
-          v-model="selectedStaffList"
+          v-model:selected-staff-list="selectedStaffList"
           :staff-list="allStaffList!"
+          :staff-ids-with-shift-for-date="staffIdsWithShiftForDate"
         />
         <Message
           v-else-if="allStaffListStatus === 'error'"
@@ -74,8 +72,7 @@
 
 <script setup lang="ts">
 import { MainButton, useWebApp, useWebAppPopup } from "vue-tg"
-import type { Staff, StaffIdAndName } from "~/types/staff"
-import type { ShiftListItem, ShiftsConfirmation } from "~/types/shifts"
+import type { StaffIdAndName } from "~/types/staff"
 import { subDays } from "date-fns"
 import ShiftRequestPlannedOnDateStaffList from "~/components/shift-request/ShiftRequestPlannedOnDateStaffList.vue"
 import ShiftRequestTargetedStaffList from "~/components/shift-request/ShiftRequestTargetedStaffList.vue"
@@ -89,89 +86,48 @@ const selectedStaffList = ref<StaffIdAndName[]>([])
 
 const date = ref<Date>(new Date())
 
-const humanizedDate = useDateFormat(date, "DD.MM.YYYY")
+const isTargetedStaffMode = ref<boolean>(false)
 
-const formattedDate = useDateFormat(date, "YYYY-MM-DD")
-
-const runtimeConfig = useRuntimeConfig()
-
-const onlySpecificStaff = ref<boolean>(false)
-
-
+const { data: allStaffList, status: allStaffListStatus } = useStaffList()
 const {
-  data: allStaffList,
-  status: allStaffListStatus,
-} = useFetch("/staff/", {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  query: {
-    order_by: "-created_at",
-  },
-  transform(data: { staff: Staff[] }): StaffIdAndName[] {
-    return data.staff.map((staff: Staff) => ({
-      id: staff.id,
-      full_name: staff.full_name,
-    }))
-  },
-})
+  status: shiftsStatus,
+  staffIds: staffIdsWithShiftForDate,
+  staffList: staffListForDate,
+} = useShifts(date)
 
-const {
-  data: staffListOnSpecificShiftDate,
-  refresh: refreshStaffListOnSpecificShiftDate,
-  status: staffListOnSpecificShiftDateStatus,
-} = useFetch("/shifts/", {
-  query: { date_from: formattedDate, date_to: formattedDate, limit: 1000 },
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  transform(data: { shifts: ShiftListItem[] }): StaffIdAndName[] {
-    return data.shifts.map((shift: ShiftListItem) => ({
-      id: shift.staff.id,
-      full_name: shift.staff.full_name,
-    }))
-  },
-})
-
-watch(date, async () => {
-  if (date.value) {
-    await refreshStaffListOnSpecificShiftDate()
+watch(staffListForDate, (): void => {
+  if (shiftsStatus.value === "success") {
+    selectedStaffList.value = staffListForDate.value
   }
 })
 
-watch(onlySpecificStaff, (): void => {
-  selectedStaffList.value = []
+watch(isTargetedStaffMode, (): void => {
+  if (!isTargetedStaffMode.value) {
+    selectedStaffList.value = staffListForDate.value
+  } else {
+    selectedStaffList.value = []
+  }
 })
 
 const isMainButtonVisible = computed((): boolean => {
-  if (onlySpecificStaff.value) {
+  if (isTargetedStaffMode.value) {
     return selectedStaffList.value.length > 0
   }
   return !!date.value
 })
 
-const confirmationText = computed((): string => {
-  if (onlySpecificStaff.value) {
-    return "Вы уверены что хотите отправить запрос выбранным сотрудникам?"
-  }
-  return `Отправить запрос на дату ${humanizedDate.value} всем сотрудникам?`
+const { confirmationText, calendarLabel } = useShiftConfirmationLabels({
+  isTargetedStaffMode: isTargetedStaffMode,
+  date,
+  selectedStaffList,
 })
 
-const shiftsForDateToSend = computed((): ShiftsConfirmation => {
-  return {
-    date: formattedDate.value,
-    staff_list: selectedStaffList.value,
-  }
+const { serializedData } = useShiftConfirmationDataToSend({
+  date,
+  selectedStaffList,
 })
-
-const calendarLabel = computed((): string => {
-  return onlySpecificStaff.value
-    ? "Дата на которую поставить смены"
-    : "Дата на которую поставили смены"
-})
-
-const serializedData = computed((): string =>
-  JSON.stringify(shiftsForDateToSend.value),
-)
 
 const onConfirm = (): void => {
-  console.log(serializedData.value)
   showConfirm?.(confirmationText.value, (ok: boolean) => {
     if (!ok) return
     sendData?.(serializedData.value)
