@@ -1,10 +1,15 @@
 import type { Staff } from '~/types/staff'
 
+export type PenaltyConsequence = 'warn' | 'dismissal'
+
 export interface Penalty {
   id: number
-  staff: Staff
+  staff_id: number
+  staff_full_name: string
+  shift_id: number
+  shift_date: string
   reason: string
   amount: number
-  consequence: 'warn' | 'dismissal' | null
+  consequence: PenaltyConsequence | null
   created_at: string
 }
