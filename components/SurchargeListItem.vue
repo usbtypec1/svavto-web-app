@@ -8,7 +8,7 @@
       <i class="pi pi-calendar" />Дата смены: {{ formattedShiftDate }}
     </p>
     <p class="flex items-center gap-x-1">
-      <i class="pi pi-calendar-clock" /> Дата выдачи штрафа:
+      <i class="pi pi-calendar-clock" /> Дата выдачи доплаты:
       {{ formattedCreateAt }}
     </p>
   </Message>
