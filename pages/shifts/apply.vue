@@ -6,7 +6,6 @@
         v-model="dates"
         selection-mode="multiple"
         inline
-        show-button-bar
         :showOtherMonths="false"
         :min-date="currentMonthDate"
         :max-date="maxDate"
