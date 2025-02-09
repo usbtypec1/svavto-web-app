@@ -67,7 +67,10 @@ const acceptRegisterRequest = async (
 const onAcceptRegisterRequest = (registerRequestId: number): void => {
   showConfirm(
     "Вы уверены, что хотите принять заявку?",
-    async () => await acceptRegisterRequest(registerRequestId),
+    async (ok: boolean) => {
+      if (!ok) return
+      await acceptRegisterRequest(registerRequestId)
+    },
   )
 }
 
@@ -93,7 +96,10 @@ const rejectRegisterRequest = async (
 const onRejectRegisterRequest = (registerRequestId: number): void => {
   showConfirm(
     "Вы уверены, что хотите отклонить заявку?",
-    async () => await rejectRegisterRequest(registerRequestId),
+    async (ok: boolean) => {
+      if (!ok) return
+      await rejectRegisterRequest(registerRequestId)
+    },
   )
 }
 </script>
