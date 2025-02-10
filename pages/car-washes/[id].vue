@@ -119,13 +119,13 @@ const { data: allCarWashServices } = await useFetch("/car-washes/services/", {
 
 const initialValues = computed(() => {
   if (carWash.value === null) return {}
+  console.log(carWash.value)
   return {
     name: carWash.value.name,
-    comfort_class_car_transfer_price:
-      carWash.value.comfort_class_car_transfer_price,
-    business_class_car_transfer_price:
-      carWash.value.business_class_car_transfer_price,
-    van_transfer_price: carWash.value.van_transfer_price,
+    comfort_class_car_washing_price: carWash.value.comfort_class_car_washing_price,
+    business_class_car_washing_price: carWash.value.business_class_car_washing_price,
+    van_washing_price: carWash.value.van_washing_price,
+    windshield_washer_price_per_bottle: carWash.value.windshield_washer_price_per_bottle,
   }
 })
 
