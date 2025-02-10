@@ -3,14 +3,11 @@
     <FormField v-slot="$number" name="number">
       <Fieldset>
         <template #legend>
-          <div class="flex items-center gap-x-2">
-            <i
-             tabindex="1" 
-             v-tooltip.focus.right="{ value: 'Если в сервисном приложении нажать на номер, он скопируется и не придется печатать его вручную.', autoHide: false }" 
-             class="pi pi-info-circle" 
-             @mouseover="event => event.target!.focus" 
-             @mouseleave="event => event.target!.blur"
-            ></i>
+          <div
+            @click="onShowCarNumberHelpText"
+            class="flex items-center gap-x-2"
+          >
+            <i class="pi pi-info-circle"></i>
             <span>Гос.номер</span>
           </div>
         </template>
@@ -161,11 +158,14 @@ import { Form, FormField, type FormSubmitEvent } from "@primevue/forms"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
 import { classTypeOptions, washTypeOptions } from "~/utils/car-wash-services"
+import { useWebAppPopup } from "vue-tg"
 
 const emit = defineEmits([
   "submitWithoutAdditionalServices",
   "submitWithAdditionalServices",
 ])
+
+const { showAlert } = useWebAppPopup()
 
 const isAdditionalServicesIncluded = ref<boolean>(false)
 
@@ -214,6 +214,12 @@ const resolver = ref(
 const windshieldWasherRefilledBottlePercentageOptions: number[] = [
   10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120,
 ]
+
+const onShowCarNumberHelpText = (): void => {
+  showAlert(
+    "Если в сервисном приложении нажать на номер, он скопируется и не придется печатать его вручную.",
+  )
+}
 
 const onSubmit = ({ valid, values, originalEvent }: FormSubmitEvent) => {
   if (!valid) {
