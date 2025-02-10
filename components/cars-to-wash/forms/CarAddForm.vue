@@ -159,6 +159,7 @@ import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
 import { classTypeOptions, washTypeOptions } from "~/utils/car-wash-services"
 import { useWebAppPopup } from "vue-tg"
+import { windshieldWasherRefilledBottlePercentageOptions } from "~/utils/car-transfers"
 
 const emit = defineEmits([
   "submitWithoutAdditionalServices",
@@ -210,10 +211,6 @@ const resolver = ref(
     }),
   ),
 )
-
-const windshieldWasherRefilledBottlePercentageOptions: number[] = [
-  10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120,
-]
 
 const onShowCarNumberHelpText = (): void => {
   showAlert(

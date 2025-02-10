@@ -13,20 +13,6 @@
         <span class="font-semibold">Вид мойки: </span>
         <span>{{ washTypeValueToLabel[carToWash.wash_type] }}</span>
       </div>
-      <div>
-        <template
-          v-if="carToWash.windshield_washer_refilled_bottle_percentage === 0"
-        >
-          <span class="font-semibold">Незамерзающая жидкость: </span>
-          <span>без долива/долита вода</span>
-        </template>
-        <template
-          v-else
-        >
-          <span class="font-semibold">Незамерзающая жидкость: </span>
-          <span>{{ carToWash.windshield_washer_refilled_bottle_percentage }}%</span>
-        </template>
-      </div>
     </template>
   </Card>
 </template>

@@ -5,7 +5,6 @@
       v-model:service-id-to-count="serviceIdToCount"
       :car-wash-service="carWashServicePassedToDialog!"
     />
-    <p class="text-xl font-semibold mb-2">Дополнительные услуги</p>
     <Message
       v-if="!specificCarWashServices?.length"
       severity="warn"
