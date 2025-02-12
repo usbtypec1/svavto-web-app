@@ -27,7 +27,7 @@
       />
     </template>
     <ProgressSpinner v-else />
-    <BackButton @click="navigateTo('surcharges-car-wash')" />
+    <BackButton @click="navigateTo({ name: 'surcharges-car-wash' })" />
   </div>
 </template>
 
