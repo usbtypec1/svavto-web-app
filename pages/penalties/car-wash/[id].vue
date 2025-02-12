@@ -1,25 +1,31 @@
 <template>
   <div class="flex flex-col gap-y-4">
-    <h1 class="font-semibold text-xl mb-2">
-      Оштрафовать мойку {{ carWash?.name }}
-    </h1>
-    <CarWashPenaltyListDataView
-      @delete-penalty="onDeletePenalty"
-      :car-wash-penalties="carWashPenalties!"
-    />
-    <Button
-      @click="isCarWashPenaltyCreateDialogVisible = true"
-      label="Добавить штраф"
-      size="large"
-      icon="pi pi-plus"
-      severity="danger"
-      fluid
-      rounded
-    />
-    <CarWashPenaltyCreateDialog
-      v-model:visible="isCarWashPenaltyCreateDialogVisible"
-      @create-car-wash-penalty="onCreateCarWashPenalty"
-    />
+    <template
+      v-if="carWashPenaltiesStatus !== 'pending' && carWashStatus !== 'pending'"
+    >
+      <h1 class="font-semibold text-xl mb-2">
+        Оштрафовать мойку {{ carWash?.name }}
+      </h1>
+      <CarWashPenaltyListDataView
+        @delete-penalty="onDeletePenalty"
+        :car-wash-penalties="carWashPenalties!"
+      />
+      <Button
+        @click="isCarWashPenaltyCreateDialogVisible = true"
+        label="Добавить штраф"
+        size="large"
+        icon="pi pi-plus"
+        severity="danger"
+        fluid
+        rounded
+      />
+      <CarWashPenaltyCreateDialog
+        v-model:visible="isCarWashPenaltyCreateDialogVisible"
+        @create-car-wash-penalty="onCreateCarWashPenalty"
+      />
+    </template>
+    <ProgressSpinner v-else />
+    <BackButton @click="navigateTo('penalties-car-wash')" />
   </div>
 </template>
 
@@ -29,7 +35,7 @@ import type {
   CarWashPenaltyCreateEvent,
 } from "~/types/penalties"
 import CarWashPenaltyCreateDialog from "~/components/dialogs/CarWashPenaltyCreateDialog.vue"
-import { useWebAppPopup } from "vue-tg"
+import { useWebAppPopup, BackButton } from "vue-tg"
 import type { CarWashWithServices } from "~/types/car-washes"
 import CarWashPenaltyListDataView from "~/components/data-views/CarWashPenaltyListDataView.vue"
 

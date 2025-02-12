@@ -27,6 +27,7 @@
       />
     </template>
     <ProgressSpinner v-else />
+    <BackButton @click="navigateTo('surcharges-car-wash')" />
   </div>
 </template>
 
@@ -36,7 +37,7 @@ import type {
   CarWashSurchargeCreateEvent,
 } from "~/types/surcharges"
 import CarWashSurchargeCreateDialog from "~/components/dialogs/CarWashSurchargeCreateDialog.vue"
-import { useWebAppPopup } from "vue-tg"
+import { useWebAppPopup, BackButton } from "vue-tg"
 import type { CarWashWithServices } from "~/types/car-washes"
 import CarWashSurchargeListDataView from "~/components/data-views/CarWashSurchargeListDataView.vue"
 
