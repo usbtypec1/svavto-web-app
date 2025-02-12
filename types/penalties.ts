@@ -1,6 +1,4 @@
-import type { Staff } from '~/types/staff'
-
-export type PenaltyConsequence = 'warn' | 'dismissal'
+export type PenaltyConsequence = "warn" | "dismissal"
 
 export interface Penalty {
   id: number
@@ -12,4 +10,17 @@ export interface Penalty {
   amount: number
   consequence: PenaltyConsequence | null
   created_at: string
+}
+
+export interface CarWashPenalty {
+  id: number
+  car_wash_id: number
+  reason: string
+  amount: number
+  created_at: string
+}
+
+export interface CarWashPenaltyCreateEvent {
+  reason: string
+  amount: number
 }
