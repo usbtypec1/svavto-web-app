@@ -4,10 +4,18 @@
     <p class="text-xl font-semibold mb-2">Редактировать доп.услуги</p>
     <p class="text-lg font-semibold mb-2">{{ carWash?.name }}</p>
     <ProgressSpinner v-if="carToWashStatus === 'pending'" />
-    <CarToWashDetailCard
-      v-else-if="carToWashStatus === 'success'"
-      :car-to-wash="carToWash!"
-    />
+    <template v-else-if="carToWashStatus === 'success'">
+      <CarToWashDetailCard :car-to-wash="carToWash!" />
+    <p class="text-xl font-semibold mt-4 mb-2">Дополнительные услуги</p>
+      <Card>
+        <template #title>Долив воды/незамерзающей жидкости</template>
+        <template #content>
+          <WindshieldWasherSelect
+            v-model="windshieldWasherRefilledBottlePercentage"
+          />
+        </template>
+      </Card>
+    </template>
     <Message
       v-else-if="carToWashStatus === 'error'"
       severity="error"
@@ -15,22 +23,6 @@
     >
       Ошибка загрузки данных о машине
     </Message>
-
-    <p class="text-xl font-semibold mt-4 mb-2">Дополнительные услуги</p>
-    <Card>
-      <template #title> Сколько % от бутылки было залито? </template>
-      <template #content>
-        <div v-if="carToWashStatus === 'success'">
-          <Select
-            v-model="windshieldWasherRefilledBottlePercentage"
-            :options="windshieldWasherRefilledBottlePercentageOptions"
-            fluid
-            :default-value="carToWash!.windshield_washer_refilled_bottle_percentage"
-          />
-        </div>
-      </template>
-    </Card>
-
     <CarToWashAdditionalServicesForm
       v-if="carWashStatus === 'success'"
       v-model:service-id-to-count="serviceIdToCount"
@@ -58,7 +50,7 @@ import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/Car
 import CarToWashDetailCard from "~/components/cars-to-wash/cards/CarToWashDetailCard.vue"
 import type { CarToWashDetail } from "~/types/cars"
 import type { CarWashWithServices } from "~/types/car-washes"
-import { windshieldWasherRefilledBottlePercentageOptions } from "~/utils/car-transfers"
+import WindshieldWasherSelect from "~/components/forms/WindshieldWasherSelect.vue"
 
 const { showAlert, showConfirm } = useWebAppPopup()
 const { sendData } = useWebApp()
@@ -78,6 +70,12 @@ const { data: carToWash, status: carToWashStatus } =
   await useFetch<CarToWashDetail>(`/shifts/cars/${carId}/`, {
     baseURL: runtimeConfig.public.apiBaseUrl,
   })
+
+watch(carToWash, () => {
+  if (carToWash.value === null) return
+  windshieldWasherRefilledBottlePercentage.value =
+    carToWash.value.windshield_washer_refilled_bottle_percentage
+})
 
 const {
   data: carWash,

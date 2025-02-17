@@ -172,12 +172,6 @@ const isAdditionalServicesIncluded = ref<boolean>(false)
 
 const initialValues = ref<CarToWashDraft>({})
 
-const windshieldWasherOptions: string[] = [
-  "Без долива",
-  "Вода",
-  "Незамерзающая жидкость",
-]
-
 const carNumberRegExp = new RegExp(/^[А-Яа-я]\d{3}[А-Яа-я]{2}\d{3}$/)
 
 const resolver = ref(
