@@ -33,11 +33,7 @@
 </template>
 
 <script setup lang="ts">
-const windshieldWasherOptions: string[] = [
-  "Без долива",
-  "Вода",
-  "Незамерзающая жидкость",
-]
+import { windshieldWasherRefilledBottlePercentageOptions, windshieldWasherOptions } from "~/utils/car-transfers"
 
 const windshieldWasher = ref<string>(windshieldWasherOptions[0])
 const windshieldWasherRefilledBottlePercentage = defineModel<number>({

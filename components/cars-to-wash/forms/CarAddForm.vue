@@ -159,7 +159,7 @@ import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
 import { classTypeOptions, washTypeOptions } from "~/utils/car-wash-services"
 import { useWebAppPopup } from "vue-tg"
-import { windshieldWasherRefilledBottlePercentageOptions } from "~/utils/car-transfers"
+import { windshieldWasherRefilledBottlePercentageOptions, windshieldWasherOptions } from "~/utils/car-transfers"
 
 const emit = defineEmits([
   "submitWithoutAdditionalServices",
