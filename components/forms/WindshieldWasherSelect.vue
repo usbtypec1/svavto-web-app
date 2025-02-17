@@ -44,6 +44,12 @@ const windshieldWasherRefilledBottlePercentage = defineModel<number>({
   default: 0,
 })
 
+watch(windshieldWasherRefilledBottlePercentage, (): void => {
+  if (windshieldWasherRefilledBottlePercentage.value > 0) {
+    windshieldWasher.value = windshieldWasherOptions[2]
+  }
+})
+
 watch(windshieldWasher, (): void => {
   if (windshieldWasher.value !== windshieldWasherOptions[2]) {
     windshieldWasherRefilledBottlePercentage.value = 0

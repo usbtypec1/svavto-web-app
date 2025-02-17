@@ -6,7 +6,7 @@
     <ProgressSpinner v-if="carToWashStatus === 'pending'" />
     <template v-else-if="carToWashStatus === 'success'">
       <CarToWashDetailCard :car-to-wash="carToWash!" />
-    <p class="text-xl font-semibold mt-4 mb-2">Дополнительные услуги</p>
+      <p class="text-xl font-semibold mt-4 mb-2">Дополнительные услуги</p>
       <Card>
         <template #title>Долив воды/незамерзающей жидкости</template>
         <template #content>
@@ -66,28 +66,43 @@ const windshieldWasherRefilledBottlePercentage = ref<number>(0)
 const route = useRoute()
 const carId = Number(route.params.id as string)
 
-const { data: carToWash, status: carToWashStatus } =
-  await useFetch<CarToWashDetail>(`/shifts/cars/${carId}/`, {
+const { data: carToWash, status: carToWashStatus } = useFetch<CarToWashDetail>(
+  `/shifts/cars/${carId}/`,
+  {
     baseURL: runtimeConfig.public.apiBaseUrl,
-  })
-
-watch(carToWash, () => {
-  if (carToWash.value === null) return
-  windshieldWasherRefilledBottlePercentage.value =
-    carToWash.value.windshield_washer_refilled_bottle_percentage
-})
+  },
+)
 
 const {
   data: carWash,
   status: carWashStatus,
   refresh: refreshCarWash,
-} = await useFetch<CarWashWithServices>(
-  (): string => `/car-washes/${carToWash.value!.car_wash?.id}/`,
+} = useFetch<CarWashWithServices>(
+  (): string => `/car-washes/${carToWash.value?.car_wash?.id}/`,
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
     immediate: false,
   },
 )
+
+watch(carToWash, async (): Promise<void> => {
+  if (carToWash.value === null) return
+  windshieldWasherRefilledBottlePercentage.value =
+    carToWash.value.windshield_washer_refilled_bottle_percentage
+
+  if (carToWash.value.car_wash === null) {
+    isCarWashChooseDialogVisible.value = true
+    return
+  }
+  await refreshCarWash()
+  serviceIdToCount.value = Object.fromEntries(
+    carToWash.value.additional_services.map((service) => [
+      service.id,
+      service.count,
+    ]),
+  )
+
+})
 
 const serializedData = computed((): string => {
   return JSON.stringify({
@@ -118,19 +133,4 @@ const onSubmitCarToWashWithAdditionalServices = (): void => {
     sendData?.(serializedData.value)
   })
 }
-
-watchEffect(async () => {
-  if (carToWash.value === null) return
-  if (carToWash.value.car_wash === null) {
-    isCarWashChooseDialogVisible.value = true
-    return
-  }
-  await refreshCarWash()
-  serviceIdToCount.value = Object.fromEntries(
-    carToWash.value.additional_services.map((service) => [
-      service.id,
-      service.count,
-    ]),
-  )
-})
 </script>
