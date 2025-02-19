@@ -84,7 +84,7 @@ const onCreateCarWashSurcharge = async ({
     async onResponse() {
       await refreshCarWashSurcharges()
       showAlert(
-        `✅ Мойке ${carWash.value!.name} успешно доплатено ${amount} рублей`,
+        `✅ Мойке ${carWash.value!.name} успешно доплачено ${amount} рублей`,
       )
     },
     onResponseError() {
