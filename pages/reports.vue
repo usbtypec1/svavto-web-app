@@ -15,11 +15,10 @@
       <Message
         v-else
         severity="error"
-        variant="simple"
         class="my-2"
         size="large"
       >
-        У вас не было смен за выбранный период
+        У вас не было смен
       </Message>
     </template>
     <Message
