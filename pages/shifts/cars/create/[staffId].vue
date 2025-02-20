@@ -31,7 +31,6 @@
 
 <script setup lang="ts">
 import CarWashChooseDialog from "~/components/car-washes/dialogs/CarWashChooseDialog.vue"
-import type { CarWashService } from "~/types/car-wash-services"
 import type { CarToWash } from "~/types/cars"
 import type { CarWashWithServices } from "~/types/car-washes"
 import CarAddForm from "~/components/cars-to-wash/forms/CarAddForm.vue"

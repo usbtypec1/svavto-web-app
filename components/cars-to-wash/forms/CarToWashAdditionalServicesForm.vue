@@ -13,7 +13,7 @@
     </Message>
     <div class="flex flex-col gap-y-6">
       <Card
-        v-for="[serviceParentId, services] in Object.entries(carWashServicesGroupedByParentId)"
+        v-for="[serviceParentId, services] in Object.entries(carWashServicesGroupedByParentId).sort(([a], [b]) => b.localeCompare(a))"
         :key="serviceParentId"
       >
         <template
