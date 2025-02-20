@@ -88,7 +88,8 @@
     return `${format(from_date, "dd.MM.yyyy")}-${format(to_date, "dd.MM.yyyy")}`
   }
   
-  const staffId = inject(userIdKey)
+  const route = useRoute()
+  const staffId = Number(route.params.userId as string)
   
   const runtimeConfig = useRuntimeConfig()
   
