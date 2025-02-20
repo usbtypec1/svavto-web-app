@@ -20,6 +20,12 @@ export interface CarWashPenalty {
   created_at: string
 }
 
+export interface CarTransporterPenaltyCreateEvent {
+  shiftId: number
+  reason: string
+  amount: number
+}
+
 export interface CarWashPenaltyCreateEvent {
   reason: string
   amount: number
