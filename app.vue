@@ -23,7 +23,6 @@
 
 <script setup>
 import { useWebApp } from 'vue-tg'
-import { useUserStore } from '~/stores/users'
 import { userIdKey } from '~/utils/keys'
 
 const webApp = useWebApp()
@@ -31,7 +30,4 @@ const webApp = useWebApp()
 const userId = webApp?.initDataUnsafe?.user?.id
 
 provide(userIdKey, userId)
-
-const userStore = useUserStore()
-userStore.setUserId(userId)
 </script>

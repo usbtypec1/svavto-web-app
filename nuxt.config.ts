@@ -89,6 +89,14 @@ const locale = {
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
+  nitro: {
+    minify: true,
+    compressPublicAssets: true,
+    preset: 'node-server',
+    experimental: {
+      wasm: false, 
+    }
+  },
   modules: [
     '@primevue/nuxt-module',
     '@pinia/nuxt',
