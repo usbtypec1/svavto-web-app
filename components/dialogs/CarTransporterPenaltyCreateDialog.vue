@@ -26,6 +26,5 @@ const isVisible = defineModel<boolean>("visible", { default: false })
 
 const onSubmitForm = (values: CarWashPenaltyCreateEvent): void => {
   emit("createCarTransporterPenalty", values)
-  isVisible.value = false
 }
 </script>

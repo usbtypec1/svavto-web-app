@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import CarTransporterPenaltyCreateDialog from "~/components/dialogs/CarTransporterPenaltyCreateDialog.vue"
 import CarTransporterPenaltyListDataView from "~/components/data-views/CarTransporterPenaltyListDataView.vue"
-import { useWebAppPopup } from "vue-tg"
+import { useWebAppPopup, useWebAppHapticFeedback } from "vue-tg"
 import type {
   Penalty,
   CarTransporterPenaltyCreateEvent,
@@ -55,6 +55,7 @@ const runtimeConfig = useRuntimeConfig()
 
 const isCreateDialogVisible = ref<boolean>(false)
 
+const { notificationOccurred } = useWebAppHapticFeedback()
 const { showConfirm, showAlert } = useWebAppPopup()
 
 const selectedStaff = ref<StaffIdAndName | null>(null)
@@ -94,46 +95,65 @@ const { data: shifts, status: shiftsStatus } = useFetch("/shifts/v2/", {
 })
 
 const onDeletePenalty = async (penaltyId: number) => {
-  await $fetch(`/economics/penalties/${penaltyId}/`, {
+  notificationOccurred("warning")
+  showConfirm("Вы уверены что хотите удалить штраф?", async (ok: boolean) => {
+    if (!ok) return
+    await $fetch(`/economics/penalties/${penaltyId}/`, {
+      baseURL: runtimeConfig.public.apiBaseUrl,
+      method: "DELETE",
+      async onResponse() {
+        showAlert("❗️ Штраф удален")
+        notificationOccurred("success")
+        await refreshPenalties()
+      },
+      onResponseError() {
+        showAlert("❌ Не удалось удалить штраф")
+        notificationOccurred("error")
+      },
+    })
+  })
+}
+
+const createPenalty = async ({
+  amount,
+  reason,
+  shiftId,
+}: CarTransporterPenaltyCreateEvent): Promise<void> => {
+  await $fetch("/economics/penalties/", {
     baseURL: runtimeConfig.public.apiBaseUrl,
-    method: "DELETE",
+    method: "POST",
+    body: {
+      amount,
+      reason,
+      shift_id: shiftId,
+    },
     async onResponse() {
-      showAlert("❗️ Штраф удален")
+      showAlert(`❗️ Сотрудник ${selectedStaff.value?.full_name} оштрафован`)
+      notificationOccurred("success")
       await refreshPenalties()
     },
     onResponseError() {
-      showAlert("❌ Не удалось удалить штраф")
+      showAlert("❌ Не удалось оштрафовать сотрудника")
+      notificationOccurred("error")
     },
   })
 }
 
-const onCreatePenalty = async ({
+const onCreatePenalty = ({
   amount,
   reason,
   shiftId,
-}: CarTransporterPenaltyCreateEvent) => {
+}: CarTransporterPenaltyCreateEvent): void => {
+  notificationOccurred("warning")
   showConfirm(
     `Вы уверены что хотите оштрафовать сотрудника ${selectedStaff.value?.full_name} на сумму ${amount}?`,
     async (ok: boolean) => {
       if (!ok) return
-      await $fetch("/economics/penalties/", {
-        baseURL: runtimeConfig.public.apiBaseUrl,
-        method: "POST",
-        body: {
-          amount,
-          reason,
-          shift_id: shiftId,
-        },
-        async onResponse() {
-          showAlert(
-            `❗️ Сотрудник ${selectedStaff.value?.full_name} оштрафован`,
-          )
-          await refreshPenalties()
-        },
-        onResponseError() {
-          showAlert("❌ Не удалось оштрафовать сотрудника")
-        },
-      })
+      try {
+        createPenalty({ amount, reason, shiftId })
+      } finally {
+        isCreateDialogVisible.value = false
+      }
     },
   )
 }
