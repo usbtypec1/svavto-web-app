@@ -13,23 +13,23 @@
     </Message>
     <div class="flex flex-col gap-y-6">
       <Card
-        v-for="[serviceParentId, services] in Object.entries(carWashServicesGroupedByParentId).sort(([a], [b]) => b.localeCompare(a))"
-        :key="serviceParentId"
+        v-for="parentId in orderedParentIds"
+        :key="parentId"
       >
         <template
           #title
-          v-if="serviceParentId !== 'undefined'"
+          v-if="parentId !== 'undefined'"
         >
-          {{ carWashServicesIdToName[serviceParentId] }}
+          {{ carWashServicesIdToName[parentId] }}
         </template>
         <template #content>
           <div class="flex flex-col gap-y-4">
             <div
               @click="onUpdateCarToWashAdditionalServiceCountModelValue(service)"
-              v-for="service in services"
+              v-for="service in carWashServicesGroupedByParentId[parentId]"
               :key="service.id"
               class="flex justify-between items-center border-t border-gray-200 dark:border-gray-600 pt-4 cursor-pointer"
-              :class="{ 'first:border-0': serviceParentId === 'undefined'}"
+              :class="{ 'first:border-0': parentId === 'undefined'}"
             >
               <label class="flex flex-col cursor-pointer select-none">
                 <span>{{ service.name }}</span>
@@ -72,6 +72,12 @@ const {
   groupedByParentId: carWashServicesGroupedByParentId,
   idToName: carWashServicesIdToName,
 } = useTransformedCarWashServices(toRef(props, 'specificCarWashServices'))
+
+const orderedParentIds = [
+  'undefined',
+  '47c58bdf-bf49-4af7-9f1a-87ec2bd185b9',
+  'b1e62578-29e6-479a-9a8b-977bcb5d9f65',
+]
 
 const carWashServicePassedToDialog = ref<CarWashService | null>(null)
 
