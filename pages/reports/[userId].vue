@@ -45,7 +45,7 @@
             <template #content>
               <div class="flex flex-col gap-y-3 my-3">
                 <ReportCardItem
-                  v-for="shiftStatistics in staffShiftsStatistics![0].shifts_statistics"
+                  v-for="shiftStatistics in staffShiftsStatistics![0].shifts_statistics.toSorted((a, b) => a.shift_date.localeCompare(b.shift_date))"
                   :shift-statistics="shiftStatistics"
                   :key="shiftStatistics.shift_date"
                 />
