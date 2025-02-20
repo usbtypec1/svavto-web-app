@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{ currentShiftError }}
     <Title>Добавить машину</Title>
     <p class="text-xl font-semibold mb-2">Добавить авто</p>
     <p class="text-lg font-semibold mb-2">{{  carWash?.name  }}</p>
@@ -110,13 +111,13 @@ const {
 
 const {
   data: carWash,
-  status: carWashStatus,
   refresh: refreshCarWash,
 } = await useFetch<CarWashWithServices>(
-  (): string => `/car-washes/${currentShift.value!.car_wash?.id}/`,
+  (): string => `/car-washes/${currentShift.value?.car_wash?.id}/`,
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
     immediate: false,
+    watch: [currentShift],
   },
 )
 
