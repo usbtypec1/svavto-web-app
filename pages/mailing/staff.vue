@@ -1,25 +1,31 @@
 <template>
   <div>
-    <Listbox
-      v-model="selectedStaffIds"
-      multiple
-      checkmark
-      :options="notBannedStaffList"
-      option-label="full_name"
-      option-value="id"
-    />
-    <transition-group name="p-message" tag="div" class="flex flex-col">
-      <Message v-if="!anySelectedStaff" severity="info" class="my-3">
-        Выберите сотрудников которым нужно отправить рассылку
-      </Message>
-    </transition-group>
+    <ProgressSpinner v-if="status === 'pending'" />
+    <template v-else-if="status === 'success'">
+      <PageHeader text="Выберите сотрудников" />
+      <Listbox
+        v-model="selectedStaffIds"
+        multiple
+        checkmark
+        :options="data!"
+        option-label="full_name"
+        option-value="id"
+        empty-filter-message="Сотрудники не найдены"
+        empty-message="Сотрудники не найдены"
+        filter
+        :filter-fields="[ 'full_name', 'id' ]"
+        filter-message="{0} результатов"
+        filter-icon="pi pi-search"
+        list-style="max-height:70dvh"
+        filter-placeholder="Поиск по ФИО, ID"
+      />
+    </template>
     <MainButton :visible="anySelectedStaff" @click="onSubmit" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { MainButton, useWebApp } from "vue-tg"
-import type { Staff } from "~/types/staff"
 
 const { sendData } = useWebApp()
 
@@ -32,17 +38,5 @@ const onSubmit = () => {
   sendData?.(JSON.stringify(selectedStaffIds.value))
 }
 
-const runtimeConfig = useRuntimeConfig()
-
-const { data: staffList } = useFetch("/staff/", {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  transform(data: { staff: Staff[] }): Staff[] {
-    return data.staff
-  },
-})
-
-const notBannedStaffList = computed(
-  (): Staff[] =>
-    staffList.value?.filter((staff: Staff) => staff.banned_at !== null) ?? [],
-)
+const { data, status } = useStaffList()
 </script>
