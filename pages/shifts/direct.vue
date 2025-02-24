@@ -7,7 +7,7 @@
         v-model="date"
         inline
         date-format="dd/mm/yy"
-        :min-date="new Date()"
+        :min-date="subDays(new Date(), 1)"
         fluid
       />
     </div>
@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
 import type { Staff } from '~/types/staff'
+import { subDays } from 'date-fns'
 
 const { showConfirm } = useWebAppPopup()
 
