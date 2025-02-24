@@ -31,6 +31,16 @@
         @click="isCreateDialogVisible = true"
       />
     </div>
+    <FileUpload
+        mode="basic"
+        name="demo[]"
+        url="/api/upload"
+        accept="image/*"
+        :maxFileSize="1000000"
+        :auto="true"
+        chooseLabel="Browse"
+      />
+
     <CarTransporterPenaltyCreateDialog
       v-if="shiftsStatus === 'success'"
       v-model:visible="isCreateDialogVisible"
