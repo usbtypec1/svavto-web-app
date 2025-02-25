@@ -28,7 +28,7 @@
           @date-select="onDateSelect"
           selection-mode="multiple"
           inline
-          :disabled="shiftsStatus === 'success'"
+          :disabled="shiftsStatus !== 'success'"
         />
         <Message
           v-if="shiftsStatus === 'error'"
