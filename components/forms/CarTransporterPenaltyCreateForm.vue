@@ -65,6 +65,11 @@
       >
     </FormField>
 
+    <MultipleFilesUploader
+      v-model:uploaded-photo-urls="uploadedPhotoUrls"
+      label="Фото штрафа"
+    />
+
     <Button
       :disabled="!$form.valid"
       type="submit"
@@ -107,11 +112,16 @@ const resolver = ref(
   ),
 )
 
+const uploadedPhotoUrls = ref<string[]>([])
+
 const reasons: string[] = ["Невыход", "Ранний уход", "Отчет не вовремя"]
 
 const onSubmitForm = ({ valid, values }: FormSubmitEvent): void => {
   if (valid) {
-    emit("submit", values as CarTransporterPenaltyCreateEvent)
+    emit("submit", {
+      ...values,
+      photoUrls: uploadedPhotoUrls.value,
+    } as CarTransporterPenaltyCreateEvent)
   }
 }
 

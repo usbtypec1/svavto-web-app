@@ -24,6 +24,7 @@ export interface CarTransporterPenaltyCreateEvent {
   shiftId: number
   reason: string
   amount: number
+  photoUrls: string[]
 }
 
 export interface CarWashPenaltyCreateEvent {

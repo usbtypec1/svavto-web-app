@@ -31,16 +31,6 @@
         @click="isCreateDialogVisible = true"
       />
     </div>
-    <FileUpload
-        mode="basic"
-        name="demo[]"
-        url="/api/upload"
-        accept="image/*"
-        :maxFileSize="1000000"
-        :auto="true"
-        chooseLabel="Browse"
-      />
-
     <CarTransporterPenaltyCreateDialog
       v-if="shiftsStatus === 'success'"
       v-model:visible="isCreateDialogVisible"
@@ -128,6 +118,7 @@ const createPenalty = async ({
   amount,
   reason,
   shiftId,
+  photoUrls,
 }: CarTransporterPenaltyCreateEvent): Promise<void> => {
   await $fetch("/economics/penalties/", {
     baseURL: runtimeConfig.public.apiBaseUrl,
@@ -136,6 +127,7 @@ const createPenalty = async ({
       amount,
       reason,
       shift_id: shiftId,
+      photo_urls: photoUrls,
     },
     async onResponse() {
       showAlert(`❗️ Сотрудник ${selectedStaff.value?.full_name} оштрафован`)
@@ -153,6 +145,7 @@ const onCreatePenalty = ({
   amount,
   reason,
   shiftId,
+  photoUrls,
 }: CarTransporterPenaltyCreateEvent): void => {
   notificationOccurred("warning")
   showConfirm(
@@ -160,7 +153,7 @@ const onCreatePenalty = ({
     async (ok: boolean) => {
       if (!ok) return
       try {
-        createPenalty({ amount, reason, shiftId })
+        createPenalty({ amount, reason, shiftId, photoUrls })
       } finally {
         isCreateDialogVisible.value = false
       }
