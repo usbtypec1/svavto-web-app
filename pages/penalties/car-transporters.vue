@@ -153,7 +153,7 @@ const onCreatePenalty = ({
     async (ok: boolean) => {
       if (!ok) return
       try {
-        createPenalty({ amount, reason, shiftId, photoUrls })
+        await createPenalty({ amount, reason, shiftId, photoUrls })
       } finally {
         isCreateDialogVisible.value = false
       }

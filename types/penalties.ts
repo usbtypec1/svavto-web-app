@@ -9,6 +9,7 @@ export interface Penalty {
   reason: string
   amount: number
   consequence: PenaltyConsequence | null
+  photo_urls: string[]
   created_at: string
 }
 
