@@ -19,6 +19,7 @@ export interface ShiftListItem {
   staff_full_name: string
   started_at: string | null
   finished_at: string | null
+  confirmed_at: string | null
   created_at: string
   type: "regular" | "extra" | "test"
 }
