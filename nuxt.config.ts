@@ -123,7 +123,7 @@ export default defineNuxtConfig({
     'primeicons/primeicons.css',
   ],
   app: {
-    baseURL: '/app/',
+    baseURL: process.env.NUXT_APP_BASE_URL,
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       script: [
