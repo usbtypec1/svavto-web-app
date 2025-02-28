@@ -37,11 +37,12 @@ import type {
   CarWashSurchargeCreateEvent,
 } from "~/types/surcharges"
 import CarWashSurchargeCreateDialog from "~/components/dialogs/CarWashSurchargeCreateDialog.vue"
-import { useWebAppPopup, BackButton } from "vue-tg"
+import { useWebAppPopup, BackButton, useWebAppHapticFeedback } from "vue-tg"
 import type { CarWashWithServices } from "~/types/car-washes"
 import CarWashSurchargeListDataView from "~/components/data-views/CarWashSurchargeListDataView.vue"
 import { formatDate } from "date-fns"
 
+const { notificationOccurred } = useWebAppHapticFeedback()
 const { showAlert, showConfirm } = useWebAppPopup()
 
 const runtimeConfig = useRuntimeConfig()
@@ -86,18 +87,21 @@ const onCreateCarWashSurcharge = async ({
     },
     async onResponse({ response }) {
       if (!response.ok) return
-      await refreshCarWashSurcharges()
+      notificationOccurred('success')
       showAlert(
         `✅ Мойке ${carWash.value!.name} успешно доплачено ${amount} рублей`,
       )
+      await refreshCarWashSurcharges()
     },
     onResponseError() {
+      notificationOccurred('error')
       showAlert(`❌ Не удалось доплатить мойке ${carWash.value?.name}`)
     },
   })
 }
 
 const onDeleteSurcharge = async (surchargeId: number): Promise<void> => {
+  notificationOccurred('warning')
   showConfirm(
     "❗️ Вы уверены что хотите удалить доплату?",
     async (ok: boolean): Promise<void> => {
@@ -107,10 +111,12 @@ const onDeleteSurcharge = async (surchargeId: number): Promise<void> => {
         baseURL: runtimeConfig.public.apiBaseUrl,
         async onResponse({ response }) {
           if (!response.ok) return
-          await refreshCarWashSurcharges()
+          notificationOccurred('success')
           showAlert(`❗️ Доплата успешно удалена`)
+          await refreshCarWashSurcharges()
         },
         onResponseError() {
+          notificationOccurred('error')
           showAlert(`❌ Не удалось удалить доплату`)
         },
       })

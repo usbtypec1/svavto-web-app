@@ -35,11 +35,12 @@ import type {
   CarWashPenaltyCreateEvent,
 } from "~/types/penalties"
 import CarWashPenaltyCreateDialog from "~/components/dialogs/CarWashPenaltyCreateDialog.vue"
-import { useWebAppPopup, BackButton } from "vue-tg"
+import { useWebAppPopup, BackButton, useWebAppHapticFeedback } from "vue-tg"
 import type { CarWashWithServices } from "~/types/car-washes"
 import CarWashPenaltyListDataView from "~/components/data-views/CarWashPenaltyListDataView.vue"
 import { formatDate } from "date-fns"
 
+const { notificationOccurred } = useWebAppHapticFeedback()
 const { showAlert, showConfirm } = useWebAppPopup()
 
 const runtimeConfig = useRuntimeConfig()
@@ -85,20 +86,23 @@ const onCreateCarWashPenalty = async ({
     },
     async onResponse({ response }) {
       if (!response.ok) return
-      await refreshCarWashPenalties()
+      notificationOccurred('success')
       showAlert(
         `❗️ Мойка ${
           carWash.value!.name
         } успешно оштрафована на сумму ${amount} рублей`,
       )
+      await refreshCarWashPenalties()
     },
     onResponseError() {
+      notificationOccurred('error')
       showAlert(`❌ Не удалось оштрафовать мойку ${carWash.value?.name}`)
     },
   })
 }
 
 const onDeletePenalty = async (penaltyId: number): Promise<void> => {
+  notificationOccurred('warning')
   showConfirm(
     "❗️ Вы уверены что хотите удалить штраф?",
     async (ok: boolean): Promise<void> => {
@@ -108,10 +112,12 @@ const onDeletePenalty = async (penaltyId: number): Promise<void> => {
         baseURL: runtimeConfig.public.apiBaseUrl,
         async onResponse({ response }) {
           if (!response.ok) return
-          await refreshCarWashPenalties()
+          notificationOccurred('success')
           showAlert(`❗️ Штраф успешно удален`)
+          await refreshCarWashPenalties()
         },
         onResponseError() {
+          notificationOccurred('error')
           showAlert(`❌ Не удалось удалить штраф`)
         },
       })
