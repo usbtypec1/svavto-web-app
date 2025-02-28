@@ -38,6 +38,7 @@ import CarWashPenaltyCreateDialog from "~/components/dialogs/CarWashPenaltyCreat
 import { useWebAppPopup, BackButton } from "vue-tg"
 import type { CarWashWithServices } from "~/types/car-washes"
 import CarWashPenaltyListDataView from "~/components/data-views/CarWashPenaltyListDataView.vue"
+import { formatDate } from "date-fns"
 
 const { showAlert, showConfirm } = useWebAppPopup()
 
@@ -70,7 +71,9 @@ const { data: carWash, status: carWashStatus } = useFetch<CarWashWithServices>(
 const onCreateCarWashPenalty = async ({
   amount,
   reason,
+  date,
 }: CarWashPenaltyCreateEvent): Promise<void> => {
+  console.log({ amount, reason, date })
   await $fetch("/economics/car-washes/penalties/", {
     method: "POST",
     baseURL: runtimeConfig.public.apiBaseUrl,
@@ -78,8 +81,10 @@ const onCreateCarWashPenalty = async ({
       car_wash_id: carWashId,
       amount,
       reason,
+      date: formatDate(date, "yyyy-MM-dd"),
     },
-    async onResponse() {
+    async onResponse({ response }) {
+      if (!response.ok) return
       await refreshCarWashPenalties()
       showAlert(
         `❗️ Мойка ${
@@ -101,7 +106,8 @@ const onDeletePenalty = async (penaltyId: number): Promise<void> => {
       await $fetch(`/economics/car-washes/penalties/${penaltyId}/`, {
         method: "DELETE",
         baseURL: runtimeConfig.public.apiBaseUrl,
-        async onResponse() {
+        async onResponse({ response }) {
+          if (!response.ok) return
           await refreshCarWashPenalties()
           showAlert(`❗️ Штраф успешно удален`)
         },

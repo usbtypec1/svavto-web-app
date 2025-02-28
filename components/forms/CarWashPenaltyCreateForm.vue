@@ -8,10 +8,20 @@
     v-slot="$form"
   >
     <FormField v-slot="$field" name="amount" class="flex flex-col gap-1">
-      <label class="font-semibold" for="penalty_amount">
-        Сумма
-      </label>
+      <label class="font-semibold" for="penalty_amount"> Сумма </label>
       <InputNumber input-id="penalty_amount" type="text" />
+      <Message
+        v-if="$field?.invalid"
+        severity="error"
+        size="small"
+        variant="simple"
+        >{{ $field.error?.message }}</Message
+      >
+    </FormField>
+
+    <FormField v-slot="$field" name="date" class="flex flex-col gap-1">
+      <label class="font-semibold" for="penalty_date">Дата</label>
+      <DatePicker input-id="penalty_date" />
       <Message
         v-if="$field?.invalid"
         severity="error"
@@ -59,6 +69,7 @@ const resolver = ref(
         .number({ message: "Введите сумму штрафа" })
         .min(1, { message: "Минимальная сумма штрафа 1" })
         .max(1_000_000, { message: "Максимальная сумма штрафа 1 000 000" }),
+      date: z.date({ message: "Введите дату штрафа" }),
       reason: z
         .string({ message: "Введите причину штрафа" })
         .min(1, { message: "Минимальная длина 1 символ" })

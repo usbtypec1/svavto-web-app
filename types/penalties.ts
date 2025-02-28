@@ -18,6 +18,7 @@ export interface CarWashPenalty {
   car_wash_id: number
   reason: string
   amount: number
+  date: string
   created_at: string
 }
 
@@ -30,5 +31,6 @@ export interface CarTransporterPenaltyCreateEvent {
 
 export interface CarWashPenaltyCreateEvent {
   reason: string
+  date: Date
   amount: number
 }

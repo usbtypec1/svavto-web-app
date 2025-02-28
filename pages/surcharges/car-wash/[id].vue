@@ -40,6 +40,7 @@ import CarWashSurchargeCreateDialog from "~/components/dialogs/CarWashSurchargeC
 import { useWebAppPopup, BackButton } from "vue-tg"
 import type { CarWashWithServices } from "~/types/car-washes"
 import CarWashSurchargeListDataView from "~/components/data-views/CarWashSurchargeListDataView.vue"
+import { formatDate } from "date-fns"
 
 const { showAlert, showConfirm } = useWebAppPopup()
 
@@ -72,6 +73,7 @@ const { data: carWash, status: carWashStatus } = useFetch<CarWashWithServices>(
 const onCreateCarWashSurcharge = async ({
   amount,
   reason,
+  date,
 }: CarWashSurchargeCreateEvent): Promise<void> => {
   await $fetch("/economics/car-washes/surcharges/", {
     method: "POST",
@@ -80,8 +82,10 @@ const onCreateCarWashSurcharge = async ({
       car_wash_id: carWashId,
       amount,
       reason,
+      date: formatDate(date, 'yyyy-MM-dd'),
     },
-    async onResponse() {
+    async onResponse({ response }) {
+      if (!response.ok) return
       await refreshCarWashSurcharges()
       showAlert(
         `✅ Мойке ${carWash.value!.name} успешно доплачено ${amount} рублей`,
@@ -101,7 +105,8 @@ const onDeleteSurcharge = async (surchargeId: number): Promise<void> => {
       await $fetch(`/economics/car-washes/surcharges/${surchargeId}/`, {
         method: "DELETE",
         baseURL: runtimeConfig.public.apiBaseUrl,
-        async onResponse() {
+        async onResponse({ response }) {
+          if (!response.ok) return
           await refreshCarWashSurcharges()
           showAlert(`❗️ Доплата успешно удалена`)
         },

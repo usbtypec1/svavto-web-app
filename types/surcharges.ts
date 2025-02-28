@@ -14,12 +14,14 @@ export interface CarWashSurcharge {
   car_wash_id: number
   reason: string
   amount: number
+  date: string
   created_at: string
 }
 
 export interface CarWashSurchargeCreateEvent {
   reason: string
   amount: number
+  date: Date
 }
 
 export interface CarTransporterSurchargeCreateEvent {

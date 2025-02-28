@@ -23,7 +23,10 @@
             </p>
             <p class="text-gray-500">Причина: {{ surcharge.reason }}</p>
             <p class="text-gray-500 text-sm flex items-center gap-x-1">
-              Дата: {{ formatDate(surcharge.created_at, "dd.MM.yyyy HH:mm") }}
+              Дата: {{ formatDate(parseISO(surcharge.date), "dd.MM.yyyy") }}
+            </p>
+            <p class="text-gray-500 text-sm flex items-center gap-x-1">
+              Дата доплаты: {{ formatDate(parseISO(surcharge.created_at), "dd.MM.yyyy HH:mm") }}
             </p>
           </div>
           <div>
@@ -41,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDate } from "date-fns"
+import { formatDate, parseISO } from "date-fns"
 import type { CarWashSurcharge } from "~/types/surcharges"
 
 defineProps<{
