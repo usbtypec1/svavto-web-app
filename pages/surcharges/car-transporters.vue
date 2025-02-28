@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-xl font-semibold mb-3">Оштрафовать сотрудника</h1>
+    <h1 class="text-xl font-semibold mb-3">Доплатить сотруднику</h1>
     <ProgressSpinner v-if="staffListStatus === 'pending'" />
     <Select
       v-else-if="staffListStatus === 'success'"
@@ -15,39 +15,39 @@
       empty-filter-message="Сотрудник не найден"
       empty-message="Нет сотрудников"
     />
-    <div v-if="selectedStaff && penaltiesStatus === 'success'" class="my-4">
-      <CarTransporterPenaltyListDataView
-        :car-transporter-penalties="penalties!"
+    <div v-if="selectedStaff && surchargesStatus === 'success'" class="my-4">
+      <CarTransporterSurchargeListDataView
+        :car-transporter-surcharges="surcharges!"
         :staff="selectedStaff"
-        @delete-penalty="onDeletePenalty"
+        @delete-surcharge="onDeleteSurcharge"
       />
       <Button
         rounded
-        label="Добавить штраф"
+        label="Добавить доплату"
         icon="pi pi-plus"
-        severity="danger"
+        severity="success"
         fluid
         class="mt-3"
         @click="isCreateDialogVisible = true"
       />
     </div>
-    <CarTransporterPenaltyCreateDialog
+    <CarTransporterSurchargeCreateDialog
       v-if="shiftsStatus === 'success'"
       v-model:visible="isCreateDialogVisible"
       :shifts="shifts!"
-      @create-car-transporter-penalty="onCreatePenalty"
+      @create-car-transporter-surcharge="onCreateSurcharge"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import CarTransporterPenaltyCreateDialog from "~/components/dialogs/CarTransporterPenaltyCreateDialog.vue"
-import CarTransporterPenaltyListDataView from "~/components/data-views/CarTransporterPenaltyListDataView.vue"
+import CarTransporterSurchargeListDataView from "~/components/data-views/CarTransporterSurchargeListDataView.vue"
+import CarTransporterSurchargeCreateDialog from "~/components/dialogs/CarTransporterSurchargeCreateDialog.vue"
 import { useWebAppPopup, useWebAppHapticFeedback } from "vue-tg"
 import type {
-  Penalty,
-  CarTransporterPenaltyCreateEvent,
-} from "~/types/penalties"
+  Surcharge,
+  CarTransporterSurchargeCreateEvent,
+} from "~/types/surcharges"
 import type { StaffIdAndName } from "~/types/staff"
 import type { ShiftListItem } from "~/types/shifts"
 
@@ -66,27 +66,27 @@ const { data: staffList, status: staffListStatus } = useFetch("/staff/", {
   },
 })
 
-const penaltiesQuery = computed(() => ({
+const surchargesQuery = computed(() => ({
   staff_ids: selectedStaff.value?.id,
   limit: 1000,
 }))
 const {
-  data: penalties,
-  status: penaltiesStatus,
-  refresh: refreshPenalties,
-} = useFetch("/economics/penalties/", {
+  data: surcharges,
+  status: surchargesStatus,
+  refresh: refreshSurcharges,
+} = useFetch("/economics/surcharges/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
-  query: penaltiesQuery,
+  query: surchargesQuery,
   watch: [selectedStaff],
   immediate: false,
-  transform(data: { penalties: Penalty[] }) {
-    return data.penalties
+  transform(data: { surcharges: Surcharge[] }) {
+    return data.surcharges
   },
 })
 
 const { data: shifts, status: shiftsStatus } = useFetch("/shifts/v2/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
-  query: penaltiesQuery,
+  query: surchargesQuery,
   immediate: false,
   watch: [selectedStaff],
   transform(data: { shifts: ShiftListItem[] }) {
@@ -94,68 +94,67 @@ const { data: shifts, status: shiftsStatus } = useFetch("/shifts/v2/", {
   },
 })
 
-const onDeletePenalty = async (penaltyId: number) => {
+const onDeleteSurcharge = async (surchargeId: number) => {
   notificationOccurred("warning")
-  showConfirm("Вы уверены что хотите удалить штраф?", async (ok: boolean) => {
+  showConfirm("Вы уверены что хотите удалить доплату?", async (ok: boolean) => {
     if (!ok) return
-    await $fetch(`/economics/penalties/${penaltyId}/`, {
+    await $fetch(`/economics/surcharges/${surchargeId}/`, {
       baseURL: runtimeConfig.public.apiBaseUrl,
       method: "DELETE",
       async onResponse({ response }) {
         if (!response.ok) return
-        showAlert("❗️ Штраф удален")
+        showAlert("❗️ Доплата удалена")
         notificationOccurred("success")
-        await refreshPenalties()
+        await refreshSurcharges()
       },
       onResponseError() {
-        showAlert("❌ Не удалось удалить штраф")
+        showAlert("❌ Не удалось удалить доплату")
         notificationOccurred("error")
       },
     })
   })
 }
 
-const createPenalty = async ({
+const createSurcharge = async ({
   amount,
   reason,
   shiftId,
-  photoUrls,
-}: CarTransporterPenaltyCreateEvent): Promise<void> => {
-  await $fetch("/economics/penalties/", {
+}: CarTransporterSurchargeCreateEvent): Promise<void> => {
+  await $fetch("/economics/surcharges/", {
     baseURL: runtimeConfig.public.apiBaseUrl,
     method: "POST",
     body: {
       amount,
       reason,
       shift_id: shiftId,
-      photo_urls: photoUrls,
     },
     async onResponse({ response }) {
       if (!response.ok) return
-      showAlert(`❗️ Сотрудник ${selectedStaff.value?.full_name} оштрафован`)
+      showAlert(
+        `❗️ Сотруднику ${selectedStaff.value?.full_name} доплачено ${amount} рублей`,
+      )
       notificationOccurred("success")
-      await refreshPenalties()
+      await refreshSurcharges()
     },
     onResponseError() {
-      showAlert("❌ Не удалось оштрафовать сотрудника")
+      showAlert("❌ Не удалось доплатить сотруднику")
       notificationOccurred("error")
     },
   })
 }
 
-const onCreatePenalty = ({
+const onCreateSurcharge = ({
   amount,
   reason,
   shiftId,
-  photoUrls,
-}: CarTransporterPenaltyCreateEvent): void => {
+}: CarTransporterSurchargeCreateEvent): void => {
   notificationOccurred("warning")
   showConfirm(
-    `Вы уверены что хотите оштрафовать сотрудника ${selectedStaff.value?.full_name} на сумму ${amount}?`,
+    `Вы уверены что хотите доплатить сотруднику ${selectedStaff.value?.full_name} ${amount} рублей?`,
     async (ok: boolean) => {
       if (!ok) return
       try {
-        await createPenalty({ amount, reason, shiftId, photoUrls })
+        await createSurcharge({ amount, reason, shiftId })
       } finally {
         isCreateDialogVisible.value = false
       }

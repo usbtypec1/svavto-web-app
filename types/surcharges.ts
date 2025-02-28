@@ -21,3 +21,9 @@ export interface CarWashSurchargeCreateEvent {
   reason: string
   amount: number
 }
+
+export interface CarTransporterSurchargeCreateEvent {
+  shiftId: number
+  reason: string
+  amount: number
+}
