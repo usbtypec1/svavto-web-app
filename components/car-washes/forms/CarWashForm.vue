@@ -3,6 +3,8 @@
     v-slot="$form"
     @submit="onSubmit"
     :resolver="resolver"
+    :validate-on-value-update="false"
+    :validate-on-blur="true"
     class="flex flex-col gap-y-2"
   >
     <FormField
@@ -39,19 +41,19 @@
 </template>
 
 <script setup lang="ts">
-import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
-import { zodResolver } from "@primevue/forms/resolvers/zod";
-import { z } from "zod";
+import { Form, FormField, type FormSubmitEvent } from "@primevue/forms"
+import { zodResolver } from "@primevue/forms/resolvers/zod"
+import { z } from "zod"
 
 interface Props {
-  initialValues?: Record<string, string | number>;
+  initialValues?: Record<string, string | number>
 }
 
-const { initialValues = {} } = defineProps<Props>();
+const { initialValues = {} } = defineProps<Props>()
 
-const emit = defineEmits(["submit"]);
+const emit = defineEmits(["submit"])
 
-const isLoading = defineModel<boolean>("isLoading", { default: false });
+const isLoading = defineModel<boolean>("isLoading", { default: false })
 
 const fields = [
   {
@@ -84,7 +86,7 @@ const fields = [
     type: "number",
     initialValue: 0,
   },
-];
+]
 
 const resolver = ref(
   zodResolver(
@@ -103,12 +105,12 @@ const resolver = ref(
       windshield_washer_price_per_bottle: z
         .number({ message: "Введите цену " })
         .min(0),
-    })
-  )
-);
+    }),
+  ),
+)
 
 const onSubmit = ({ values, valid }: FormSubmitEvent): void => {
-  if (!valid) return;
-  emit("submit", values);
-};
+  if (!valid) return
+  emit("submit", values)
+}
 </script>

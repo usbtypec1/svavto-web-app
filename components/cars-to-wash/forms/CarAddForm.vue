@@ -1,5 +1,11 @@
 <template>
-  <Form :resolver @submit="onSubmit" class="flex flex-col gap-y-4">
+  <Form
+    :resolver
+    @submit="onSubmit"
+    class="flex flex-col gap-y-4"
+    :validate-on-value-update="false"
+    :validate-on-blur="true"
+  >
     <FormField v-slot="$number" name="number">
       <Fieldset>
         <template #legend>
@@ -159,7 +165,10 @@ import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
 import { classTypeOptions, washTypeOptions } from "~/utils/car-wash-services"
 import { useWebAppPopup } from "vue-tg"
-import { windshieldWasherRefilledBottlePercentageOptions, windshieldWasherOptions } from "~/utils/car-transfers"
+import {
+  windshieldWasherRefilledBottlePercentageOptions,
+  windshieldWasherOptions,
+} from "~/utils/car-transfers"
 
 const emit = defineEmits([
   "submitWithoutAdditionalServices",

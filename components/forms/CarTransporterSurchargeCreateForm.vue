@@ -2,7 +2,7 @@
   <Form
     :resolver
     class="flex flex-col gap-4 w-full"
-    :validate-on-value-update="true"
+    :validate-on-value-update="false"
     :validate-on-blur="true"
     @submit="onSubmitForm"
     v-slot="$form"

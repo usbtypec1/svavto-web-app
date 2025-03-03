@@ -67,7 +67,7 @@ const currentCarWashId = ref<number | null>(null)
 
 const runtimeConfig = useRuntimeConfig()
 
-const { data: carWashes, status: carWashesStatus } = await useFetch<CarWashListItem[]>('/car-washes/', {
+const { data: carWashes, status: carWashesStatus } = await useFetch('/car-washes/', {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform: (data: { car_washes: CarWashListItem[] }): CarWashListItem[] => data.car_washes,
 })
