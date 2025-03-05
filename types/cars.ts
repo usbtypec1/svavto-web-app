@@ -84,6 +84,7 @@ export interface UpdatedAdditionalService {
 
 export interface TransferredCarUpdateEvent {
   additionalServices: UpdatedAdditionalService[]
+  carWashId: number
   classType: string
   number: string
   washType: string

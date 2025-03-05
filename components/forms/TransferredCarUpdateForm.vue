@@ -273,9 +273,11 @@ const onShowCarNumberHelpText = (): void => {
 
 const onSubmit = ({ valid, values }: FormSubmitEvent) => {
   if (!valid) {
+    showAlert('Ошибка при сохранении формы. Не все поля заполнены корректно.')
     console.error(`Invalid car update form: values=${JSON.stringify(values)}`)
   } else {
     values.additionalServices = updatedAdditionalServices.value
+    values.carWashId = carWashId.value
     if (values["windshieldWasher"] !== windshieldWasherOptions[2]) {
       values.windshield_washer_refilled_bottle_percentage = 0
     }
