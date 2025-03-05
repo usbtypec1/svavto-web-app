@@ -78,7 +78,7 @@ const {
   status: carWashStatus,
   refresh: refreshCarWash,
 } = useFetch<CarWashWithServices>(
-  (): string => `/car-washes/${carToWash.value?.car_wash?.id}/`,
+  (): string => `/car-washes/${carToWash.value?.car_wash_id}/`,
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
     immediate: false,
