@@ -1,8 +1,8 @@
-import type { AdditionalService } from '~/types/additional-services'
-import type { CarWashIdAndName } from '~/types/car-washes'
+import type { AdditionalService } from "~/types/additional-services"
+import type { CarWashIdAndName } from "~/types/car-washes"
 
-export type ClassTypeValue = 'comfort' | 'business' | 'van'
-export type WashTypeValue = 'planned' | 'urgent'
+export type ClassTypeValue = "comfort" | "business" | "van"
+export type WashTypeValue = "planned" | "urgent"
 
 export interface CarToWash {
   number: string
@@ -11,8 +11,7 @@ export interface CarToWash {
   windshieldWasherRefilledBottlePercentage: number
 }
 
-export interface CarToWashDraft extends Partial<CarToWash> {
-}
+export interface CarToWashDraft extends Partial<CarToWash> {}
 
 export interface ClassType {
   label: string
@@ -33,4 +32,60 @@ export interface CarToWashDetail {
   created_at: string
   additional_services: AdditionalService[]
   car_wash: CarWashIdAndName
+}
+
+export interface TranferredCarsListItemAdditionalService {
+  id: string
+  name: string
+  count: number
+}
+
+export interface TranferredCarsListItem {
+  id: number
+  number: string
+  class_type: ClassTypeValue
+  wash_type: WashTypeValue
+  car_wash_id: number
+  car_wash_name: string
+  windshield_washer_refilled_bottle_percentage: number
+  additional_services: TranferredCarsListItemAdditionalService[]
+  created_at: string
+}
+
+export interface TransferredCarsListResponseData {
+  staff_id: number
+  staff_full_name: string
+  shift_id: number
+  shift_date: string
+  transferred_cars: TranferredCarsListItem[]
+}
+
+export interface TransferredCarDetail {
+  id: number
+  staff_id: number
+  staff_full_name: string
+  shift_id: number
+  shift_date: string
+  number: string
+  class_type: ClassTypeValue
+  wash_type: WashTypeValue
+  car_wash_id: number
+  car_wash_name: string
+  windshield_washer_refilled_bottle_percentage: number
+  additional_services: TranferredCarsListItemAdditionalService[]
+  created_at: string
+}
+
+
+export interface UpdatedAdditionalService {
+  id: string
+  count: number
+}
+
+export interface TransferredCarUpdateEvent {
+  additionalServices: UpdatedAdditionalService[]
+  classType: string
+  number: string
+  washType: string
+  windshieldWasherRefilledBottlePercentage: number
 }

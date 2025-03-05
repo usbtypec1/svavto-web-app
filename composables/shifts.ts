@@ -48,3 +48,11 @@ export const useShifts = (date: Ref<Date>) => {
     staffIds,
   }
 }
+
+export const useActiveShift = (staffId: number) => {
+  const runtimeConfig = useRuntimeConfig()
+
+  return useFetch(`/shifts/current/${staffId}/`, {
+    baseURL: runtimeConfig.public.apiBaseUrl,
+  })
+}

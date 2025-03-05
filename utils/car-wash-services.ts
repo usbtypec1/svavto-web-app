@@ -1,10 +1,17 @@
-import type { CarWashService } from '~/types/car-wash-services'
-import type { ClassType, WashType } from '~/types/cars'
+import type { CarWashService } from "~/types/car-wash-services"
+import type {
+  ClassType,
+  WashType,
+  ClassTypeValue,
+  WashTypeValue,
+} from "~/types/cars"
 
-export const groupCarWashServicesByParent = (services: CarWashService[]): Record<string, CarWashService[]> => {
+export const groupCarWashServicesByParent = (
+  services: CarWashService[],
+): Record<string, CarWashService[]> => {
   const grouped: Record<string, CarWashService[]> = {}
-  services.forEach(service => {
-    const key = service.parent?.id || 'undefined'
+  services.forEach((service) => {
+    const key = service.parent?.id || "undefined"
     if (!grouped[key]) {
       grouped[key] = []
     }
@@ -13,35 +20,35 @@ export const groupCarWashServicesByParent = (services: CarWashService[]): Record
   return grouped
 }
 
-export const mapCarWashServiceIdToName = (services: CarWashService[]): Record<string, string> => {
-  return Object.fromEntries(
-    services.map(({ id, name }) => [id, name]),
-  )
+export const mapCarWashServiceIdToName = (
+  services: CarWashService[],
+): Record<string, string> => {
+  return Object.fromEntries(services.map(({ id, name }) => [id, name]))
 }
 
 export const classTypeOptions: ClassType[] = [
   {
-    label: 'Комфорт',
-    value: 'comfort',
+    label: "Комфорт",
+    value: "comfort",
   },
   {
-    label: 'Бизнес',
-    value: 'business',
+    label: "Бизнес",
+    value: "business",
   },
   {
-    label: 'Фургон',
-    value: 'van',
+    label: "Фургон",
+    value: "van",
   },
 ]
 
 export const washTypeOptions: WashType[] = [
   {
-    label: 'Плановая',
-    value: 'planned',
+    label: "Плановая",
+    value: "planned",
   },
   {
-    label: 'Срочная',
-    value: 'urgent',
+    label: "Срочная",
+    value: "urgent",
   },
 ]
 
@@ -52,3 +59,11 @@ export const classTypeValueToLabel = Object.fromEntries(
 export const washTypeValueToLabel = Object.fromEntries(
   washTypeOptions.map(({ label, value }) => [value, label]),
 )
+
+export const humanizeClassType = (value: ClassTypeValue): string => {
+  return classTypeValueToLabel[value] ?? value
+}
+
+export const humanizeWashType = (value: WashTypeValue): string => {
+  return washTypeValueToLabel[value] ?? value
+}

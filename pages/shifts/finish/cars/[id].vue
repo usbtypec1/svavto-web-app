@@ -1,0 +1,98 @@
+<template>
+  <div>
+    <template
+      v-if="
+        transferredCarStatus === 'success' &&
+        carWashServicesStatus === 'success' &&
+        carWashesStatus === 'success'
+      "
+    >
+      <TransferredCarUpdateForm
+        @submit="onSubmit"
+        :transferred-car="transferredCar!"
+        :car-wash-services="carWashServices!"
+        :car-washes="carWashes!"
+        v-model:car-wash-id="carWashId"
+      />
+    </template>
+    <ProgressSpinner v-else />
+    <FloatingCornerButton page-name="shifts-finish" severity="secondary" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import FloatingCornerButton from "~/components/navigation/FloatingCornerButton.vue"
+import type {
+  TransferredCarDetail,
+  TransferredCarUpdateEvent,
+} from "~/types/cars"
+import TransferredCarUpdateForm from "~/components/forms/TransferredCarUpdateForm.vue"
+import type { CarWashService } from "~/types/car-wash-services"
+import { useWebAppPopup } from "vue-tg"
+import type { CarWashIdAndName } from "~/types/car-washes"
+
+const { showAlert, showConfirm } = useWebAppPopup()
+
+const route = useRoute()
+const transferredCardId = Number(route.params.id as string)
+
+const runtimeConfig = useRuntimeConfig()
+
+const carWashId = ref<number>()
+const { data: transferredCar, status: transferredCarStatus } =
+  await useFetch<TransferredCarDetail>(`/shifts/cars/${transferredCardId}/`, {
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    transform(data: TransferredCarDetail) {
+      carWashId.value = data.car_wash_id
+      return data
+    },
+  })
+
+const { data: carWashServices, status: carWashServicesStatus } = await useFetch(
+  "/car-washes/services/",
+  {
+    query: { car_wash_ids: carWashId },
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    transform(data: { services: CarWashService[] }) {
+      return data.services
+    },
+  },
+)
+const { data: carWashes, status: carWashesStatus } = await useFetch(
+  "/car-washes/",
+  {
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    transform(data: { car_washes: CarWashIdAndName[] }): CarWashIdAndName[] {
+      return data.car_washes
+    },
+  },
+)
+
+const onSubmit = (values: TransferredCarUpdateEvent) => {
+  showConfirm(
+    `Вы уверены что хотите обновить данные по авто ${values.number}`,
+    async (ok: boolean): Promise<void> => {
+      if (!ok) return
+      await $fetch(`/shifts/cars/${transferredCardId}/`, {
+        method: "PATCH",
+        body: {
+          number: values.number,
+          class_type: values.classType,
+          wash_type: values.washType,
+          windshield_washer_refilled_bottle_percentage:
+            values.windshieldWasherRefilledBottlePercentage,
+          additional_services: values.additionalServices,
+        },
+        baseURL: runtimeConfig.public.apiBaseUrl,
+        onResponse({ response }) {
+          if (response.ok) {
+            showAlert(`Данные по авто ${values.number} успешно обновлены`)
+          } else {
+            showAlert(`Ошибка при обновлении данных по авто ${values.number}`)
+          }
+        },
+      })
+    },
+  )
+}
+</script>
