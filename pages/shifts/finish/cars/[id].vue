@@ -31,7 +31,7 @@ import type { CarWashService } from "~/types/car-wash-services"
 import { useWebAppPopup } from "vue-tg"
 import type { CarWashIdAndName } from "~/types/car-washes"
 
-const { showAlert, showConfirm } = useWebAppPopup()
+const { showAlert } = useWebAppPopup()
 
 const route = useRoute()
 const transferredCarId = Number(route.params.id as string)
@@ -75,31 +75,25 @@ const { data: carWashes, status: carWashesStatus } = await useFetch(
   },
 )
 
-const onSubmit = (values: TransferredCarUpdateEvent) => {
-  showConfirm(
-    `Вы уверены что хотите обновить данные по авто ${values.number}`,
-    async (ok: boolean): Promise<void> => {
-      if (!ok) return
-      await $fetch(`/shifts/cars/${transferredCarId}/`, {
-        method: "PATCH",
-        body: {
-          number: values.number,
-          class_type: values.classType,
-          wash_type: values.washType,
-          windshield_washer_refilled_bottle_percentage:
-            values.windshieldWasherRefilledBottlePercentage,
-          additional_services: values.additionalServices,
-        },
-        baseURL: runtimeConfig.public.apiBaseUrl,
-        onResponse({ response }) {
-          if (response.ok) {
-            showAlert(`Данные по авто ${values.number} успешно обновлены`)
-          } else {
-            showAlert(`Ошибка при обновлении данных по авто ${values.number}`)
-          }
-        },
-      })
+const onSubmit = async (values: TransferredCarUpdateEvent) => {
+  await $fetch(`/shifts/cars/${transferredCarId}/`, {
+    method: "PATCH",
+    body: {
+      number: values.number,
+      class_type: values.classType,
+      wash_type: values.washType,
+      windshield_washer_refilled_bottle_percentage:
+        values.windshieldWasherRefilledBottlePercentage,
+      additional_services: values.additionalServices,
     },
-  )
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    onResponse({ response }) {
+      if (response.ok) {
+        showAlert(`Данные по авто ${values.number} успешно обновлены`)
+      } else {
+        showAlert(`Ошибка при обновлении данных по авто ${values.number}`)
+      }
+    },
+  })
 }
 </script>
