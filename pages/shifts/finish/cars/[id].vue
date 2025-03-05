@@ -80,7 +80,7 @@ const onSubmit = (values: TransferredCarUpdateEvent) => {
     `Вы уверены что хотите обновить данные по авто ${values.number}`,
     async (ok: boolean): Promise<void> => {
       if (!ok) return
-      await $fetch(`/shifts/cars/${transferredCardId}/`, {
+      await $fetch(`/shifts/cars/${transferredCarId}/`, {
         method: "PATCH",
         body: {
           number: values.number,
