@@ -1,11 +1,9 @@
-import { useWebApp } from "vue-tg"
 import { useActiveShift } from "~/composables/shifts"
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (!import.meta.client) return
-  
-  const { initDataUnsafe } = useWebApp()
-  const userId = initDataUnsafe?.user?.id
+
+  const userId = Number(to.params.userId as string)
 
   if (!userId) {
     return navigateTo({ name: "shifts-no-active" })
@@ -17,5 +15,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo({ name: "shifts-no-active" })
   }
 
-  useState<number>('shiftId', () => data.value.id)
+  useState<number>("shiftId", () => data.value.id)
 })

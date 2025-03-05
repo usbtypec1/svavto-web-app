@@ -14,14 +14,14 @@
         :car-washes="carWashes!"
         v-model:car-wash-id="carWashId"
       />
+      <BackButton @click="onNavigateToBackPage" />
     </template>
     <ProgressSpinner v-else />
-    <FloatingCornerButton page-name="shifts-finish" severity="secondary" />
   </div>
 </template>
 
 <script setup lang="ts">
-import FloatingCornerButton from "~/components/navigation/FloatingCornerButton.vue"
+import { BackButton } from "vue-tg"
 import type {
   TransferredCarDetail,
   TransferredCarUpdateEvent,
@@ -34,19 +34,26 @@ import type { CarWashIdAndName } from "~/types/car-washes"
 const { showAlert, showConfirm } = useWebAppPopup()
 
 const route = useRoute()
-const transferredCardId = Number(route.params.id as string)
+const transferredCarId = Number(route.params.id as string)
 
 const runtimeConfig = useRuntimeConfig()
 
 const carWashId = ref<number>()
 const { data: transferredCar, status: transferredCarStatus } =
-  await useFetch<TransferredCarDetail>(`/shifts/cars/${transferredCardId}/`, {
+  await useFetch<TransferredCarDetail>(`/shifts/cars/${transferredCarId}/`, {
     baseURL: runtimeConfig.public.apiBaseUrl,
     transform(data: TransferredCarDetail) {
       carWashId.value = data.car_wash_id
       return data
     },
   })
+
+const onNavigateToBackPage = () => {
+  navigateTo({
+    name: "shifts-finish-userId",
+    params: { userId: transferredCar.value!.staff_id },
+  })
+}
 
 const { data: carWashServices, status: carWashServicesStatus } = await useFetch(
   "/car-washes/services/",
