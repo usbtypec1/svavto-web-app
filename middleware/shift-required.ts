@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!import.meta.client) return
   
   const { initDataUnsafe } = useWebApp()
-  const userId = initDataUnsafe?.user?.id ?? 7715737169
+  const userId = initDataUnsafe?.user?.id
 
   if (!userId) {
     return navigateTo({ name: "shifts-no-active" })
