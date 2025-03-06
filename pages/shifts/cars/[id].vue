@@ -121,9 +121,9 @@ const submitConfirmMessage = computed((): string => {
       carToWash.value!.number
     }`
   }
-  return `Вы уверены? Это действие удалит все ранее внесенные данные по автомобилю ${
+  return `Вы уверены? Это действие обновит данные по автомобилю ${
     carToWash.value!.number
-  }`
+  }. Ранее введенные данные сохраняться`
 })
 
 const onSubmitCarToWashWithAdditionalServices = (): void => {

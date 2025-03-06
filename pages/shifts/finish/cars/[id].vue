@@ -1,22 +1,13 @@
 <template>
   <div>
-    <template
-      v-if="
-        transferredCarStatus === 'success' &&
-        carWashServicesStatus === 'success' &&
-        carWashesStatus === 'success'
-      "
-    >
-      <TransferredCarUpdateForm
-        @submit="onSubmit"
-        :transferred-car="transferredCar!"
-        :car-wash-services="carWashServices!"
-        :car-washes="carWashes!"
-        v-model:car-wash-id="carWashId"
-      />
-      <BackButton @click="onNavigateToBackPage" />
-    </template>
-    <ProgressSpinner v-else />
+    <TransferredCarUpdateForm
+      @submit="onSubmit"
+      :transferred-car="transferredCar!"
+      :car-wash-services="carWashServices!"
+      :car-washes="carWashes!"
+      v-model:car-wash-id="carWashId"
+    />
+    <BackButton @click="onNavigateToBackPage" />
   </div>
 </template>
 
@@ -48,8 +39,8 @@ const { data: transferredCar, status: transferredCarStatus } =
     },
   })
 
-const onNavigateToBackPage = () => {
-  navigateTo({
+const onNavigateToBackPage = async () => {
+  await navigateTo({
     name: "shifts-finish-userId",
     params: { userId: transferredCar.value!.staff_id },
   })
@@ -79,6 +70,7 @@ const onSubmit = async (values: TransferredCarUpdateEvent) => {
   await $fetch(`/shifts/cars/${transferredCarId}/`, {
     method: "PATCH",
     body: {
+      car_wash_id: values.carWashId,
       number: values.number,
       class_type: values.classType,
       wash_type: values.washType,
@@ -87,9 +79,10 @@ const onSubmit = async (values: TransferredCarUpdateEvent) => {
       additional_services: values.additionalServices,
     },
     baseURL: runtimeConfig.public.apiBaseUrl,
-    onResponse({ response }) {
+    async onResponse({ response }) {
       if (response.ok) {
         showAlert(`Данные по авто ${values.number} успешно обновлены`)
+        await onNavigateToBackPage()
       } else {
         showAlert(`Ошибка при обновлении данных по авто ${values.number}`)
       }
