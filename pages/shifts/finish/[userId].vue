@@ -99,7 +99,7 @@
               input-id="is-user-confirmed"
             />
             <label for="is-user-confirmed">
-              Я, подтверждаю что проверил всю введенную информацию
+              Я подтверждаю что проверил всю введенную информацию
             </label>
           </div>
         </Fieldset>

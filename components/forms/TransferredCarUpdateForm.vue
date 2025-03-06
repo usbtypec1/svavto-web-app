@@ -279,7 +279,7 @@ const onSubmit = ({ valid, values }: FormSubmitEvent) => {
     values.additionalServices = updatedAdditionalServices.value
     values.carWashId = carWashId.value
     if (values["windshieldWasher"] !== windshieldWasherOptions[2]) {
-      values.windshield_washer_refilled_bottle_percentage = 0
+      values.windshieldWasherRefilledBottlePercentage = 0
     }
     emit("submit", values as TransferredCarUpdateEvent)
   }
