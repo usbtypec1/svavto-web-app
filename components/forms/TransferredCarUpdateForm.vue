@@ -11,7 +11,7 @@
       <Fieldset>
         <template #legend>
           <div
-            @click="onShowCarNumberHelpText"
+            @click="onShowTextDisplayDialog('transferred_car_number_help_text')"
             class="flex items-center gap-x-2"
           >
             <i class="pi pi-info-circle"></i>
@@ -31,7 +31,16 @@
     </FormField>
 
     <FormField v-slot="$classType" name="classType">
-      <Fieldset legend="Класс автомобиля">
+      <Fieldset>
+        <template #legend>
+          <div
+            @click="onShowTextDisplayDialog('transferred_car_class_help_text')"
+            class="flex items-center gap-x-2"
+          >
+            <i class="pi pi-info-circle"></i>
+            <span>Класс автомобиля</span>
+          </div>
+        </template>
         <SelectButton
           :options="classTypeOptions"
           option-label="label"
@@ -162,8 +171,12 @@
       type="submit"
     />
 
-    <BackButton @click="navigateTo('shifts-finish')"/>
+    <BackButton @click="navigateTo('shifts-finish')" />
   </Form>
+  <TextDisplayDialog
+    :text-key="textKey!"
+    v-model:visible="isTextDialogVisible"
+  />
 </template>
 
 <script setup lang="ts">
@@ -184,6 +197,7 @@ import {
 import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
 import type { CarWashService } from "~/types/car-wash-services"
 import type { CarWashIdAndName } from "~/types/car-washes"
+import TextDisplayDialog from "~/components/dialogs/TextDisplayDialog.vue"
 
 const props = defineProps<{
   transferredCar: TransferredCarDetail
@@ -265,15 +279,17 @@ const resolver = ref(
   ),
 )
 
-const onShowCarNumberHelpText = (): void => {
-  showAlert(
-    "Если в сервисном приложении нажать на номер, он скопируется и не придется печатать его вручную.",
-  )
+const isTextDialogVisible = ref<boolean>(false)
+const textKey = ref<string | null>(null)
+const onShowTextDisplayDialog = (key: string): void => {
+  textKey.value = key
+  isTextDialogVisible.value = true
+  console.log("onShowTextDisplayDialog", key)
 }
 
 const onSubmit = ({ valid, values }: FormSubmitEvent) => {
   if (!valid) {
-    showAlert('Ошибка при сохранении формы. Не все поля заполнены корректно.')
+    showAlert("Ошибка при сохранении формы. Не все поля заполнены корректно.")
     console.error(`Invalid car update form: values=${JSON.stringify(values)}`)
   } else {
     values.additionalServices = updatedAdditionalServices.value

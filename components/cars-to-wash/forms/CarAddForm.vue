@@ -10,7 +10,7 @@
       <Fieldset>
         <template #legend>
           <div
-            @click="onShowCarNumberHelpText"
+            @click="onShowTextDisplayDialog('transferred_car_number_help_text')"
             class="flex items-center gap-x-2"
           >
             <i class="pi pi-info-circle"></i>
@@ -36,7 +36,17 @@
     </FormField>
 
     <FormField v-slot="$classType" name="classType">
-      <Fieldset legend="Класс автомобиля">
+      <Fieldset>
+        <template #legend>
+          <div
+            @click="onShowTextDisplayDialog('transferred_car_class_help_text')"
+            class="flex items-center gap-x-2"
+          >
+            <i class="pi pi-info-circle"></i>
+            <span>Класс автомобиля</span>
+          </div>
+        </template>
+
         <SelectButton
           :options="classTypeOptions"
           option-label="label"
@@ -156,6 +166,7 @@
       </div>
     </Fieldset>
   </Form>
+  <TextDisplayDialog :text-key="textKey!" v-model:visible="isTextDialogVisible" />
 </template>
 
 <script setup lang="ts">
@@ -164,18 +175,16 @@ import { Form, FormField, type FormSubmitEvent } from "@primevue/forms"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
 import { classTypeOptions, washTypeOptions } from "~/utils/car-wash-services"
-import { useWebAppPopup } from "vue-tg"
 import {
   windshieldWasherRefilledBottlePercentageOptions,
   windshieldWasherOptions,
 } from "~/utils/car-transfers"
+import TextDisplayDialog from "~/components/dialogs/TextDisplayDialog.vue"
 
 const emit = defineEmits([
   "submitWithoutAdditionalServices",
   "submitWithAdditionalServices",
 ])
-
-const { showAlert } = useWebAppPopup()
 
 const isAdditionalServicesIncluded = ref<boolean>(false)
 
@@ -215,12 +224,6 @@ const resolver = ref(
   ),
 )
 
-const onShowCarNumberHelpText = (): void => {
-  showAlert(
-    "Если в сервисном приложении нажать на номер, он скопируется и не придется печатать его вручную.",
-  )
-}
-
 const onSubmit = ({ valid, values, originalEvent }: FormSubmitEvent) => {
   if (!valid) {
     console.log(`Invalid car add form: values=${JSON.stringify(values)}`)
@@ -232,5 +235,13 @@ const onSubmit = ({ valid, values, originalEvent }: FormSubmitEvent) => {
     isAdditionalServicesIncluded.value = true
     emit("submitWithAdditionalServices", values)
   }
+}
+
+const isTextDialogVisible = ref<boolean>(false)
+const textKey = ref<string | null>(null)
+const onShowTextDisplayDialog = (key: string): void => {
+  textKey.value = key
+  isTextDialogVisible.value = true
+  console.log("onShowTextDisplayDialog", key)
 }
 </script>
