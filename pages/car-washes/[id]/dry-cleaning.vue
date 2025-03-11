@@ -39,10 +39,16 @@ const { data: carWashServices } = await useFetch("/car-washes/services/", {
     )
   },
 })
+const serviceIdToName = computed((): Record<string, string> => {
+  if (!carWashServices.value) return {}
+  return Object.fromEntries(
+    carWashServices.value.map((service) => [service.id, service.name]),
+  )
+})
 
 const serializedData = computed(() => {
   const services = Object.entries(serviceIdToCount.value).map(
-    ([id, count]) => ({ id, count }),
+    ([id, count]) => ({ id, name: serviceIdToName.value[id], count }),
   )
   return JSON.stringify(services)
 })
