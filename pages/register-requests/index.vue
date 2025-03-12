@@ -6,7 +6,6 @@
       @accept="onAcceptRegisterRequest"
       @reject="onRejectRegisterRequest"
     />
-    <ProgressSpinner v-else-if="status === 'pending'" />
     <Message v-else icon="pi pi-exclamation-triangle" severity="error">
       Ошибка при загрузке заявок на регистрацию
     </Message>
@@ -34,7 +33,7 @@ const {
   data: staffRegisterRequests,
   refresh,
   status,
-} = useFetch("/staff/register-requests/", {
+} = await useFetch("/staff/register-requests/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform(data: {
     staff_register_requests: StaffRegisterRequest[]
