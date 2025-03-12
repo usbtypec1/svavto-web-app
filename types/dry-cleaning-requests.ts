@@ -6,9 +6,9 @@ export interface DryCleaningRequestService {
 }
 
 export enum DryCleaningRequestStatus {
-  Pending = 0,
-  Accepted = 1,
-  Rejected = 2,
+  Pending = 1,
+  Accepted = 2,
+  Rejected = 3,
 }
 
 export interface DryCleaningRequest {
