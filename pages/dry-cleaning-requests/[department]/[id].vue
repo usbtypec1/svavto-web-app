@@ -64,6 +64,7 @@ const { notificationOccurred } = useWebAppHapticFeedback()
 const { showConfirm } = useWebAppPopup()
 
 const route = useRoute()
+const department = route.params.department as string
 const dryCleaningRequestId = Number(route.params.id as string)
 
 const withComment = ref<boolean>(false)
@@ -133,6 +134,7 @@ const onReject = (): void => {
           is_approved: false,
           comment: withComment.value ? comment.value : null,
           services: services.value,
+          department,
         }),
       )
     },
