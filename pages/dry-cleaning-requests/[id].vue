@@ -45,11 +45,14 @@
 <script setup lang="ts">
 import { useWebApp, useWebAppHapticFeedback, useWebAppPopup } from "vue-tg"
 import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
-import type { DryCleaningRequest } from "~/types/dry-cleaning-requests"
+import {
+  DryCleaningRequestStatus,
+  type DryCleaningRequest,
+} from "~/types/dry-cleaning-requests"
 
 const { sendData } = useWebApp()
 const { notificationOccurred } = useWebAppHapticFeedback()
-const { showConfirm } = useWebAppPopup()
+const { showConfirm, showAlert } = useWebAppPopup()
 
 const route = useRoute()
 const dryCleaningRequestId = Number(route.params.id as string)
@@ -61,6 +64,16 @@ const { data: dryCleaningRequest } = await useFetch<DryCleaningRequest>(
     baseURL: runtimeConfig.public.apiBaseUrl,
   },
 )
+
+watchEffect(async () => {
+  if (
+    dryCleaningRequest.value?.status === DryCleaningRequestStatus.Accepted ||
+    dryCleaningRequest.value?.status === DryCleaningRequestStatus.Rejected
+  ) {
+    notificationOccurred("error")
+    await navigateTo({ name: "dry-cleaning-requests-already-responded" })
+  }
+})
 
 const services = computed(() => {
   if (!dryCleaningRequest.value) return []
