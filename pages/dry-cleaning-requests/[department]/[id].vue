@@ -115,6 +115,9 @@ const onApprove = (): void => {
         JSON.stringify({
           dry_cleaning_request_id: dryCleaningRequest.value!.id,
           is_approved: true,
+          comment: withComment.value ? comment.value : null,
+          services: services.value,
+          department,
         }),
       )
     },
