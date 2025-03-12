@@ -3,7 +3,7 @@
     <PageHeader text="Запрос на химчистку" />
     <CarToWashAdditionalServicesForm
       :service-id-to-count="serviceIdToCount"
-      :specific-car-wash-services="services"
+      :specific-car-wash-services="servicesToReview"
     />
     <div class="flex justify-between gap-2 my-2">
       <Button
@@ -87,7 +87,7 @@ watchEffect(async () => {
   }
 })
 
-const services = computed(() => {
+const servicesToReview = computed(() => {
   if (!dryCleaningRequest.value) return []
   return dryCleaningRequest.value.services.map((service) => ({
     ...service,
@@ -100,6 +100,7 @@ const {
   resetServiceIdToCount,
   clearServiceIdToCount,
   serviceIdToCount,
+  services,
 } = useDryCleaningRequestReview(dryCleaningRequest)
 
 const onApprove = (): void => {
@@ -131,6 +132,7 @@ const onReject = (): void => {
           dry_cleaning_request_id: dryCleaningRequest.value!.id,
           is_approved: false,
           comment: withComment.value ? comment.value : null,
+          services: services.value,
         }),
       )
     },
