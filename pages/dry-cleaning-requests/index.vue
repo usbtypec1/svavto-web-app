@@ -11,7 +11,10 @@
 <script setup lang="ts">
 import { MainButton, useWebApp } from "vue-tg"
 import DryCleaningRequestListDataView from "~/components/data-views/DryCleaningRequestListDataView.vue"
-import type { DryCleaningRequest } from "~/types/dry-cleaning-requests"
+import {
+  DryCleaningRequestStatus,
+  type DryCleaningRequest,
+} from "~/types/dry-cleaning-requests"
 
 const { close, sendData } = useWebApp()
 
@@ -20,6 +23,7 @@ const { data: dryCleaningRequests, refresh } = await useFetch(
   "/shifts/dry-cleaning-requests/",
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
+    query: { statuses: [DryCleaningRequestStatus.Pending] },
     transform(data: {
       dry_cleaning_requests: DryCleaningRequest[]
     }): DryCleaningRequest[] {
