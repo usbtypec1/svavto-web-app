@@ -14,6 +14,8 @@ export enum DryCleaningRequestStatus {
 export interface DryCleaningRequest {
   id: number
   shift_id: number
+  staff_id: number
+  staff_full_name: string
   car_number: string
   photo_file_ids: string[]
   services: DryCleaningRequestService[]

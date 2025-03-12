@@ -1,6 +1,7 @@
 <template>
   <div>
     <PageHeader text="Запрос на химчистку" />
+    <PageSubheader :text="dryCleaningRequest!.staff_full_name"/>
     <CarToWashAdditionalServicesForm
       :service-id-to-count="serviceIdToCount"
       :specific-car-wash-services="servicesToReview"

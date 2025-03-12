@@ -25,6 +25,9 @@
             <p class="text-lg font-semibold flex items-center gap-x-1">
               Гос.номер: {{ request.car_number }}
             </p>
+            <p class="text-sm font-normal flex items-center gap-x-1">
+              Сотрудник: {{ request.staff_full_name }}
+            </p>
             <p
               v-for="service in request.services"
               :key="service.id"
@@ -53,7 +56,6 @@
 </template>
 
 <script setup lang="ts">
-import { formatDate, parseISO } from "date-fns"
 import type { DryCleaningRequest } from "~/types/dry-cleaning-requests"
 
 defineProps<{
