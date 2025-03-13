@@ -1,7 +1,7 @@
 <template>
   <div>
     <PageHeader text="Запрос на химчистку" />
-    <PageSubheader :text="dryCleaningRequest!.staff_full_name"/>
+    <PageSubheader :text="dryCleaningRequest!.staff_full_name" />
     <CarToWashAdditionalServicesForm
       :service-id-to-count="serviceIdToCount"
       :specific-car-wash-services="servicesToReview"
@@ -41,19 +41,18 @@
         fluid
         icon="pi pi-times"
       />
-      <Button
-        @click="onApprove"
-        label="Одобрить"
-        :disabled="!canBeApproved"
-        fluid
-        icon="pi pi-check"
-      />
+      <MainButton @click="onApprove" text="Одобрить" :visible="canBeApproved" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useWebApp, useWebAppHapticFeedback, useWebAppPopup } from "vue-tg"
+import {
+  MainButton,
+  useWebApp,
+  useWebAppHapticFeedback,
+  useWebAppPopup,
+} from "vue-tg"
 import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
 import {
   DryCleaningRequestStatus,
