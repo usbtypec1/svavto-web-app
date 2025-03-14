@@ -20,7 +20,7 @@ const { close, sendData } = useWebApp()
 
 const runtimeConfig = useRuntimeConfig()
 const { data: dryCleaningRequests, refresh } = await useFetch(
-  "/shifts/dry-cleaning-requests/",
+  "/dry-cleaning/requests/",
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
     query: { statuses: [DryCleaningRequestStatus.Pending] },

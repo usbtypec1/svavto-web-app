@@ -72,7 +72,7 @@ const comment = ref<string | null>(null)
 
 const runtimeConfig = useRuntimeConfig()
 const { data: dryCleaningRequest } = await useFetch<DryCleaningRequest>(
-  `/shifts/dry-cleaning-requests/${dryCleaningRequestId}/`,
+  `/dry-cleaning/requests/${dryCleaningRequestId}/`,
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
   },
