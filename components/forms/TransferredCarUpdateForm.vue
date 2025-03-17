@@ -236,17 +236,16 @@ const updatedAdditionalServices = computed((): UpdatedAdditionalService[] => {
   }))
 })
 
-const initialValues = computed(() => ({
-  number: props.transferredCar?.number,
-  classType: props.transferredCar?.class_type,
-  washType: props.transferredCar?.wash_type,
-  windshieldWasherType:
-    props.transferredCar.windshield_washer_refilled_bottle_percentage === 0
-      ? windshieldWasherTypeOptions[0].value
-      : windshieldWasherTypeOptions[2].value,
-  windshieldWasherRefilledBottlePercentage:
-    props.transferredCar.windshield_washer_refilled_bottle_percentage,
-}))
+const initialValues = computed(() => {
+  return {
+    number: props.transferredCar?.number,
+    classType: props.transferredCar?.class_type,
+    washType: props.transferredCar?.wash_type,
+    windshieldWasherType: props.transferredCar.windshield_washer_type,
+    windshieldWasherRefilledBottlePercentage:
+      props.transferredCar.windshield_washer_refilled_bottle_percentage,
+  }
+})
 
 const carNumberRegExp = new RegExp(/^[А-Яа-я]\d{3}[А-Яа-я]{2}\d{3}$/)
 
@@ -272,9 +271,12 @@ const resolver = ref(
           message: "Выберите одно из опций",
         },
       ),
-      windshieldWasherType: z.enum(windshieldWasherTypeOptions.map(({ value }) => value), {
-        message: "Выберите одно из опций",
-      }),
+      windshieldWasherType: z.enum(
+        windshieldWasherTypeOptions.map(({ value }) => value),
+        {
+          message: "Выберите одно из опций",
+        },
+      ),
       windshieldWasherRefilledBottlePercentage: z.number({
         message: "Выберите % от бутылки, который был залит",
       }),

@@ -63,15 +63,6 @@
                   <p>Долив воды:</p>
                   <p>Да</p>
                 </template>
-                <template
-                  v-else-if="
-                    transferredCar.windshield_washer_type ===
-                    WindshieldWasherType.None
-                  "
-                >
-                  <p>Долив незамерзайки:</p>
-                  <p>Нет</p>
-                </template>
               </div>
               <div
                 v-for="service in transferredCar.additional_services"

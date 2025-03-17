@@ -84,6 +84,7 @@ export interface TransferredCarDetail {
   wash_type: WashTypeValue
   car_wash_id: number
   car_wash_name: string
+  windshield_washer_type: WindshieldWasherType
   windshield_washer_refilled_bottle_percentage: number
   additional_services: TranferredCarsListItemAdditionalService[]
   created_at: string
