@@ -5,14 +5,36 @@
       <section
         class="flex flex-col divide-y divide-gray-200 dark:divide-gray-600"
       >
+        <div class="py-2">
+          <div class="flex items-center gap-x-2">
+            <i class="pi pi-car"></i>
+            <span class="font-semibold">Всего - {{ totalCarsCount }}</span>
+          </div>
+          <Tree
+            :pt="{
+              root: {
+                style: {
+                  margin: 0,
+                  padding: 0,
+                },
+              },
+            }"
+            :value="treeNodes"
+            v-model:expanded-keys="expanded"
+            class="p-0 m-0"
+          />
+        </div>
         <div
-          v-for="{ key, label } in keysAndLabels"
+          v-for="{ key, label, icon } in keysAndLabels"
           class="flex justify-between py-2"
           :key="key"
         >
-          <span>
-            {{ label }}
-          </span>
+          <div class="flex items-center gap-x-2">
+            <i class="pi" :class="icon"></i>
+            <span>
+              {{ label }}
+            </span>
+          </div>
           <span>
             {{ totalShiftStatistics[key as keyof TotalShiftStatistics] }}
           </span>
@@ -32,46 +54,69 @@ const { shiftsStatistics = [] } = defineProps<{
 interface KeyAndLabel {
   key: string
   label: string
+  icon: string
 }
 
 const keysAndLabels: KeyAndLabel[] = [
   {
     key: "penalty_amount",
     label: "Штрафы",
+    icon: "pi pi-exclamation-triangle",
   },
   {
     key: "surcharge_amount",
     label: "Доплаты",
-  },
-  {
-    key: "planned_comfort_cars_washed_count",
-    label: "Комфорт",
-  },
-  {
-    key: "planned_business_cars_washed_count",
-    label: "Бизнес",
-  },
-  {
-    key: "planned_vans_washed_count",
-    label: "Фургон",
-  },
-  {
-    key: "urgent_cars_washed_count",
-    label: "Срочные",
+    icon: "pi pi-plus-circle",
   },
   {
     key: "dry_cleaning_items_count",
     label: "Химчистка",
+    icon: "pi pi-car",
   },
   {
     key: "extra_shifts_count",
-    label: "Доп.смены",
+    label: "Доп. смены",
+    icon: "pi pi-clock",
+  },
+  {
+    key: "road_accident_fund_amount",
+    label: "Фонд ДТП (3%)",
+    icon: "pi pi-file-check",
+  },
+  {
+    key: "fine_deposit_amount",
+    label: "Залог на оплату штрафов",
+    icon: "pi pi-camera",
   },
   {
     key: "washed_cars_total_cost",
     label: "Заработано",
+    icon: "pi pi-money-bill",
   },
 ]
+
+const expanded = {
+  total: true,
+  planned: true,
+  urgent: true,
+  comfort: true,
+  business: true,
+  van: true,
+}
+
+const plannedCarsCount = computed(() => {
+  return (
+    totalShiftStatistics.value.planned_comfort_cars_washed_count +
+    totalShiftStatistics.value.planned_business_cars_washed_count +
+    totalShiftStatistics.value.planned_vans_washed_count
+  )
+})
+
+const totalCarsCount = computed(() => {
+  return (
+    plannedCarsCount.value + totalShiftStatistics.value.urgent_cars_washed_count
+  )
+})
 
 const totalShiftStatistics = computed((): TotalShiftStatistics => {
   const totalStatistics: TotalShiftStatistics = {
@@ -104,4 +149,34 @@ const totalShiftStatistics = computed((): TotalShiftStatistics => {
   }
   return totalStatistics
 })
+
+const treeNodes = [
+  {
+    key: "planned",
+    label: `Плановая - ${plannedCarsCount.value}`,
+    icon: "pi pi-calendar-clock",
+    children: [
+      {
+        key: "comfort",
+        label: `Комфорт - ${totalShiftStatistics.value.planned_comfort_cars_washed_count}`,
+        icon: "pi pi-car",
+      },
+      {
+        key: "business",
+        label: `Бизнес - ${totalShiftStatistics.value.planned_business_cars_washed_count}`,
+        icon: "pi pi-car",
+      },
+      {
+        key: "van",
+        label: `Фургон - ${totalShiftStatistics.value.planned_vans_washed_count}`,
+        icon: "pi pi-truck",
+      },
+    ],
+  },
+  {
+    key: "urgent",
+    label: `Срочная - ${totalShiftStatistics.value.urgent_cars_washed_count}`,
+    icon: "pi pi-bolt",
+  },
+]
 </script>
