@@ -99,5 +99,6 @@ export interface TransferredCarUpdateEvent {
   classType: string
   number: string
   washType: string
+  windshieldWasherType: string
   windshieldWasherRefilledBottlePercentage: number
 }

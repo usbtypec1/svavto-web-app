@@ -74,6 +74,7 @@ const onSubmit = async (values: TransferredCarUpdateEvent) => {
       number: values.number,
       class_type: values.classType,
       wash_type: values.washType,
+      windshield_washer_type: values.windshieldWasherType,
       windshield_washer_refilled_bottle_percentage:
         values.windshieldWasherRefilledBottlePercentage,
       additional_services: values.additionalServices,
