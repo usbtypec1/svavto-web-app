@@ -41,20 +41,37 @@
               <div
                 class="flex justify-between items-center border-b border-gray-200 dark:border-gray-500 pb-2"
               >
-                <p>Залито незамерзайки:</p>
-                <p
+                <template
                   v-if="
-                    transferredCar.windshield_washer_refilled_bottle_percentage ===
-                    0
+                    transferredCar.windshield_washer_type ===
+                    WindshieldWasherType.Antifreeze
                   "
                 >
-                  Нет
-                </p>
-                <p v-else>
-                  {{
-                    transferredCar.windshield_washer_refilled_bottle_percentage
-                  }}%
-                </p>
+                  <p>Залито незамерзайки:</p>
+                  <p>
+                    {{
+                      transferredCar.windshield_washer_refilled_bottle_percentage
+                    }}%
+                  </p>
+                </template>
+                <template
+                  v-else-if="
+                    transferredCar.windshield_washer_type ===
+                    WindshieldWasherType.Water
+                  "
+                >
+                  <p>Долив воды:</p>
+                  <p>Да</p>
+                </template>
+                <template
+                  v-else-if="
+                    transferredCar.windshield_washer_type ===
+                    WindshieldWasherType.None
+                  "
+                >
+                  <p>Долив незамерзайки:</p>
+                  <p>Нет</p>
+                </template>
               </div>
               <div
                 v-for="service in transferredCar.additional_services"
@@ -116,7 +133,10 @@
 <script setup lang="ts">
 import { MainButton, useWebApp } from "vue-tg"
 import { format, parseISO } from "date-fns"
-import type { TransferredCarsListResponseData } from "~/types/cars"
+import {
+  WindshieldWasherType,
+  type TransferredCarsListResponseData,
+} from "~/types/cars"
 
 const runtimeConfig = useRuntimeConfig()
 
