@@ -117,12 +117,11 @@
         name="windshieldWasherRefilledBottlePercentage"
         :initial-value="0"
         v-show="
-          $form.windshieldWasherType?.value?.value ===
-            WindshieldWasherType.Antifreeze &&
-          $form.windshieldWasherType?.value?.label !== 'Без долива'
+          $form.windshieldWasherType?.value ===
+            WindshieldWasherType.Antifreeze
         "
       >
-        <div>
+        <div class="mt-2">
           <label for="windshield_washer_refilled_bottle_percentage">
             Сколько % от бутылки было залито?
           </label>
