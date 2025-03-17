@@ -56,6 +56,7 @@ const onAddCarWithoutAdditionalServices = (car: CarToWash): void => {
           number: car.number,
           class_type: car.classType,
           wash_type: car.washType,
+          windshield_washer_type: car.windshieldWasherType,
           windshield_washer_refilled_bottle_percentage:
             car.windshieldWasherRefilledBottlePercentage,
           additional_services: [],
@@ -84,6 +85,7 @@ const onSubmitCarToWashWithAdditionalServices = (): void => {
           number: carToWash.value!.number,
           class_type: carToWash.value!.classType,
           wash_type: carToWash.value!.washType,
+          windshield_washer_type: carToWash.value!.windshieldWasherType,
           windshield_washer_refilled_bottle_percentage:
             carToWash.value!.windshieldWasherRefilledBottlePercentage,
           additional_services: Object.entries(serviceIdToCount.value).map(

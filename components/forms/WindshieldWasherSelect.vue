@@ -1,22 +1,24 @@
 <template>
   <div class="flex flex-col gap-y-2">
-    <RadioButtonGroup v-model="windshieldWasher" class="flex flex-col gap-y-2">
+    <RadioButtonGroup v-model="WindshieldWasherType" class="flex flex-col gap-y-2">
       <div
-        v-for="windshieldWasherOption in windshieldWasherOptions"
-        :key="windshieldWasherOption"
+        v-for="windshieldWasherTypeOption in windshieldWasherTypeOptions"
+        :key="windshieldWasherTypeOption.value"
         class="flex items-center gap-x-2"
       >
         <RadioButton
           size="large"
-          :value="windshieldWasherOption"
-          :input-id="windshieldWasherOption"
+          :value="windshieldWasherTypeOption.value"
+          :input-id="windshieldWasherTypeOption.value"
         />
-        <label :for="windshieldWasherOption" class="text-md">{{
-          windshieldWasherOption
+        <label :for="windshieldWasherTypeOption.value" class="text-md">{{
+          windshieldWasherTypeOption.label
         }}</label>
       </div>
     </RadioButtonGroup>
-    <div v-show="windshieldWasher === 'Незамерзающая жидкость'">
+    <div
+      v-show="windshieldWasherType.value === WindshieldWasherType.Antifreeze"
+    >
       <label for="windshield_washer_refilled_bottle_percentage">
         Сколько % от бутылки было залито?
       </label>
@@ -33,21 +35,29 @@
 </template>
 
 <script setup lang="ts">
-import { windshieldWasherRefilledBottlePercentageOptions, windshieldWasherOptions } from "~/utils/car-transfers"
-
-const windshieldWasher = ref<string>(windshieldWasherOptions[0])
+import {
+  WindshieldWasherType,
+  type WindshieldWasherTypeOption,
+} from "~/types/cars"
+import {
+  windshieldWasherRefilledBottlePercentageOptions,
+  windshieldWasherTypeOptions,
+} from "~/utils/car-transfers"
+const windshieldWasherType = ref<WindshieldWasherTypeOption>(
+  windshieldWasherTypeOptions[0],
+)
 const windshieldWasherRefilledBottlePercentage = defineModel<number>({
   default: 0,
 })
 
 watchEffect((): void => {
   if (windshieldWasherRefilledBottlePercentage.value > 0) {
-    windshieldWasher.value = windshieldWasherOptions[2]
+    windshieldWasherType.value = windshieldWasherTypeOptions[2]
   }
 })
 
 watchEffect((): void => {
-  if (windshieldWasher.value !== windshieldWasherOptions[2]) {
+  if (windshieldWasherType.value !== windshieldWasherTypeOptions[2]) {
     windshieldWasherRefilledBottlePercentage.value = 0
   }
 })

@@ -6,6 +6,7 @@
     :initial-values="initialValues"
     :validate-on-value-update="false"
     :validate-on-blur="true"
+    v-slot="$form"
   >
     <FormField v-slot="$number" name="number">
       <Fieldset>
@@ -76,59 +77,60 @@
     </FormField>
 
     <Fieldset legend="Долив воды/незамерзающей жидкости">
-      <FormField v-slot="$windshieldWasher" name="windshieldWasher">
+      <FormField v-slot="$windshieldWasherType" name="windshieldWasherType">
         <RadioButtonGroup class="flex flex-col gap-y-2">
           <div
-            v-for="windshieldWasherOption in windshieldWasherOptions"
-            :key="windshieldWasherOption"
+            v-for="windshieldWasherTypeOption in windshieldWasherTypeOptions"
+            :key="windshieldWasherTypeOption.value"
             class="flex items-center gap-x-2"
           >
             <RadioButton
               size="large"
-              :value="windshieldWasherOption"
-              :input-id="windshieldWasherOption"
+              :value="windshieldWasherTypeOption.value"
+              :input-id="windshieldWasherTypeOption.value"
             />
-            <label :for="windshieldWasherOption" class="text-md">{{
-              windshieldWasherOption
+            <label :for="windshieldWasherTypeOption.value" class="text-md">{{
+              windshieldWasherTypeOption.label
             }}</label>
           </div>
           <Message
-            v-if="$windshieldWasher?.invalid"
+            v-if="$windshieldWasherType?.invalid"
             severity="error"
             size="small"
             variant="simple"
           >
-            {{ $windshieldWasher.error.message }}
+            {{ $windshieldWasherType.error.message }}
           </Message>
-
-          <FormField
-            v-slot="$windshieldWasherRefilledBottlePercentage"
-            name="windshieldWasherRefilledBottlePercentage"
-          >
-            <div
-              v-show="$windshieldWasher.value === windshieldWasherOptions[2]"
-            >
-              <label for="windshield_washer_refilled_bottle_percentage">
-                Сколько % от бутылки было залито?
-              </label>
-              <Select
-                :options="windshieldWasherRefilledBottlePercentageOptions"
-                input-id="windshield_washer_refilled_bottle_percentage"
-                fluid
-                class="mt-1"
-                name="windshieldWasherRefilledBottlePercentage"
-              />
-              <Message
-                v-if="$windshieldWasherRefilledBottlePercentage?.invalid"
-                severity="error"
-                size="small"
-                variant="simple"
-              >
-                {{ $windshieldWasherRefilledBottlePercentage.error.message }}
-              </Message>
-            </div>
-          </FormField>
         </RadioButtonGroup>
+      </FormField>
+      <FormField
+        v-slot="$windshieldWasherRefilledBottlePercentage"
+        name="windshieldWasherRefilledBottlePercentage"
+        v-show="
+          $form.windshieldWasherType?.value === WindshieldWasherType.Antifreeze
+        "
+      >
+        <div>
+          <label for="windshield_washer_refilled_bottle_percentage">
+            Сколько % от бутылки было залито?
+          </label>
+          <Select
+            :options="windshieldWasherRefilledBottlePercentageOptions"
+            input-id="windshield_washer_refilled_bottle_percentage"
+            fluid
+            :default-value="0"
+            class="mt-1"
+            name="windshieldWasherRefilledBottlePercentage"
+          />
+          <Message
+            v-if="$windshieldWasherRefilledBottlePercentage?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+          >
+            {{ $windshieldWasherRefilledBottlePercentage.error.message }}
+          </Message>
+        </div>
       </FormField>
     </Fieldset>
 
@@ -180,10 +182,11 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  TransferredCarDetail,
-  UpdatedAdditionalService,
-  TransferredCarUpdateEvent,
+import {
+  type TransferredCarDetail,
+  type UpdatedAdditionalService,
+  type TransferredCarUpdateEvent,
+  WindshieldWasherType,
 } from "~/types/cars"
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
@@ -192,7 +195,7 @@ import { classTypeOptions, washTypeOptions } from "~/utils/car-wash-services"
 import { useWebAppPopup, BackButton } from "vue-tg"
 import {
   windshieldWasherRefilledBottlePercentageOptions,
-  windshieldWasherOptions,
+  windshieldWasherTypeOptions,
 } from "~/utils/car-transfers"
 import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
 import type { CarWashService } from "~/types/car-wash-services"
@@ -237,10 +240,10 @@ const initialValues = computed(() => ({
   number: props.transferredCar?.number,
   classType: props.transferredCar?.class_type,
   washType: props.transferredCar?.wash_type,
-  windshieldWasher:
+  windshieldWasherType:
     props.transferredCar.windshield_washer_refilled_bottle_percentage === 0
-      ? windshieldWasherOptions[0]
-      : windshieldWasherOptions[2],
+      ? windshieldWasherTypeOptions[0].value
+      : windshieldWasherTypeOptions[2].value,
   windshieldWasherRefilledBottlePercentage:
     props.transferredCar.windshield_washer_refilled_bottle_percentage,
 }))
@@ -269,7 +272,7 @@ const resolver = ref(
           message: "Выберите одно из опций",
         },
       ),
-      windshieldWasher: z.enum(windshieldWasherOptions, {
+      windshieldWasherType: z.enum(windshieldWasherTypeOptions.map(({ value }) => value), {
         message: "Выберите одно из опций",
       }),
       windshieldWasherRefilledBottlePercentage: z.number({
@@ -294,9 +297,14 @@ const onSubmit = ({ valid, values }: FormSubmitEvent) => {
   } else {
     values.additionalServices = updatedAdditionalServices.value
     values.carWashId = carWashId.value
-    if (values["windshieldWasher"] !== windshieldWasherOptions[2]) {
+
+    if (values.windshieldWasherType === WindshieldWasherType.None) {
+      values.windshieldWasherRefilledBottlePercentage = 0
+      values.windshieldWasherType = WindshieldWasherType.Antifreeze
+    } else if (values.windshieldWasherType === WindshieldWasherType.Water) {
       values.windshieldWasherRefilledBottlePercentage = 0
     }
+
     emit("submit", values as TransferredCarUpdateEvent)
   }
 }

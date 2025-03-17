@@ -5,6 +5,7 @@
     class="flex flex-col gap-y-4"
     :validate-on-value-update="false"
     :validate-on-blur="true"
+    v-slot="$form"
   >
     <FormField v-slot="$number" name="number">
       <Fieldset>
@@ -84,61 +85,65 @@
     </FormField>
 
     <Fieldset legend="Долив воды/незамерзающей жидкости">
-      <FormField v-slot="$windshieldWasher" name="windshieldWasher">
+      <FormField v-slot="$windshieldWasherType" name="windshieldWasherType">
         <RadioButtonGroup class="flex flex-col gap-y-2">
           <div
-            v-for="windshieldWasherOption in windshieldWasherOptions"
-            :key="windshieldWasherOption"
+            v-for="windshieldWasherTypeOption in windshieldWasherTypeOptions"
+            :key="windshieldWasherTypeOption.value"
             class="flex items-center gap-x-2"
           >
             <RadioButton
               size="large"
-              :value="windshieldWasherOption"
-              :input-id="windshieldWasherOption"
+              :value="windshieldWasherTypeOption.value"
+              :input-id="windshieldWasherTypeOption.value"
               :disabled="isAdditionalServicesIncluded"
             />
-            <label :for="windshieldWasherOption" class="text-md">{{
-              windshieldWasherOption
+            <label :for="windshieldWasherTypeOption.value" class="text-md">{{
+              windshieldWasherTypeOption.label
             }}</label>
           </div>
           <Message
-            v-if="$windshieldWasher?.invalid"
+            v-if="$windshieldWasherType?.invalid"
             severity="error"
             size="small"
             variant="simple"
           >
-            {{ $windshieldWasher.error.message }}
+            {{ $windshieldWasherType.error.message }}
           </Message>
-
-          <FormField
-            v-slot="$windshieldWasherRefilledBottlePercentage"
-            name="windshieldWasherRefilledBottlePercentage"
-            :initial-value="0"
-          >
-            <div v-show="$windshieldWasher.value === 'Незамерзающая жидкость'">
-              <label for="windshield_washer_refilled_bottle_percentage">
-                Сколько % от бутылки было залито?
-              </label>
-              <Select
-                :options="windshieldWasherRefilledBottlePercentageOptions"
-                input-id="windshield_washer_refilled_bottle_percentage"
-                fluid
-                :default-value="0"
-                class="mt-1"
-                name="windshieldWasherRefilledBottlePercentage"
-                :disabled="isAdditionalServicesIncluded"
-              />
-              <Message
-                v-if="$windshieldWasherRefilledBottlePercentage?.invalid"
-                severity="error"
-                size="small"
-                variant="simple"
-              >
-                {{ $windshieldWasherRefilledBottlePercentage.error.message }}
-              </Message>
-            </div>
-          </FormField>
         </RadioButtonGroup>
+      </FormField>
+      <FormField
+        v-slot="$windshieldWasherRefilledBottlePercentage"
+        name="windshieldWasherRefilledBottlePercentage"
+        :initial-value="0"
+        v-show="
+          $form.windshieldWasherType?.value?.value ===
+            WindshieldWasherType.Antifreeze &&
+          $form.windshieldWasherType?.value?.label !== 'Без долива'
+        "
+      >
+        <div>
+          <label for="windshield_washer_refilled_bottle_percentage">
+            Сколько % от бутылки было залито?
+          </label>
+          <Select
+            :options="windshieldWasherRefilledBottlePercentageOptions"
+            input-id="windshield_washer_refilled_bottle_percentage"
+            fluid
+            :default-value="0"
+            class="mt-1"
+            name="windshieldWasherRefilledBottlePercentage"
+            :disabled="isAdditionalServicesIncluded"
+          />
+          <Message
+            v-if="$windshieldWasherRefilledBottlePercentage?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+          >
+            {{ $windshieldWasherRefilledBottlePercentage.error.message }}
+          </Message>
+        </div>
       </FormField>
     </Fieldset>
 
@@ -166,7 +171,10 @@
       </div>
     </Fieldset>
   </Form>
-  <TextDisplayDialog :text-key="textKey!" v-model:visible="isTextDialogVisible" />
+  <TextDisplayDialog
+    :text-key="textKey!"
+    v-model:visible="isTextDialogVisible"
+  />
 </template>
 
 <script setup lang="ts">
@@ -177,9 +185,10 @@ import { z } from "zod"
 import { classTypeOptions, washTypeOptions } from "~/utils/car-wash-services"
 import {
   windshieldWasherRefilledBottlePercentageOptions,
-  windshieldWasherOptions,
+  windshieldWasherTypeOptions,
 } from "~/utils/car-transfers"
 import TextDisplayDialog from "~/components/dialogs/TextDisplayDialog.vue"
+import { WindshieldWasherType } from "~/types/cars"
 
 const emit = defineEmits([
   "submitWithoutAdditionalServices",
@@ -214,9 +223,12 @@ const resolver = ref(
           message: "Выберите одно из опций",
         },
       ),
-      windshieldWasher: z.enum(windshieldWasherOptions, {
-        message: "Выберите одно из опций",
-      }),
+      windshieldWasherType: z.enum(
+        windshieldWasherTypeOptions.map(({ value }) => value),
+        {
+          message: "Выберите одно из опций",
+        },
+      ),
       windshieldWasherRefilledBottlePercentage: z.number({
         message: "Выберите % от бутылки, который был залит",
       }),
@@ -229,6 +241,14 @@ const onSubmit = ({ valid, values, originalEvent }: FormSubmitEvent) => {
     console.log(`Invalid car add form: values=${JSON.stringify(values)}`)
     return
   }
+
+  if (values.windshieldWasherType === WindshieldWasherType.None) {
+    values.windshieldWasherRefilledBottlePercentage = 0
+    values.windshieldWasherType = WindshieldWasherType.Antifreeze
+  } else if (values.windshieldWasherType === WindshieldWasherType.Water) {
+    values.windshieldWasherRefilledBottlePercentage = 0
+  }
+
   if (originalEvent.submitter.id === "create-without-additional-services") {
     emit("submitWithoutAdditionalServices", values)
   } else if (originalEvent.submitter.id === "create-with-additional-services") {

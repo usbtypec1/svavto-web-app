@@ -4,10 +4,22 @@ import type { CarWashIdAndName } from "~/types/car-washes"
 export type ClassTypeValue = "comfort" | "business" | "van"
 export type WashTypeValue = "planned" | "urgent"
 
+export enum WindshieldWasherType {
+  None = "none",
+  Water = "water",
+  Antifreeze = "antifreeze",
+}
+
+export interface WindshieldWasherTypeOption {
+  label: string
+  value: WindshieldWasherType
+}
+
 export interface CarToWash {
   number: string
   classType: ClassTypeValue
   washType: WashTypeValue
+  windshieldWasherType: WindshieldWasherType
   windshieldWasherRefilledBottlePercentage: number
 }
 
@@ -75,7 +87,6 @@ export interface TransferredCarDetail {
   additional_services: TranferredCarsListItemAdditionalService[]
   created_at: string
 }
-
 
 export interface UpdatedAdditionalService {
   id: string
