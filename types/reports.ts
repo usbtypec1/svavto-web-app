@@ -10,7 +10,9 @@ export interface ShiftStatistics {
   urgent_cars_washed_count: number
   is_extra_shift: boolean
   washed_cars_total_cost: number
-  dry_cleaning_items_count: number
+  washed_cars_total_count: number
+  dirty_revenue: number
+  road_accident_deposit_amount: number
 }
 
 export interface TotalShiftStatistics {
@@ -22,10 +24,15 @@ export interface TotalShiftStatistics {
   urgent_cars_washed_count: number
   extra_shifts_count: number
   washed_cars_total_cost: number
-  dry_cleaning_items_count: number
+  washed_cars_total_count: number
+  dirty_revenue: number
+  road_accident_deposit_amount: number
+  fine_deposit_amount: number
+  net_revenue: number
 }
 
 export interface StaffShiftsStatistics {
   staff: Staff
   shifts_statistics: ShiftStatistics[]
+  total_statistics: TotalShiftStatistics
 }

@@ -8,7 +8,9 @@
         <div class="py-2">
           <div class="flex items-center gap-x-2">
             <i class="pi pi-car"></i>
-            <span class="font-semibold">Всего - {{ totalCarsCount }}</span>
+            <span class="font-semibold"
+              >Всего - {{ totalStatistics.washed_cars_total_count }}</span
+            >
           </div>
           <Tree
             :pt="{
@@ -25,7 +27,7 @@
           />
         </div>
         <div
-          v-for="{ key, label, icon } in keysAndLabels"
+          v-for="{ key, label, icon, withRubleSign } in keysAndLabels"
           class="flex justify-between py-2"
           :key="key"
         >
@@ -36,7 +38,8 @@
             </span>
           </div>
           <span>
-            {{ totalShiftStatistics[key as keyof TotalShiftStatistics] }}
+            {{ totalStatistics[key as keyof TotalShiftStatistics]
+            }}<span v-if="withRubleSign">₽</span>
           </span>
         </div>
       </section>
@@ -45,16 +48,17 @@
 </template>
 
 <script setup lang="ts">
-import type { ShiftStatistics, TotalShiftStatistics } from "~/types/reports"
+import type { TotalShiftStatistics } from "~/types/reports"
 
-const { shiftsStatistics = [] } = defineProps<{
-  shiftsStatistics: ShiftStatistics[]
+const props = defineProps<{
+  totalStatistics: TotalShiftStatistics
 }>()
 
 interface KeyAndLabel {
   key: string
   label: string
   icon: string
+  withRubleSign?: boolean
 }
 
 const keysAndLabels: KeyAndLabel[] = [
@@ -62,11 +66,13 @@ const keysAndLabels: KeyAndLabel[] = [
     key: "penalty_amount",
     label: "Штрафы",
     icon: "pi pi-exclamation-triangle",
+    withRubleSign: true,
   },
   {
     key: "surcharge_amount",
     label: "Доплаты",
     icon: "pi pi-plus-circle",
+    withRubleSign: true,
   },
   {
     key: "dry_cleaning_items_count",
@@ -79,19 +85,22 @@ const keysAndLabels: KeyAndLabel[] = [
     icon: "pi pi-clock",
   },
   {
-    key: "road_accident_fund_amount",
+    key: "road_accident_deposit_amount",
     label: "Фонд ДТП (3%)",
     icon: "pi pi-file-check",
+    withRubleSign: true,
   },
   {
     key: "fine_deposit_amount",
     label: "Залог на оплату штрафов",
     icon: "pi pi-camera",
+    withRubleSign: true,
   },
   {
-    key: "washed_cars_total_cost",
+    key: "net_revenue",
     label: "Заработано",
     icon: "pi pi-money-bill",
+    withRubleSign: true,
   },
 ]
 
@@ -106,48 +115,9 @@ const expanded = {
 
 const plannedCarsCount = computed(() => {
   return (
-    totalShiftStatistics.value.planned_comfort_cars_washed_count +
-    totalShiftStatistics.value.planned_business_cars_washed_count +
-    totalShiftStatistics.value.planned_vans_washed_count
+    props.totalStatistics.washed_cars_total_count -
+    props.totalStatistics.urgent_cars_washed_count
   )
-})
-
-const totalCarsCount = computed(() => {
-  return (
-    plannedCarsCount.value + totalShiftStatistics.value.urgent_cars_washed_count
-  )
-})
-
-const totalShiftStatistics = computed((): TotalShiftStatistics => {
-  const totalStatistics: TotalShiftStatistics = {
-    penalty_amount: 0,
-    surcharge_amount: 0,
-    planned_comfort_cars_washed_count: 0,
-    planned_business_cars_washed_count: 0,
-    planned_vans_washed_count: 0,
-    urgent_cars_washed_count: 0,
-    dry_cleaning_items_count: 0,
-    extra_shifts_count: 0,
-    washed_cars_total_cost: 0,
-  }
-  for (const shiftStatistics of shiftsStatistics) {
-    totalStatistics.penalty_amount += shiftStatistics.penalty_amount
-    totalStatistics.surcharge_amount += shiftStatistics.surcharge_amount
-    totalStatistics.planned_comfort_cars_washed_count +=
-      shiftStatistics.planned_comfort_cars_washed_count
-    totalStatistics.planned_business_cars_washed_count +=
-      shiftStatistics.planned_business_cars_washed_count
-    totalStatistics.planned_vans_washed_count +=
-      shiftStatistics.planned_vans_washed_count
-    totalStatistics.urgent_cars_washed_count +=
-      shiftStatistics.urgent_cars_washed_count
-    totalStatistics.dry_cleaning_items_count +=
-      shiftStatistics.dry_cleaning_items_count
-    totalStatistics.extra_shifts_count += shiftStatistics.is_extra_shift ? 1 : 0
-    totalStatistics.washed_cars_total_cost +=
-      shiftStatistics.washed_cars_total_cost
-  }
-  return totalStatistics
 })
 
 const treeNodes = [
@@ -158,24 +128,24 @@ const treeNodes = [
     children: [
       {
         key: "comfort",
-        label: `Комфорт - ${totalShiftStatistics.value.planned_comfort_cars_washed_count}`,
+        label: `Комфорт - ${props.totalStatistics.planned_comfort_cars_washed_count}`,
         icon: "pi pi-car",
       },
       {
         key: "business",
-        label: `Бизнес - ${totalShiftStatistics.value.planned_business_cars_washed_count}`,
+        label: `Бизнес - ${props.totalStatistics.planned_business_cars_washed_count}`,
         icon: "pi pi-car",
       },
       {
         key: "van",
-        label: `Фургон - ${totalShiftStatistics.value.planned_vans_washed_count}`,
+        label: `Фургон - ${props.totalStatistics.planned_vans_washed_count}`,
         icon: "pi pi-truck",
       },
     ],
   },
   {
     key: "urgent",
-    label: `Срочная - ${totalShiftStatistics.value.urgent_cars_washed_count}`,
+    label: `Срочная - ${props.totalStatistics.urgent_cars_washed_count}`,
     icon: "pi pi-bolt",
   },
 ]

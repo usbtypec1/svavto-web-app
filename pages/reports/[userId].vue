@@ -1,35 +1,17 @@
 <template>
   <div>
-    <template v-if="reportPeriodsStatus === 'pending'">
-      <Skeleton v-for="key in 3" :key="key" height="2rem" class="mb-2" />
-    </template>
-    <template v-else-if="reportPeriodsStatus === 'success'">
-      <section v-if="reportPeriods!.length > 0" class="flex flex-col gap-y-3">
-        <p class="font-semibold text-lg">Выберите отчетный период</p>
-        <Listbox
-          v-model="reportPeriod"
-          :options="reportPeriods!"
-          :option-label="formatPeriod"
-        />
-      </section>
-      <Message v-else severity="error" class="my-2" size="large">
-        У вас не было смен
-      </Message>
-    </template>
-    <Message
-      v-else-if="reportPeriodsStatus === 'error'"
-      severity="error"
-      variant="simple"
-      class="my-2"
-      size="large"
-    >
-      Произошла ошибка при загрузке данных
-    </Message>
+    <p class="font-semibold text-lg">Выберите отчетный период</p>
+    <Listbox
+      v-model="reportPeriod"
+      :options="reportPeriods!"
+      :option-label="formatPeriod"
+      empty-message="У вас не было смен"
+    />
 
     <template v-if="staffShiftsStatisticsStatus === 'success'">
-      <template v-if="staffShiftsStatistics!.length > 0">
+      <template v-if="staffShiftsStatistics !== null">
         <ReportCardTotalStatistics
-          :shifts-statistics="staffShiftsStatistics![0].shifts_statistics"
+          :total-statistics="staffShiftsStatistics.total_statistics"
           class="my-3"
         />
         <Inplace>
@@ -40,7 +22,9 @@
           <template #content>
             <div class="flex flex-col gap-y-3 my-3">
               <ReportCardItem
-                v-for="shiftStatistics in staffShiftsStatistics![0].shifts_statistics.toSorted((a, b) => a.shift_date.localeCompare(b.shift_date))"
+                v-for="shiftStatistics in staffShiftsStatistics.shifts_statistics.toSorted(
+                  (a, b) => a.shift_date.localeCompare(b.shift_date),
+                )"
                 :shift-statistics="shiftStatistics"
                 :key="shiftStatistics.shift_date"
               />
@@ -48,16 +32,6 @@
           </template>
         </Inplace>
       </template>
-
-      <Message
-        v-if="staffShiftsStatistics!.length === 0"
-        severity="error"
-        variant="simple"
-        class="my-2"
-        size="large"
-      >
-        Данные не найдены
-      </Message>
     </template>
     <div v-else-if="staffShiftsStatisticsStatus === 'pending'" class="my-3">
       <Skeleton v-for="key in 8" :key="key" height="2rem" class="mb-2" />
@@ -88,7 +62,7 @@ const staffId = Number(route.params.userId as string)
 
 const runtimeConfig = useRuntimeConfig()
 
-const { data: reportPeriods, status: reportPeriodsStatus } = useFetch(
+const { data: reportPeriods, status: reportPeriodsStatus } = await useFetch(
   `/shifts/report-periods/staff/${staffId}/`,
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
@@ -124,8 +98,8 @@ const {
   query: queryParams,
   transform(data: {
     staff_list: StaffShiftsStatistics[]
-  }): StaffShiftsStatistics[] {
-    return data.staff_list
+  }): StaffShiftsStatistics | null {
+    return data.staff_list[0] ?? null
   },
 })
 watch(reportPeriod, async (value) => {

@@ -20,7 +20,7 @@
       />
     </div>
     <div
-      v-for="{ key, label, icon } in keysAndLabels"
+      v-for="{ key, label, icon, withRubleSign } in keysAndLabels"
       class="flex justify-between py-2"
       :key="key"
     >
@@ -31,7 +31,8 @@
         </span>
       </div>
       <span>
-        {{ shiftStatistics[key as keyof ShiftStatistics] }}
+        {{ shiftStatistics[key as keyof ShiftStatistics]
+        }}<span v-if="withRubleSign">₽</span>
       </span>
     </div>
   </section>
@@ -48,6 +49,7 @@ interface KeyAndLabel {
   key: string
   label: string
   icon: string
+  withRubleSign?: boolean
 }
 
 const expanded = {
@@ -106,11 +108,13 @@ const keysAndLabels: KeyAndLabel[] = [
     key: "penalty_amount",
     label: "Штрафы",
     icon: "pi pi-exclamation-triangle",
+    withRubleSign: true,
   },
   {
     key: "surcharge_amount",
     label: "Доплаты",
     icon: "pi pi-plus-circle",
+    withRubleSign: true,
   },
   {
     key: "dry_cleaning_items_count",
@@ -118,19 +122,16 @@ const keysAndLabels: KeyAndLabel[] = [
     icon: "pi pi-car",
   },
   {
-    key: "road_accident_fund_amount",
+    key: "road_accident_deposit_amount",
     label: "Фонд ДТП (3%)",
     icon: "pi pi-file-check",
+    withRubleSign: true,
   },
   {
-    key: "fine_deposit_amount",
-    label: "Залог на оплату штрафов",
-    icon: "pi pi-camera",
-  },
-  {
-    key: "washed_cars_total_cost",
+    key: "dirty_revenue",
     label: "Заработано",
     icon: "pi pi-money-bill",
+    withRubleSign: true,
   },
 ]
 </script>
