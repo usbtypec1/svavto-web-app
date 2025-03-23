@@ -62,7 +62,7 @@ const staffId = Number(route.params.userId as string)
 
 const runtimeConfig = useRuntimeConfig()
 
-const { data: reportPeriods, status: reportPeriodsStatus } = await useFetch(
+const { data: reportPeriods } = await useFetch(
   `/shifts/report-periods/staff/${staffId}/`,
   {
     baseURL: runtimeConfig.public.apiBaseUrl,
@@ -71,21 +71,19 @@ const { data: reportPeriods, status: reportPeriodsStatus } = await useFetch(
     },
   },
 )
+const reportPeriod = ref<ReportPeriod | null>(null)
 
-const queryParams = computed(() => {
-  const { from_date, to_date } = reportPeriod.value ?? {}
+const staffShiftsStatisticsQueryParams = computed(() => {
+  const { number, month, year } = reportPeriod.value ?? {}
 
   return {
     staff_ids: staffId,
-    from_date: from_date
-      ? formatISO(from_date, { representation: "date" })
-      : undefined,
-    to_date: to_date
-      ? formatISO(to_date, { representation: "date" })
-      : undefined,
+    report_period_number: number,
+    year,
+    month,
   }
 })
-const reportPeriod = ref<ReportPeriod | null>(null)
+
 const {
   data: staffShiftsStatistics,
   status: staffShiftsStatisticsStatus,
@@ -95,7 +93,7 @@ const {
   baseURL: runtimeConfig.public.apiBaseUrl,
   immediate: false,
   watch: false,
-  query: queryParams,
+  query: staffShiftsStatisticsQueryParams,
   transform(data: {
     staff_list: StaffShiftsStatistics[]
   }): StaffShiftsStatistics | null {
