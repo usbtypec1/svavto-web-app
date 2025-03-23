@@ -84,9 +84,15 @@ const {
   },
 })
 
+const shiftsQuery = computed(() => {
+  return {
+    ...penaltiesQuery.value,
+    types: ['extra', 'regular', 'test'],
+  }
+})
 const { data: shifts, status: shiftsStatus } = useFetch("/shifts/v2/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
-  query: penaltiesQuery,
+  query: shiftsQuery,
   immediate: false,
   watch: [selectedStaff],
   transform(data: { shifts: ShiftListItem[] }) {
