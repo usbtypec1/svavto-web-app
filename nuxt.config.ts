@@ -97,6 +97,12 @@ export default defineNuxtConfig({
       wasm: false, 
     }
   },
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
   modules: [
     '@primevue/nuxt-module',
     '@pinia/nuxt',

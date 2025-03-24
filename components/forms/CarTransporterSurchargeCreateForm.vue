@@ -19,30 +19,31 @@
       >
     </FormField>
 
-    <FormField v-slot="$field" name="shiftId">
-      <label class="font-semibold" for="shift"> Смена </label>
-      <Select
-        empty-message="Нет смен"
-        :options="sortedShifts"
-        fluid
-        input-id="shift"
-        :option-label="formatShiftDate"
-        option-value="id"
-        filter
-        :filter-fields="['date']"
-        filter-message="Найдено {0} смен"
-        empty-filter-message="Смена не найдена"
-        selection-message="Выберите смену"
-        filter-icon="pi pi-search"
-        filter-placeholder="Поиск по дате (YYYY-MM-DD)"
-      />
+    <FormField v-slot="$field" name="date" class="flex flex-col gap-3">
+      <label class="font-semibold" for="surcharge_date"> Дата </label>
+      <div class="flex flex-col gap-y-4">
+        <FloatLabel variant="on">
+          <DatePicker view="month" date-format="MM - yy год" fluid />
+          <label for="month">Месяц</label>
+        </FloatLabel>
+        <FloatLabel variant="on" v-if="$field.value">
+          <DatePicker
+          :model-value="$field.value"
+            :min-date="startOfMonth($field.value)"
+            :max-date="endOfMonth($field.value)"
+            fluid
+          />
+          <label for="date">Дата</label>
+        </FloatLabel>
+      </div>
       <Message
         v-if="$field.invalid"
         severity="error"
         size="small"
         variant="simple"
-        >{{ $field.error.message }}</Message
       >
+        {{ $field.error.message }}
+      </Message>
     </FormField>
 
     <FormField v-slot="$field" name="reason">
@@ -71,12 +72,12 @@ import type { FormSubmitEvent } from "@primevue/forms"
 import { Form } from "@primevue/forms"
 import { z } from "zod"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
-import type { ShiftListItem } from "~/types/shifts"
-import { formatDate } from "date-fns"
 import type { CarTransporterSurchargeCreateEvent } from "~/types/surcharges"
+import { startOfMonth, endOfMonth } from "date-fns"
+
 
 const props = defineProps<{
-  shifts: ShiftListItem[]
+  staffId: number
 }>()
 
 const emit = defineEmits<{
@@ -94,22 +95,15 @@ const resolver = ref(
         .string({ message: "Введите причину доплаты" })
         .min(1, { message: "Минимальная длина 1 символ" })
         .max(1000, { message: "Максимальная длина 1000 символов" }),
-      shiftId: z.number({ message: "Выберите смену" }),
+      date: z.date({ message: "Введите дату доплаты" }),
     }),
   ),
 )
 
 const onSubmitForm = ({ valid, values }: FormSubmitEvent): void => {
   if (valid) {
+    values.staffId = props.staffId
     emit("submit", values as CarTransporterSurchargeCreateEvent)
   }
 }
-
-const formatShiftDate = ({ date }: ShiftListItem): string => {
-  return formatDate(date, "dd.MM.yyyy")
-}
-
-const sortedShifts = computed((): ShiftListItem[] => {
-  return props.shifts.toSorted((a, b) => a.date.localeCompare(b.date))
-})
 </script>

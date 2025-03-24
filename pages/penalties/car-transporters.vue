@@ -1,9 +1,7 @@
 <template>
   <div>
     <h1 class="text-xl font-semibold mb-3">Оштрафовать сотрудника</h1>
-    <ProgressSpinner v-if="staffListStatus === 'pending'" />
     <Select
-      v-else-if="staffListStatus === 'success'"
       v-model="selectedStaff"
       :options="staffList!"
       option-label="full_name"
@@ -32,9 +30,9 @@
       />
     </div>
     <CarTransporterPenaltyCreateDialog
-      v-if="shiftsStatus === 'success'"
+      v-if="selectedStaff"
+      :staff-id="selectedStaff.id"
       v-model:visible="isCreateDialogVisible"
-      :shifts="shifts!"
       @create-car-transporter-penalty="onCreatePenalty"
     />
   </div>
@@ -45,11 +43,10 @@ import CarTransporterPenaltyCreateDialog from "~/components/dialogs/CarTransport
 import CarTransporterPenaltyListDataView from "~/components/data-views/CarTransporterPenaltyListDataView.vue"
 import { useWebAppPopup, useWebAppHapticFeedback } from "vue-tg"
 import type {
-  Penalty,
+  CarTransporterPenalty,
   CarTransporterPenaltyCreateEvent,
 } from "~/types/penalties"
 import type { StaffIdAndName } from "~/types/staff"
-import type { ShiftListItem } from "~/types/shifts"
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -59,7 +56,7 @@ const { notificationOccurred } = useWebAppHapticFeedback()
 const { showConfirm, showAlert } = useWebAppPopup()
 
 const selectedStaff = ref<StaffIdAndName | null>(null)
-const { data: staffList, status: staffListStatus } = useFetch("/staff/", {
+const { data: staffList } = await useFetch("/staff/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform(data: { staff: StaffIdAndName[] }) {
     return data.staff
@@ -74,31 +71,16 @@ const {
   data: penalties,
   status: penaltiesStatus,
   refresh: refreshPenalties,
-} = useFetch("/economics/penalties/", {
+} = useFetch("/economics/car-transporters/penalties/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
   query: penaltiesQuery,
   watch: [selectedStaff],
   immediate: false,
-  transform(data: { penalties: Penalty[] }) {
+  transform(data: { penalties: CarTransporterPenalty[] }) {
     return data.penalties
   },
 })
 
-const shiftsQuery = computed(() => {
-  return {
-    ...penaltiesQuery.value,
-    types: ['extra', 'regular', 'test'],
-  }
-})
-const { data: shifts, status: shiftsStatus } = useFetch("/shifts/v2/", {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  query: shiftsQuery,
-  immediate: false,
-  watch: [selectedStaff],
-  transform(data: { shifts: ShiftListItem[] }) {
-    return data.shifts
-  },
-})
 
 const onDeletePenalty = async (penaltyId: number) => {
   notificationOccurred("warning")
@@ -124,16 +106,16 @@ const onDeletePenalty = async (penaltyId: number) => {
 const createPenalty = async ({
   amount,
   reason,
-  shiftId,
+  staffId,
   photoUrls,
 }: CarTransporterPenaltyCreateEvent): Promise<void> => {
-  await $fetch("/economics/penalties/", {
+  await $fetch("/economics/car-transporters/penalties/", {
     baseURL: runtimeConfig.public.apiBaseUrl,
     method: "POST",
     body: {
       amount,
       reason,
-      shift_id: shiftId,
+      staff_id: staffId,
       photo_urls: photoUrls,
     },
     async onResponse({ response }) {
@@ -152,7 +134,7 @@ const createPenalty = async ({
 const onCreatePenalty = ({
   amount,
   reason,
-  shiftId,
+  staffId,
   photoUrls,
 }: CarTransporterPenaltyCreateEvent): void => {
   notificationOccurred("warning")
@@ -161,7 +143,7 @@ const onCreatePenalty = ({
     async (ok: boolean) => {
       if (!ok) return
       try {
-        await createPenalty({ amount, reason, shiftId, photoUrls })
+        await createPenalty({ amount, reason, staffId, photoUrls })
       } finally {
         isCreateDialogVisible.value = false
       }

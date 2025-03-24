@@ -1,9 +1,8 @@
-export interface Surcharge {
+export interface CarTransporterSurcharge {
   id: number
   staff_id: number
   staff_full_name: string
-  shift_id: number
-  shift_date: string
+  date: string
   reason: string
   amount: number
   created_at: string
@@ -25,7 +24,8 @@ export interface CarWashSurchargeCreateEvent {
 }
 
 export interface CarTransporterSurchargeCreateEvent {
-  shiftId: number
+  staffId: number
+  date: Date
   reason: string
   amount: number
 }

@@ -5,13 +5,12 @@
     header="Оштрафовать сотрудника"
     :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
   >
-    <CarTransporterPenaltyCreateForm @submit="onSubmitForm" :shifts />
+    <CarTransporterPenaltyCreateForm @submit="onSubmitForm" :staff-id />
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import CarTransporterPenaltyCreateForm from "../forms/CarTransporterPenaltyCreateForm.vue"
-import type { CarWashPenaltyCreateEvent } from "~/types/penalties"
+import type { CarTransporterPenaltyCreateEvent } from "~/types/penalties"
 import type { ShiftListItem } from "~/types/shifts"
 
 const emit = defineEmits<{
@@ -19,12 +18,12 @@ const emit = defineEmits<{
 }>()
 
 defineProps<{
-  shifts: ShiftListItem[]
+  staffId: number
 }>()
 
 const isVisible = defineModel<boolean>("visible", { default: false })
 
-const onSubmitForm = (values: CarWashPenaltyCreateEvent): void => {
+const onSubmitForm = (values: CarTransporterPenaltyCreateEvent): void => {
   emit("createCarTransporterPenalty", values)
 }
 </script>

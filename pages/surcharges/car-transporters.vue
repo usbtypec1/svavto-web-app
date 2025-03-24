@@ -1,9 +1,7 @@
 <template>
   <div>
     <h1 class="text-xl font-semibold mb-3">Доплатить сотруднику</h1>
-    <ProgressSpinner v-if="staffListStatus === 'pending'" />
     <Select
-      v-else-if="staffListStatus === 'success'"
       v-model="selectedStaff"
       :options="staffList!"
       option-label="full_name"
@@ -32,24 +30,22 @@
       />
     </div>
     <CarTransporterSurchargeCreateDialog
-      v-if="shiftsStatus === 'success'"
+      v-if="selectedStaff"
       v-model:visible="isCreateDialogVisible"
-      :shifts="shifts!"
+      :staff-id="selectedStaff!.id"
       @create-car-transporter-surcharge="onCreateSurcharge"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import CarTransporterSurchargeListDataView from "~/components/data-views/CarTransporterSurchargeListDataView.vue"
-import CarTransporterSurchargeCreateDialog from "~/components/dialogs/CarTransporterSurchargeCreateDialog.vue"
 import { useWebAppPopup, useWebAppHapticFeedback } from "vue-tg"
 import type {
-  Surcharge,
+  CarTransporterSurcharge,
   CarTransporterSurchargeCreateEvent,
 } from "~/types/surcharges"
 import type { StaffIdAndName } from "~/types/staff"
-import type { ShiftListItem } from "~/types/shifts"
+import { format } from "date-fns"
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -59,7 +55,7 @@ const { notificationOccurred } = useWebAppHapticFeedback()
 const { showConfirm, showAlert } = useWebAppPopup()
 
 const selectedStaff = ref<StaffIdAndName | null>(null)
-const { data: staffList, status: staffListStatus } = useFetch("/staff/", {
+const { data: staffList } = await useFetch("/staff/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
   transform(data: { staff: StaffIdAndName[] }) {
     return data.staff
@@ -74,29 +70,13 @@ const {
   data: surcharges,
   status: surchargesStatus,
   refresh: refreshSurcharges,
-} = useFetch("/economics/surcharges/", {
+} = useFetch("/economics/car-transporters/surcharges/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
   query: surchargesQuery,
   watch: [selectedStaff],
   immediate: false,
-  transform(data: { surcharges: Surcharge[] }) {
+  transform(data: { surcharges: CarTransporterSurcharge[] }) {
     return data.surcharges
-  },
-})
-
-const shiftsQuery = computed(() => {
-  return {
-    ...surchargesQuery.value,
-    types: ['extra', 'regular', 'test'],
-  }
-})
-const { data: shifts, status: shiftsStatus } = useFetch("/shifts/v2/", {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  query: shiftsQuery,
-  immediate: false,
-  watch: [selectedStaff],
-  transform(data: { shifts: ShiftListItem[] }) {
-    return data.shifts
   },
 })
 
@@ -109,9 +89,9 @@ const onDeleteSurcharge = async (surchargeId: number) => {
       method: "DELETE",
       async onResponse({ response }) {
         if (!response.ok) return
+        await refreshSurcharges()
         showAlert("❗️ Доплата удалена")
         notificationOccurred("success")
-        await refreshSurcharges()
       },
       onResponseError() {
         showAlert("❌ Не удалось удалить доплату")
@@ -124,23 +104,25 @@ const onDeleteSurcharge = async (surchargeId: number) => {
 const createSurcharge = async ({
   amount,
   reason,
-  shiftId,
+  staffId,
+  date,
 }: CarTransporterSurchargeCreateEvent): Promise<void> => {
-  await $fetch("/economics/surcharges/", {
+  await $fetch("/economics/car-transporters/surcharges/", {
     baseURL: runtimeConfig.public.apiBaseUrl,
     method: "POST",
     body: {
       amount,
       reason,
-      shift_id: shiftId,
+      date: format(date, "yyyy-MM-dd"),
+      staff_id: staffId,
     },
     async onResponse({ response }) {
       if (!response.ok) return
+      await refreshSurcharges()
       showAlert(
         `❗️ Сотруднику ${selectedStaff.value?.full_name} доплачено ${amount} рублей`,
       )
       notificationOccurred("success")
-      await refreshSurcharges()
     },
     onResponseError() {
       showAlert("❌ Не удалось доплатить сотруднику")
@@ -152,7 +134,8 @@ const createSurcharge = async ({
 const onCreateSurcharge = ({
   amount,
   reason,
-  shiftId,
+  staffId,
+  date,
 }: CarTransporterSurchargeCreateEvent): void => {
   notificationOccurred("warning")
   showConfirm(
@@ -160,7 +143,7 @@ const onCreateSurcharge = ({
     async (ok: boolean) => {
       if (!ok) return
       try {
-        await createSurcharge({ amount, reason, shiftId })
+        await createSurcharge({ amount, reason, staffId, date })
       } finally {
         isCreateDialogVisible.value = false
       }

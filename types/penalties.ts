@@ -1,11 +1,10 @@
 export type PenaltyConsequence = "warn" | "dismissal"
 
-export interface Penalty {
+export interface CarTransporterPenalty {
   id: number
   staff_id: number
   staff_full_name: string
-  shift_id: number
-  shift_date: string
+  date: string
   reason: string
   amount: number
   consequence: PenaltyConsequence | null
@@ -23,7 +22,7 @@ export interface CarWashPenalty {
 }
 
 export interface CarTransporterPenaltyCreateEvent {
-  shiftId: number
+  staffId: number
   reason: string
   amount: number
   photoUrls: string[]
