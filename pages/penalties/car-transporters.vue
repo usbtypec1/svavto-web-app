@@ -39,8 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import CarTransporterPenaltyCreateDialog from "~/components/dialogs/CarTransporterPenaltyCreateDialog.vue"
-import CarTransporterPenaltyListDataView from "~/components/data-views/CarTransporterPenaltyListDataView.vue"
+import { format } from "date-fns";
 import { useWebAppPopup, useWebAppHapticFeedback } from "vue-tg"
 import type {
   CarTransporterPenalty,
@@ -107,6 +106,7 @@ const createPenalty = async ({
   amount,
   reason,
   staffId,
+  date,
   photoUrls,
 }: CarTransporterPenaltyCreateEvent): Promise<void> => {
   await $fetch("/economics/car-transporters/penalties/", {
@@ -116,6 +116,7 @@ const createPenalty = async ({
       amount,
       reason,
       staff_id: staffId,
+      date: format(date, "yyyy-MM-dd"),
       photo_urls: photoUrls,
     },
     async onResponse({ response }) {
@@ -135,6 +136,7 @@ const onCreatePenalty = ({
   amount,
   reason,
   staffId,
+  date,
   photoUrls,
 }: CarTransporterPenaltyCreateEvent): void => {
   notificationOccurred("warning")
@@ -143,7 +145,7 @@ const onCreatePenalty = ({
     async (ok: boolean) => {
       if (!ok) return
       try {
-        await createPenalty({ amount, reason, staffId, photoUrls })
+        await createPenalty({ amount, reason, staffId, date, photoUrls })
       } finally {
         isCreateDialogVisible.value = false
       }

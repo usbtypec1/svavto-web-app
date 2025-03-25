@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Penalty } from "~/types/penalties"
+import type { CarTransporterPenalty } from "~/types/penalties"
 import PenaltyList from "~/components/PenaltyList.vue"
 import { MainButton, useWebApp } from "vue-tg"
 import type { Staff } from "~/types/staff"
@@ -31,14 +31,19 @@ const { data: staff, status: staffStatus } = await useFetch<Staff>(
   },
 )
 
-const { data: penalties, status } = await useFetch("/economics/penalties/", {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  query: {
-    staff_ids: [staffId],
-    limit: 1000,
+const { data: penalties, status } = await useFetch(
+  "/economics/car-transporters/penalties/",
+  {
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    query: {
+      staff_ids: [staffId],
+      limit: 1000,
+    },
+    transform(data: {
+      penalties: CarTransporterPenalty[]
+    }): CarTransporterPenalty[] {
+      return data.penalties
+    },
   },
-  transform(data: { penalties: Penalty[] }): Penalty[] {
-    return data.penalties
-  },
-})
+)
 </script>

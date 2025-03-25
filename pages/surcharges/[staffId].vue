@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Surcharge } from "~/types/surcharges"
+import type { CarTransporterSurcharge } from "~/types/surcharges"
 import { MainButton, useWebApp } from "vue-tg"
 import type { Staff } from "~/types/staff"
 
@@ -32,14 +32,19 @@ const { data: staff, status: staffStatus } = await useFetch<Staff>(
   },
 )
 
-const { data: surcharges, status } = await useFetch("/economics/surcharges/", {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  query: {
-    staff_ids: [staffId],
-    limit: 1000,
+const { data: surcharges, status } = await useFetch(
+  "/economics/car-transporters/surcharges/",
+  {
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    query: {
+      staff_ids: [staffId],
+      limit: 1000,
+    },
+    transform(data: {
+      surcharges: CarTransporterSurcharge[]
+    }): CarTransporterSurcharge[] {
+      return data.surcharges
+    },
   },
-  transform(data: { surcharges: Surcharge[] }): Surcharge[] {
-    return data.surcharges
-  },
-})
+)
 </script>

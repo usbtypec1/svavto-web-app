@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { format, formatISO } from "date-fns"
+import { format } from "date-fns"
 import type { ReportPeriod } from "~/types/report-periods"
 import type { StaffShiftsStatistics } from "~/types/reports"
 

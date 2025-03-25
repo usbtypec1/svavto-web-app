@@ -10,7 +10,6 @@
 
 <script setup lang="ts">
 import { MainButton, useWebApp } from "vue-tg"
-import DryCleaningRequestListDataView from "~/components/data-views/DryCleaningRequestListDataView.vue"
 import {
   DryCleaningRequestStatus,
   type DryCleaningRequest,

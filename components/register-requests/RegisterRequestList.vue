@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import RegisterRequestListItem from "~/components/register-requests/RegisterRequestListItem.vue"
 import type { StaffRegisterRequest } from "~/types/staff-register-requests"
 
 defineProps<{

@@ -81,7 +81,6 @@
   
   <script setup lang="ts">
   import type { CarWashService } from "~/types/car-wash-services"
-  import CarWashServicePriceUpdateDialog from "~/components/dialogs/CarWashServicePriceUpdateDialog.vue"
   import {
     useWebAppHapticFeedback,
     useWebAppPopup,
@@ -89,8 +88,6 @@
     MainButton,
   } from "vue-tg"
   import type { CarWashFormValues, CarWashWithServices } from "~/types/car-washes"
-  import FloatingCornerButton from "~/components/navigation/FloatingCornerButton.vue"
-  import CarWashForm from "~/components/car-washes/forms/CarWashForm.vue"
   
   const route = useRoute()
   

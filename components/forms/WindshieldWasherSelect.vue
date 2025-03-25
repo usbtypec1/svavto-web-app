@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col gap-y-2">
-    <RadioButtonGroup v-model="WindshieldWasherType" class="flex flex-col gap-y-2">
+    <RadioButtonGroup
+      v-model="WindshieldWasherType"
+      class="flex flex-col gap-y-2"
+    >
       <div
         v-for="windshieldWasherTypeOption in windshieldWasherTypeOptions"
         :key="windshieldWasherTypeOption.value"
@@ -43,6 +46,7 @@ import {
   windshieldWasherRefilledBottlePercentageOptions,
   windshieldWasherTypeOptions,
 } from "~/utils/car-transfers"
+
 const windshieldWasherType = ref<WindshieldWasherTypeOption>(
   windshieldWasherTypeOptions[0],
 )

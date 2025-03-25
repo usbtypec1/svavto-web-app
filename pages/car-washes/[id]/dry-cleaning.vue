@@ -14,7 +14,6 @@
 
 <script setup lang="ts">
 import { MainButton, useWebApp } from "vue-tg"
-import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
 import type { CarWashService } from "~/types/car-wash-services"
 
 const route = useRoute()

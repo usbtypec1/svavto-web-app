@@ -93,8 +93,6 @@ import type { FormSubmitEvent } from "@primevue/forms"
 import { Form } from "@primevue/forms"
 import { z } from "zod"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
-import type { ShiftListItem } from "~/types/shifts"
-import { formatDate } from "date-fns"
 import { startOfMonth, endOfMonth } from "date-fns"
 
 const props = defineProps<{

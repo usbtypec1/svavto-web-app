@@ -5,20 +5,21 @@
       <i class="pi pi-money-bill" /> Цена: {{ surcharge.amount }}₽
     </p>
     <p class="flex items-center gap-x-1">
-      <i class="pi pi-calendar" />Дата смены: {{ formattedShiftDate }}
+      <i class="pi pi-calendar" />Дата смены: {{ format(surcharge.date, 'dd.MM.yyyy') }}
     </p>
     <p class="flex items-center gap-x-1">
       <i class="pi pi-calendar-clock" /> Дата выдачи доплаты:
-      {{ formattedCreateAt }}
+      {{ format(surcharge.created_at, 'dd.MM.yyyy') }}
     </p>
   </Message>
 </template>
 
 <script setup lang="ts">
-import type { Surcharge } from "~/types/surcharges"
+import { format } from "date-fns";
+import type { CarTransporterSurcharge } from "~/types/surcharges"
 
 const props = defineProps<{
-  surcharge: Surcharge
+  surcharge: CarTransporterSurcharge
 }>()
 
 const formattedCreateAt = useDateFormat(
@@ -27,7 +28,7 @@ const formattedCreateAt = useDateFormat(
 )
 
 const formattedShiftDate = useDateFormat(
-  props.surcharge.shift_date,
+  props.surcharge.date,
   "DD.MM.YYYY",
 )
 </script>

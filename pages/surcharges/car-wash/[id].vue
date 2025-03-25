@@ -36,10 +36,8 @@ import type {
   CarWashSurcharge,
   CarWashSurchargeCreateEvent,
 } from "~/types/surcharges"
-import CarWashSurchargeCreateDialog from "~/components/dialogs/CarWashSurchargeCreateDialog.vue"
 import { useWebAppPopup, BackButton, useWebAppHapticFeedback } from "vue-tg"
 import type { CarWashWithServices } from "~/types/car-washes"
-import CarWashSurchargeListDataView from "~/components/data-views/CarWashSurchargeListDataView.vue"
 import { formatDate } from "date-fns"
 
 const { notificationOccurred } = useWebAppHapticFeedback()

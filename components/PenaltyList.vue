@@ -19,10 +19,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Penalty } from '~/types/penalties'
+import type { CarTransporterPenalty } from '~/types/penalties'
 
 defineProps<{
-  penalties: Penalty[],
+  penalties: CarTransporterPenalty[],
 }>()
 </script>
 

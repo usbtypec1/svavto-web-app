@@ -8,8 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import FloatingCornerButton from "~/components/navigation/FloatingCornerButton.vue"
-import CarWashForm from "~/components/car-washes/forms/CarWashForm.vue"
 import type { CarWashFormValues } from "~/types/car-washes"
 import { FetchError } from "ofetch"
 import { useWebAppPopup } from "vue-tg"

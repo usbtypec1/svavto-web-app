@@ -23,6 +23,7 @@ export interface CarWashPenalty {
 
 export interface CarTransporterPenaltyCreateEvent {
   staffId: number
+  date: Date
   reason: string
   amount: number
   photoUrls: string[]

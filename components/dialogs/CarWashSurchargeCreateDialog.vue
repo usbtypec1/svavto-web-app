@@ -11,7 +11,6 @@
 
 <script setup lang="ts">
 import type { CarWashSurchargeCreateEvent } from "~/types/surcharges"
-import CarWashSurchargeCreateForm from "../forms/CarWashSurchargeCreateForm.vue"
 
 const emit = defineEmits<{
   createCarWashSurcharge: [values: any]

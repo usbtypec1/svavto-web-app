@@ -10,7 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import CarTransporterSurchargeCreateForm from "../forms/CarTransporterSurchargeCreateForm.vue"
 import type { CarTransporterSurchargeCreateEvent } from "~/types/surcharges"
 
 const emit = defineEmits<{

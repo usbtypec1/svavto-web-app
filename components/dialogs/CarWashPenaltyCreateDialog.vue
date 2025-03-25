@@ -10,7 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import CarWashPenaltyCreateForm from "~/components/forms/CarWashPenaltyCreateForm.vue"
 import type { CarWashPenaltyCreateEvent } from "~/types/penalties"
 
 const emit = defineEmits<{

@@ -9,7 +9,7 @@
     <template #empty>
       <Message icon="pi pi-face-smile" severity="success">Нет штрафов</Message>
     </template>
-    <template #list="{ items }: { items: Penalty[] }">
+    <template #list="{ items }: { items: CarTransporterPenalty[] }">
       <div class="flex flex-col divide-solid divide-y-2">
         <div v-for="penalty in items" :key="penalty.id">
           <div class="flex items-center justify-between px-4 py-3">
@@ -67,12 +67,12 @@
 
 <script setup lang="ts">
 import { formatDate } from "date-fns"
-import type { Penalty } from "~/types/penalties"
+import type { CarTransporterPenalty } from "~/types/penalties"
 import type { StaffIdAndName } from "~/types/staff"
 
 defineProps<{
   staff: StaffIdAndName
-  carTransporterPenalties: Penalty[]
+  carTransporterPenalties: CarTransporterPenalty[]
 }>()
 
 const emit = defineEmits<{

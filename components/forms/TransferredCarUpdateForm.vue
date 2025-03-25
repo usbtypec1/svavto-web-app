@@ -197,10 +197,8 @@ import {
   windshieldWasherRefilledBottlePercentageOptions,
   windshieldWasherTypeOptions,
 } from "~/utils/car-transfers"
-import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
 import type { CarWashService } from "~/types/car-wash-services"
 import type { CarWashIdAndName } from "~/types/car-washes"
-import TextDisplayDialog from "~/components/dialogs/TextDisplayDialog.vue"
 
 const props = defineProps<{
   transferredCar: TransferredCarDetail

@@ -18,10 +18,10 @@
   </template>
   
   <script setup lang="ts">
-  import type { Surcharge } from '~/types/surcharges'
+  import type { CarTransporterSurcharge } from '~/types/surcharges'
   
   defineProps<{
-    surcharges: Surcharge[],
+    surcharges: CarTransporterSurcharge[],
   }>()
   </script>
   

@@ -53,7 +53,6 @@ import {
   useWebAppHapticFeedback,
   useWebAppPopup,
 } from "vue-tg"
-import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
 import {
   DryCleaningRequestStatus,
   type DryCleaningRequest,

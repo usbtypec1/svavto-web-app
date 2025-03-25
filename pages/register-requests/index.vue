@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import RegisterRequestList from "~/components/register-requests/RegisterRequestList.vue"
 import type { StaffRegisterRequest } from "~/types/staff-register-requests"
 import {
   useWebAppHapticFeedback,

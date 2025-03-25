@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import ReportCardItemStatistics from "~/components/ReportCardItemStatistics.vue"
 import type { ShiftStatistics } from "~/types/reports"
 
 defineProps<{

@@ -1,16 +1,15 @@
 <template>
   <Message severity="error">
-    <p>
-      <i class="pi pi-receipt" /> Причина: {{ formattedPenaltyReason }}
-    </p>
+    <p><i class="pi pi-receipt" /> Причина: {{ formattedPenaltyReason }}</p>
     <p class="flex items-center gap-x-1">
       <i class="pi pi-money-bill" /> Цена: {{ penalty.amount }}₽
     </p>
     <p class="flex items-center gap-x-1">
-      <i class="pi pi-calendar" />Дата смены: {{ formattedShiftDate }}
+      <i class="pi pi-calendar" />Дата: {{ format(penalty.date, "dd.MM.yyyy") }}
     </p>
     <p class="flex items-center gap-x-1">
-      <i class="pi pi-calendar-clock" /> Дата выдачи штрафа: {{ formattedCreatedAt }}
+      <i class="pi pi-calendar-clock" /> Дата выдачи штрафа:
+      {{ format(penalty.created_at, "dd.MM.yyyy HH:mm") }}
     </p>
     <Tag
       v-if="penalty.consequence !== null"
@@ -24,21 +23,15 @@
 </template>
 
 <script setup lang="ts">
-import type { Penalty, PenaltyConsequence } from "~/types/penalties"
+import { format } from "date-fns"
+import type {
+  CarTransporterPenalty,
+  PenaltyConsequence,
+} from "~/types/penalties"
 
 const props = defineProps<{
-  penalty: Penalty
+  penalty: CarTransporterPenalty
 }>()
-
-const formattedCreatedAt = useDateFormat(
-  props.penalty.created_at,
-  "DD.MM.YYYY HH:mm",
-)
-
-const formattedShiftDate = useDateFormat(
-  props.penalty.shift_date,
-  "DD.MM.YYYY",
-)
 
 const penaltyReasonToName: Record<string, string> = {
   late_report: "Отчет не вовремя",

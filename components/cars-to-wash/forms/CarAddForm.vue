@@ -186,7 +186,6 @@ import {
   windshieldWasherRefilledBottlePercentageOptions,
   windshieldWasherTypeOptions,
 } from "~/utils/car-transfers"
-import TextDisplayDialog from "~/components/dialogs/TextDisplayDialog.vue"
 import { WindshieldWasherType } from "~/types/cars"
 
 const emit = defineEmits([

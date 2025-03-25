@@ -50,7 +50,6 @@
 <script setup lang="ts">
 import { useTransformedCarWashServices } from "~/composables/car-wash-services"
 import type { CarWashService } from "~/types/car-wash-services"
-import CarToWashAdditionalServiceCountDialog from "~/components/cars-to-wash/dialogs/CarToWashAdditionalServiceCountDialog.vue"
 
 const props = defineProps<{
   specificCarWashServices?: CarWashService[] | null

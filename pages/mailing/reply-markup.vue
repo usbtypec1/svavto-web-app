@@ -12,7 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import ReplyMarkupBuilder from '~/components/forms/ReplyMarkupBuilder.vue'
 import { MainButton, useWebApp } from 'vue-tg'
 import type { Button } from '~/reply-markup'
 

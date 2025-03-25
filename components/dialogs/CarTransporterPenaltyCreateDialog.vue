@@ -11,7 +11,6 @@
 
 <script setup lang="ts">
 import type { CarTransporterPenaltyCreateEvent } from "~/types/penalties"
-import type { ShiftListItem } from "~/types/shifts"
 
 const emit = defineEmits<{
   createCarTransporterPenalty: [values: any]
