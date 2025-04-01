@@ -90,7 +90,7 @@
       <FormField v-slot="$windshieldWasherType" name="windshieldWasherType">
         <RadioButtonGroup class="flex flex-col gap-y-2">
           <div
-            v-for="windshieldWasherTypeOption in windshieldWasherTypeOptions"
+            v-for="windshieldWasherTypeOption in filteredWindshieldWasherTypeOptions"
             :key="windshieldWasherTypeOption.value"
             class="flex items-center gap-x-2"
           >
@@ -179,7 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CarToWashDraft } from "~/types/cars"
+import type { CarToWashDraft, WindshieldWasherTypeOption } from "~/types/cars"
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
@@ -198,6 +198,15 @@ const emit = defineEmits([
 const props = defineProps<{
   isWindshieldWasherHidden: boolean
 }>()
+
+const filteredWindshieldWasherTypeOptions = computed((): WindshieldWasherTypeOption[] => {
+  return windshieldWasherTypeOptions.filter(
+    ({ value }) =>
+      props.isWindshieldWasherHidden &&
+      value !== WindshieldWasherType.Antifreeze,
+  )
+})
+
 
 const isAdditionalServicesIncluded = ref<boolean>(false)
 
