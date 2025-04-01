@@ -215,11 +215,12 @@ const emit = defineEmits<{
 }>()
 
 const filteredWindshieldWasherTypeOptions = computed((): WindshieldWasherTypeOption[] => {
-  return windshieldWasherTypeOptions.filter(
-    ({ value }) =>
-      props.transferredCar.is_windshield_washer_hidden &&
-      value !== WindshieldWasherType.Antifreeze,
-  )
+  return windshieldWasherTypeOptions.filter(({ value }) => {
+    if (value === WindshieldWasherType.Antifreeze) {
+      return !props.transferredCar.is_windshield_washer_hidden
+    }
+    return true;
+  })
 })
 
 const { showAlert } = useWebAppPopup()

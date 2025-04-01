@@ -200,11 +200,12 @@ const props = defineProps<{
 }>()
 
 const filteredWindshieldWasherTypeOptions = computed((): WindshieldWasherTypeOption[] => {
-  return windshieldWasherTypeOptions.filter(
-    ({ value }) =>
-      props.isWindshieldWasherHidden &&
-      value !== WindshieldWasherType.Antifreeze,
-  )
+  return windshieldWasherTypeOptions.filter(({ value }) => {
+    if (value === WindshieldWasherType.Antifreeze) {
+      return !props.isWindshieldWasherHidden
+    }
+    return true;
+  })
 })
 
 
