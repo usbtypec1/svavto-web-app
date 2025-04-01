@@ -30,7 +30,7 @@ const transferredCarId = Number(route.params.id as string)
 const runtimeConfig = useRuntimeConfig()
 
 const carWashId = ref<number>()
-const { data: transferredCar, status: transferredCarStatus } =
+const { data: transferredCar } =
   await useFetch<TransferredCarDetail>(`/shifts/cars/${transferredCarId}/`, {
     baseURL: runtimeConfig.public.apiBaseUrl,
     transform(data: TransferredCarDetail) {

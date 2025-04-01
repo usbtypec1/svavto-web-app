@@ -14,6 +14,7 @@
       :is-additional-services-included="isAdditionalServicesIncluded"
       @submit-without-additional-services="onAddCarWithoutAdditionalServices"
       @submit-with-additional-services="onAddCarWithAdditionalServices"
+      :is-windshield-washer-hidden="currentShift!.is_windshield_washer_hidden"
     />
     <template v-if="isAdditionalServicesIncluded">
       <CarToWashAdditionalServicesForm

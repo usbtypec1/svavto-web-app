@@ -3,15 +3,15 @@
     <template #content>
       <div>
         <span class="font-semibold">Гос.номер: </span>
-        <span>{{ carToWash.number }}</span>
+        <span>{{ transferredCar.number }}</span>
       </div>
       <div>
         <span class="font-semibold">Класс автомобиля: </span>
-        <span>{{ classTypeValueToLabel[carToWash.class_type] }}</span>
+        <span>{{ classTypeValueToLabel[transferredCar.class_type] }}</span>
       </div>
       <div>
         <span class="font-semibold">Вид мойки: </span>
-        <span>{{ washTypeValueToLabel[carToWash.wash_type] }}</span>
+        <span>{{ washTypeValueToLabel[transferredCar.wash_type] }}</span>
       </div>
     </template>
   </Card>
@@ -19,9 +19,9 @@
 
 <script setup lang="ts">
 import { classTypeValueToLabel, washTypeValueToLabel } from '~/utils/car-wash-services'
-import type { CarToWashDetail } from '~/types/cars'
+import type { TransferredCarDetail } from '~/types/cars'
 
 defineProps<{
-  carToWash: CarToWashDetail,
+  transferredCar: TransferredCarDetail,
 }>()
 </script>

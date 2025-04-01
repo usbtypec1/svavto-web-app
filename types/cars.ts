@@ -44,6 +44,7 @@ export interface CarToWashDetail {
   created_at: string
   additional_services: AdditionalService[]
   car_wash: CarWashIdAndName
+  is_windshield_washer_hidden: boolean
 }
 
 export interface TranferredCarsListItemAdditionalService {
@@ -87,6 +88,7 @@ export interface TransferredCarDetail {
   windshield_washer_type: WindshieldWasherType
   windshield_washer_refilled_bottle_percentage: number
   additional_services: TranferredCarsListItemAdditionalService[]
+  is_windshield_washer_hidden: boolean
   created_at: string
 }
 

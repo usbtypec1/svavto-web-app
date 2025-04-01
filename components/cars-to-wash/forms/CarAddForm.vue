@@ -4,7 +4,9 @@
     @submit="onSubmit"
     class="flex flex-col gap-y-4"
     :validate-on-value-update="false"
-    :validate-on-blur="true"
+    :validate-on-blur="false"
+    :validate-on-submit="true"
+    :validate-on-mount="false"
     v-slot="$form"
   >
     <FormField v-slot="$number" name="number">
@@ -192,6 +194,10 @@ const emit = defineEmits([
   "submitWithoutAdditionalServices",
   "submitWithAdditionalServices",
 ])
+
+const props = defineProps<{
+  isWindshieldWasherHidden: boolean
+}>()
 
 const isAdditionalServicesIncluded = ref<boolean>(false)
 

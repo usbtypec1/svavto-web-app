@@ -36,5 +36,6 @@ export interface CurrentShift {
   staff: Staff
   is_started: boolean
   is_finished: boolean
+  is_windshield_washer_hidden: boolean
   created_at: string
 }

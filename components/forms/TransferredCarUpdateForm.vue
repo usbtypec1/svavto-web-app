@@ -80,7 +80,7 @@
       <FormField v-slot="$windshieldWasherType" name="windshieldWasherType">
         <RadioButtonGroup class="flex flex-col gap-y-2">
           <div
-            v-for="windshieldWasherTypeOption in windshieldWasherTypeOptions"
+            v-for="windshieldWasherTypeOption in filteredWindshieldWasherTypeOptions"
             :key="windshieldWasherTypeOption.value"
             class="flex items-center gap-x-2"
           >
@@ -187,6 +187,7 @@ import {
   type UpdatedAdditionalService,
   type TransferredCarUpdateEvent,
   WindshieldWasherType,
+  type WindshieldWasherTypeOption,
 } from "~/types/cars"
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
@@ -211,6 +212,14 @@ const carWashId = defineModel<number>("carWashId")
 const emit = defineEmits<{
   submit: [values: TransferredCarUpdateEvent]
 }>()
+
+const filteredWindshieldWasherTypeOptions = computed((): WindshieldWasherTypeOption[] => {
+  return windshieldWasherTypeOptions.filter(
+    ({ value }) =>
+      props.transferredCar.is_windshield_washer_hidden &&
+      value !== WindshieldWasherType.Antifreeze,
+  )
+})
 
 const { showAlert } = useWebAppPopup()
 
