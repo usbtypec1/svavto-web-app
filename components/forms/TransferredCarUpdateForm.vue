@@ -108,6 +108,7 @@
         name="windshieldWasherRefilledBottlePercentage"
         v-show="
           $form.windshieldWasherType?.value === WindshieldWasherType.Antifreeze
+          && !transferredCar.is_windshield_washer_hidden
         "
       >
         <div>
