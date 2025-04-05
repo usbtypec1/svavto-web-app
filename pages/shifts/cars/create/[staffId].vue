@@ -31,12 +31,12 @@
 </template>
 
 <script setup lang="ts">
-import CarWashChooseDialog from "~/components/car-washes/dialogs/CarWashChooseDialog.vue"
+import CarWashChooseDialog from "~/components/dialogs/CarWashChooseDialog.vue"
 import type { CarToWash } from "~/types/cars"
 import type { CarWashWithServices } from "~/types/car-washes"
-import CarAddForm from "~/components/cars-to-wash/forms/CarAddForm.vue"
+import CarAddForm from "~/components/forms/CarAddForm.vue"
 import { MainButton, useWebApp, useWebAppPopup } from "vue-tg"
-import CarToWashAdditionalServicesForm from "~/components/cars-to-wash/forms/CarToWashAdditionalServicesForm.vue"
+import CarToWashAdditionalServicesForm from "~/components/forms/CarToWashAdditionalServicesForm.vue"
 import { getErrorCodes } from "~/utils/errors"
 import type { CurrentShift } from "~/types/shifts"
 
