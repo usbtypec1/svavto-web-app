@@ -5,66 +5,92 @@
     class="w-full mx-4"
     :header="carWashService?.name"
   >
-    <div class="flex flex-col gap-y-1">
-      <label :for="countInputId" class="font-semibold">Количество</label>
-      <InputNumber
-        v-model.number="count"
-        :min="0"
-        :max="1_000"
-        :input-id="countInputId"
-        fluid
-        :invalid="count === null"
-      />
-      <Message
-        v-if="count === null"
-        variant="simple"
-        severity="error"
-        size="small"
-      >
-        Введите количество
-      </Message>
-    </div>
-    <template #footer>
-      <div class="w-full flex gap-x-2">
+    <Form
+      @submit="onSubmit"
+      :resolver="resolver"
+      :validate-on-blur="true"
+      :validate-on-mount="false"
+      :validate-on-submit="true"
+      :validate-on-value-update="false"
+    >
+      <FormField v-slot="$count" name="count">
+        <label :for="countInputId" class="font-semibold">Количество</label>
+        <InputNumber :input-id="countInputId" fluid />
+        <Message
+          v-if="$count?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ $count.error?.message }}
+        </Message>
+      </FormField>
+
+      <div class="w-full flex gap-x-2 mt-4">
         <Button
           class="flex-1"
           label="Отменить"
           icon="pi pi-times"
           severity="secondary"
+          type="button"
           @click="visible = false"
-          autofocus
         />
         <Button
-          @click="onSubmit"
           class="flex-1"
           label="Сохранить"
           icon="pi pi-check"
           type="submit"
-          autofocus
-          :disabled="count === null"
         />
       </div>
-    </template>
+    </Form>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import type { CarWashService } from '~/types/car-wash-services'
+import { zodResolver } from "@primevue/forms/resolvers/zod"
+import type { CarWashService } from "~/types/car-wash-services"
+import { z } from "zod"
+import type { FormSubmitEvent } from "@primevue/forms"
 
 const countInputId = useId()
 
-const visible = defineModel('visible', { required: true, default: false })
-const serviceIdToCount = defineModel('serviceIdToCount', { required: true })
+const visible = defineModel<boolean>("visible", {
+  required: true,
+  default: false,
+})
+const serviceIdToCount = defineModel<Record<string, number>>(
+  "serviceIdToCount",
+  { required: true },
+)
 
 const props = defineProps<{
-  carWashService?: CarWashService,
+  carWashService?: CarWashService
 }>()
+const maxCount = computed((): number => props.carWashService?.max_count ?? 1000)
 
-const count = ref<number | null>(null)
+const resolver = computed(() => (
+  zodResolver(
+    z.object({
+      count: z
+        .number({ message: "Введите количество" })
+        .min(1, { message: "Введите значение больше нуля" })
+        .max(maxCount.value, {
+          message: `Максимально допустимое значение - ${maxCount.value}`,
+        }),
+    }),
+  )
+))
 
-const onSubmit = (): void => {
-  visible.value = false
-  serviceIdToCount.value[props.carWashService.id] = count.value
-  count.value = null
+interface FormValues {
+  count: number
+}
+
+const onSubmit = ({ valid, values }: FormSubmitEvent): void => {
+  if (valid) {
+    visible.value = false
+    serviceIdToCount.value[props.carWashService!.id] = (
+      values as FormValues
+    ).count
+  }
 }
 </script>

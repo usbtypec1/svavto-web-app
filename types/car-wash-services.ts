@@ -4,4 +4,5 @@ export interface CarWashService {
   is_countable?: boolean
   price?: number
   parent: CarWashService | null
+  max_count?: number
 }
