@@ -85,7 +85,7 @@ const onDeletePenalty = async (penaltyId: number) => {
   notificationOccurred("warning")
   showConfirm("Вы уверены что хотите удалить штраф?", async (ok: boolean) => {
     if (!ok) return
-    await $fetch(`/economics/penalties/${penaltyId}/`, {
+    await $fetch(`/economics/car-transporters/penalties/${penaltyId}/`, {
       baseURL: runtimeConfig.public.apiBaseUrl,
       method: "DELETE",
       async onResponse({ response }) {

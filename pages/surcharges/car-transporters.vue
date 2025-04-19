@@ -84,7 +84,7 @@ const onDeleteSurcharge = async (surchargeId: number) => {
   notificationOccurred("warning")
   showConfirm("Вы уверены что хотите удалить доплату?", async (ok: boolean) => {
     if (!ok) return
-    await $fetch(`/economics/surcharges/${surchargeId}/`, {
+    await $fetch(`/economics/car-transporters/surcharges/${surchargeId}/`, {
       baseURL: runtimeConfig.public.apiBaseUrl,
       method: "DELETE",
       async onResponse({ response }) {
