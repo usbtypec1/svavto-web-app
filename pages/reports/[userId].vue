@@ -1,11 +1,12 @@
 <template>
   <div>
     <p class="font-semibold text-lg">Выберите отчетный период</p>
-    <Listbox
+    <Select
       v-model="reportPeriod"
-      :options="reportPeriods!"
+      :options="sortedReportPeriods"
       :option-label="formatPeriod"
       empty-message="У вас не было смен"
+      fluid
     />
 
     <template v-if="staffShiftsStatisticsStatus === 'success'">
@@ -71,6 +72,14 @@ const { data: reportPeriods } = await useFetch(
     },
   },
 )
+const sortedReportPeriods = computed((): ReportPeriod[] => {
+  if (reportPeriods.value === null) return []
+  return reportPeriods.value.toSorted((a, b) => {
+    if (a.year !== b.year) return b.year - a.year
+    if (a.month !== b.month) return b.month - a.month
+    return b.number - a.number
+  })
+})
 const reportPeriod = ref<ReportPeriod | null>(null)
 
 const staffShiftsStatisticsQueryParams = computed(() => {
