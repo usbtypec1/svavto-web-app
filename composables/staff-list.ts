@@ -1,12 +1,13 @@
 import type { StaffIdAndName, Staff } from "~/types/staff"
 
-export const useStaffList = () => {
-  const runtimeConfig = useRuntimeConfig()
+type OrderOption = "-created_at" | "full_name"
 
-  const { data, status } = useFetch("/staff/", {
-    baseURL: runtimeConfig.public.apiBaseUrl,
+export const useStaffList = (
+  { orderBy }: { orderBy: OrderOption } = { orderBy: "-created_at" },
+) => {
+  return useApiFetch<StaffIdAndName[]>("/staff/", {
     query: {
-      order_by: "-created_at",
+      order_by: orderBy,
     },
     transform(data: { staff: Staff[] }): StaffIdAndName[] {
       return data.staff
@@ -17,9 +18,4 @@ export const useStaffList = () => {
         }))
     },
   })
-
-  return {
-    data,
-    status,
-  }
 }
