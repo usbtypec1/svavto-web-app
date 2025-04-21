@@ -24,10 +24,10 @@
             <div class="flex flex-col gap-y-3 my-3">
               <ReportCardItem
                 v-for="shiftStatistics in staffShiftsStatistics.shifts_statistics.toSorted(
-                  (a, b) => a.shift_date.localeCompare(b.shift_date),
+                  (a, b) => a.date.localeCompare(b.date),
                 )"
                 :shift-statistics="shiftStatistics"
-                :key="shiftStatistics.shift_date"
+                :key="shiftStatistics.date"
               />
             </div>
           </template>

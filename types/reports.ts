@@ -1,7 +1,7 @@
 import type { Staff } from "~/types/staff"
 
 export interface ShiftStatistics {
-  shift_date: string
+  date: string
   penalty_amount: number
   surcharge_amount: number
   planned_comfort_cars_washed_count: number
