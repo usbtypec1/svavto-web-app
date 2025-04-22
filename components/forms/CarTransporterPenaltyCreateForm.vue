@@ -3,7 +3,9 @@
     :resolver
     class="flex flex-col gap-4 w-full"
     :validate-on-value-update="false"
-    :validate-on-blur="true"
+    :validate-on-blur="false"
+    :validate-on-mount="false"
+    :validate-on-submit="true"
     @submit="onSubmitForm"
     v-slot="$form"
   >
