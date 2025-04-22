@@ -9,7 +9,13 @@
   >
     <FormField v-slot="$field" name="amount" class="flex flex-col gap-1">
       <label class="font-semibold" for="surcharge_amount"> Сумма </label>
-      <InputNumber input-id="surcharge_amount" type="text" />
+      <InputNumber
+        input-id="surcharge_amount"
+        :use-grouping="false"
+        :min="1"
+        :max="1_000_000"
+        type="text"
+      />
       <Message
         v-if="$field?.invalid"
         severity="error"
@@ -28,7 +34,7 @@
         </FloatLabel>
         <FloatLabel variant="on" v-if="$field.value">
           <DatePicker
-          :model-value="$field.value"
+            :model-value="$field.value"
             :min-date="startOfMonth($field.value)"
             :max-date="endOfMonth($field.value)"
             fluid
@@ -74,7 +80,6 @@ import { z } from "zod"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
 import type { CarTransporterSurchargeCreateEvent } from "~/types/surcharges"
 import { startOfMonth, endOfMonth } from "date-fns"
-
 
 const props = defineProps<{
   staffId: number

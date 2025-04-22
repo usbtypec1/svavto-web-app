@@ -9,7 +9,13 @@
   >
     <FormField v-slot="$field" name="amount" class="flex flex-col gap-1">
       <label class="font-semibold" for="penalty_amount"> Сумма </label>
-      <InputNumber input-id="penalty_amount" type="text" />
+      <InputNumber
+        input-id="penalty_amount"
+        :use-grouping="false"
+        :min="1"
+        :max="1_000_000"
+        type="text"
+      />
       <Message
         v-if="$field?.invalid"
         severity="error"
