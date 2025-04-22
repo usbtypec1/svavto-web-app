@@ -1,26 +1,32 @@
 <template>
-  <div>
-    <div class="flex flex-col font-semibold gap-y-4">
-      <h3 class="text-xl">Редактирование графика смен</h3>
+  <div class="flex flex-col gap-y-4">
+    <PageHeader text="Редактирование графика смен" />
+    <div class="flex flex-col gap-2">
+      <label for="staff">Сотрудник</label>
+      <Select
+        v-model="staffId"
+        :options="staffList!"
+        option-label="full_name"
+        option-value="id"
+        input-id="staff"
+        filter
+        filter-placeholder="Поиск по ФИО, ID"
+        :filter-fields="['full_name', 'id']"
+        empty-filter-message="Сотрудник не найден"
+        empty-selection-message="Выберите сотрудника"
+        empty-message="Нет доступных сотрудников"
+      />
+    </div>
+    <template v-if="staffId">
       <div class="flex flex-col gap-2">
-        <label for="staff">Сотрудник</label>
-        <ProgressSpinner v-if="staffListStatus === 'pending'" />
-        <Select
-          v-else-if="staffListStatus === 'success'"
-          v-model="staffId"
-          :options="staffList!"
-          option-label="full_name"
-          option-value="id"
-          input-id="staff"
-          filter
-          filter-placeholder="Поиск по ФИО, ID"
-          :filter-fields="['full_name', 'id']"
-          empty-filter-message="Сотрудник не найден"
-          empty-selection-message="Выберите сотрудника"
-          empty-message="Нет доступных сотрудников"
+        <label for="month">Месяц</label>
+        <DatePicker
+          v-model="selectedMonth"
+          view="month"
+          date-format="MM - yy год"
         />
       </div>
-      <div v-if="staffId" class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2">
         <p>График смен</p>
         <DatePicker
           :model-value="shiftDates"
@@ -28,6 +34,8 @@
           @date-select="onDateSelect"
           selection-mode="multiple"
           inline
+          :min-date="minDate"
+          :max-date="maxDate"
           :disabled="shiftsStatus !== 'success'"
         />
         <Message
@@ -38,7 +46,7 @@
           Не удалось загрузить график смен сотрудника
         </Message>
       </div>
-    </div>
+    </template>
     <MainButton text="Готово" @click="close" />
   </div>
 </template>
@@ -51,7 +59,7 @@ import {
   useWebAppHapticFeedback,
   useWebAppPopup,
 } from "vue-tg"
-import { format } from "date-fns"
+import { format, startOfMonth, endOfMonth } from "date-fns"
 
 const { close } = useWebApp()
 const { showConfirm } = useWebAppPopup()
@@ -59,7 +67,18 @@ const { notificationOccurred } = useWebAppHapticFeedback()
 
 const runtimeConfig = useRuntimeConfig()
 
-const { data: staffList, status: staffListStatus } = useStaffList()
+const selectedMonth = ref<Date>(new Date())
+const minDate = computed((): Date => startOfMonth(selectedMonth.value))
+const maxDate = computed((): Date => endOfMonth(selectedMonth.value))
+
+const minDateString = computed((): string =>
+  format(minDate.value, "yyyy-MM-dd"),
+)
+const maxDateString = computed((): string =>
+  format(maxDate.value, "yyyy-MM-dd"),
+)
+
+const { data: staffList } = await useStaffList()
 
 const staffId = ref<number>()
 
@@ -69,7 +88,12 @@ const {
   refresh: refreshShifts,
 } = useFetch("/shifts/v2/", {
   baseURL: runtimeConfig.public.apiBaseUrl,
-  query: { staff_ids: staffId, limit: 1000 },
+  query: {
+    staff_ids: staffId,
+    limit: 1000,
+    from_date: minDateString,
+    to_date: maxDateString,
+  },
   transform(data: { shifts: ShiftListItem[] }): ShiftListItem[] {
     return data.shifts
   },
@@ -98,13 +122,6 @@ const createShift = async (staffId: number, date: string): Promise<void> => {
     body: { staff_id: staffId, dates: [date] },
     ignoreResponseError: true,
   })
-}
-
-const dateToYYYYMMDDD = (date: Date): string => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const day = String(date.getDate()).padStart(2, "0")
-  return `${year}-${month}-${day}`
 }
 
 const getShiftDeleteConfirmMessage = (shift: ShiftListItem): string => {
