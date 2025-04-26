@@ -14,9 +14,6 @@
       <InputNumber
         input-id="surcharge_amount"
         :use-grouping="false"
-        :min="1"
-        :max="1_000_000"
-        type="text"
       />
       <Message
         v-if="$field?.invalid"
