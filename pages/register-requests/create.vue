@@ -2,97 +2,158 @@
   <div>
     <Fieldset legend="Регистрация">
       <Form
-        v-slot="$form"
         :initialValues
         :resolver
         class="flex flex-col gap-y-4"
         @submit="onFormSubmit"
+        :validate-on-blur="false"
+        :validate-on-submit="true"
+        :validate-on-value-update="false"
+        :validate-on-mount="false"
       >
-        <div class="flex flex-col gap-1">
+        <FormField v-slot="$field" name="fullName">
           <label for="fullName">ФИО</label>
-          <InputText id="fullName" name="fullName" type="text" placeholder="Пупкин Василий Иванович" fluid/>
-          <Message v-if="$form.fullName?.invalid" severity="error" size="small" variant="simple">
-            {{ $form.fullName.error?.message }}
+          <InputText
+            id="fullName"
+            type="text"
+            placeholder="Пупкин Василий Иванович"
+            fluid
+          />
+          <Message
+            v-if="$field.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+          >
+            {{ $field.error?.message }}
           </Message>
-        </div>
-        <div class="flex flex-col gap-1">
-          <label for="carSharingPhoneNumber">Номер телефона, привязанный к аккаунту в каршеринге</label>
-          <InputMask
+        </FormField>
+        <FormField v-slot="$field" name="carSharingPhoneNumber">
+          <label for="carSharingPhoneNumber"
+            >Номер телефона, привязанный к аккаунту в каршеринге</label
+          >
+          <InputText
             id="carSharingPhoneNumber"
-            name="carSharingPhoneNumber"
-            mask="+7 (999) 999-99-99"
+            type="text"
             placeholder="+7 (351) 240-04-40"
-            fluid
             inputmode="tel"
+            fluid
           />
-          <Message v-if="$form.carSharingPhoneNumber?.invalid" severity="error" size="small" variant="simple">
-            {{ $form.carSharingPhoneNumber.error?.message }}
+          <Message
+            v-if="$field.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+          >
+            {{ $field.error?.message }}
           </Message>
-        </div>
-        <div class="flex flex-col gap-1">
-          <label for="consolePhoneNumber">Номер телефона, указанный в компании Консоль</label>
-          <InputMask
+        </FormField>
+        <FormField v-slot="$field" name="consolePhoneNumber">
+          <label for="consolePhoneNumber"
+            >Номер телефона, привязанный к аккаунту в каршеринге</label
+          >
+          <InputText
             id="consolePhoneNumber"
-            name="consolePhoneNumber"
-            mask="+7 (999) 999-99-99"
+            type="text"
             placeholder="+7 (351) 240-04-40"
             inputmode="tel"
             fluid
           />
-          <Message v-if="$form.consolePhoneNumber?.invalid" severity="error" size="small" variant="simple">
-            {{ $form.consolePhoneNumber.error?.message }}
+          <Message
+            v-if="$field.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+          >
+            {{ $field.error?.message }}
           </Message>
-        </div>
-        <Button
-          type="submit"
-          label="Зарегистрироваться"
-          :disabled="!$form.valid"
-          :raised="$form.valid"
-        />
+        </FormField>
+        <FormField v-slot="$field" name="staffType" :initial-value="options[0].value">
+          <RadioButtonGroup class="flex flex-col gap-y-1.5">
+            <label for="staffType" class="font-semibold">Тип сотрудника</label>
+            <div
+              v-for="{ label, value } in options"
+              class="flex items-center gap-x-1"
+            >
+              <RadioButton :input-id="value" :value="value" fluid />
+              <label :for="value">{{ label }}</label>
+            </div>
+          </RadioButtonGroup>
+          <Message
+            v-if="$field.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+          >
+            {{ $field.error?.message }}
+          </Message>
+        </FormField>
+        <Button type="submit" label="Зарегистрироваться" />
       </Form>
     </Fieldset>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Form } from '@primevue/forms'
-import { zodResolver } from '@primevue/forms/resolvers/zod'
-import { z } from 'zod';
-import { useWebApp, useWebAppHapticFeedback } from 'vue-tg'
+import { Form, type FormSubmitEvent } from "@primevue/forms"
+import { zodResolver } from "@primevue/forms/resolvers/zod"
+import { z } from "zod"
+import { useWebApp, useWebAppHapticFeedback } from "vue-tg"
 
 const { notificationOccurred } = useWebAppHapticFeedback()
 const { sendData } = useWebApp()
 
-const phoneNumberRegExp = new RegExp('^\\+7\\s\\(\\d{3}\\)\\s\\d{3}-\\d{2}-\\d{2}$')
+const options = [
+  { label: "Перегонщик", value: "car_transporter" },
+  { label: "Перегонщик-мойщик", value: "car_transporter_and_washer" },
+]
 
-const resolver = ref(zodResolver(
-  z.object({
-    fullName: z.string()
-      .min(5, { message: 'Минимальная длина ФИО - 5 символов' })
-      .max(64, { message: 'Максимальная длина ФИО - 64 символов' }),
-    carSharingPhoneNumber: z.string()
-      .min(1, { message: 'Введите номер телефона' })
-      .regex(phoneNumberRegExp, { message: 'Неверный формат номера телефона' }),
-    consolePhoneNumber: z.string()
-      .min(1, { message: 'Введите номер телефона' })
-      .regex(phoneNumberRegExp, { message: 'Неверный формат номера телефона' }),
-  }),
-))
+const phoneNumberRegExp = new RegExp(
+  "^\\+7\\s\\(\\d{3}\\)\\s\\d{3}-\\d{2}-\\d{2}$",
+)
+
+const resolver = ref(
+  zodResolver(
+    z.object({
+      fullName: z
+        .string()
+        .min(5, { message: "Минимальная длина ФИО - 5 символов" })
+        .max(64, { message: "Максимальная длина ФИО - 64 символов" }),
+      carSharingPhoneNumber: z
+        .string()
+        .min(1, { message: "Введите номер телефона" })
+        .regex(phoneNumberRegExp, {
+          message: "Неверный формат номера телефона",
+        }),
+      consolePhoneNumber: z
+        .string()
+        .min(1, { message: "Введите номер телефона" })
+        .regex(phoneNumberRegExp, {
+          message: "Неверный формат номера телефона",
+        }),
+      stafftype: z.enum(["car_transporter", "car_transporter_and_washer"]),
+    }),
+  ),
+)
 
 const initialValues = ref({
-  fullName: '',
-  carSharingPhoneNumber: '',
-  consolePhoneNumber: '',
-});
+  fullName: "",
+  carSharingPhoneNumber: "",
+  consolePhoneNumber: "",
+})
 
-const onFormSubmit = ({ valid, values }) => {
-  console.log(`Register form submit: isValid=${valid} values=${JSON.stringify(values)}`)
+const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
+  console.log(
+    `Register form submit: isValid=${valid} values=${JSON.stringify(values)}`,
+  )
   if (!valid) return
-  notificationOccurred?.('success')
-  sendData?.(JSON.stringify({
-    full_name: values.fullName,
-    car_sharing_phone_number: values.carSharingPhoneNumber,
-    console_phone_number: values.consolePhoneNumber,
-  }))
+  notificationOccurred?.("success")
+  sendData?.(
+    JSON.stringify({
+      full_name: values.fullName,
+      car_sharing_phone_number: values.carSharingPhoneNumber,
+      console_phone_number: values.consolePhoneNumber,
+    }),
+  )
 }
 </script>
