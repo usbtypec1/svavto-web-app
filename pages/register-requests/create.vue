@@ -155,6 +155,7 @@ const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
       full_name: values.fullName,
       car_sharing_phone_number: values.carSharingPhoneNumber,
       console_phone_number: values.consolePhoneNumber,
+      staff_type: values.staffType,
     }),
   )
 }
