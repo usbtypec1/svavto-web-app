@@ -68,7 +68,7 @@
             {{ $field.error?.message }}
           </Message>
         </FormField>
-        <FormField v-slot="$field" name="staffType" :initial-value="options[0].value">
+        <FormField v-slot="$field" name="staffType">
           <RadioButtonGroup class="flex flex-col gap-y-1.5">
             <label for="staffType" class="font-semibold">Тип сотрудника</label>
             <div
@@ -99,13 +99,14 @@ import { Form, type FormSubmitEvent } from "@primevue/forms"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
 import { useWebApp, useWebAppHapticFeedback } from "vue-tg"
+import { StaffType } from "~/types/staff";
 
 const { notificationOccurred } = useWebAppHapticFeedback()
 const { sendData } = useWebApp()
 
 const options = [
-  { label: "Перегонщик", value: "car_transporter" },
-  { label: "Перегонщик-мойщик", value: "car_transporter_and_washer" },
+  { label: "Перегонщик", value: StaffType.CAR_TRANSPORTER },
+  { label: "Перегонщик-мойщик", value: StaffType.CAR_TRANSPORTER_AND_WASHER },
 ]
 
 const phoneNumberRegExp = new RegExp(
@@ -131,7 +132,7 @@ const resolver = ref(
         .regex(phoneNumberRegExp, {
           message: "Неверный формат номера телефона",
         }),
-      stafftype: z.enum(["car_transporter", "car_transporter_and_washer"]),
+      staffType: z.nativeEnum(StaffType),
     }),
   ),
 )
@@ -140,6 +141,7 @@ const initialValues = ref({
   fullName: "",
   carSharingPhoneNumber: "",
   consolePhoneNumber: "",
+  staffType: StaffType.CAR_TRANSPORTER,
 })
 
 const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
