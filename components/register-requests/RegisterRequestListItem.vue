@@ -10,13 +10,20 @@
         </p>
         <p>
           <i class="pi pi-phone" />
-          <span class="font-semibold"> Номер телефона в компании Консоль: </span>
+          <span class="font-semibold">
+            Номер телефона в компании Консоль:
+          </span>
           {{ staffRegisterRequest.console_phone_number }}
         </p>
         <p>
           <i class="pi pi-calendar-clock" />
           <span class="font-semibold"> Дата регистрации: </span>
           {{ formattedCreatedAt }}
+        </p>
+        <p>
+          <i class="pi pi-user" />
+          <span class="font-semibold">Тип сотрудника: </span>
+          {{ formattedStaffType }}
         </p>
       </div>
     </template>
@@ -42,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { StaffType } from "~/types/staff"
 import type { StaffRegisterRequest } from "~/types/staff-register-requests"
 
 const props = defineProps<{
@@ -52,6 +60,17 @@ const emit = defineEmits<{
   accept: [id: number]
   reject: [id: number]
 }>()
+
+const formattedStaffType = computed((): string => {
+  switch (props.staffRegisterRequest.staff_type) {
+    case StaffType.CAR_TRANSPORTER:
+      return "Перегонщик"
+    case StaffType.CAR_TRANSPORTER_AND_WASHER:
+      return "Перегонщик-мойщик"
+    default:
+      return "Неизвестный тип"
+  }
+})
 
 const formattedCreatedAt = useDateFormat(
   () => props.staffRegisterRequest.created_at,
