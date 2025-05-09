@@ -32,11 +32,12 @@
           <label for="carSharingPhoneNumber"
             >Номер телефона, привязанный к аккаунту в каршеринге</label
           >
-          <InputText
+          <InputMask
             id="carSharingPhoneNumber"
             type="text"
             placeholder="+7 (351) 240-04-40"
             inputmode="tel"
+            mask="+9 (999) 999-99-99"
             fluid
           />
           <Message
@@ -52,11 +53,12 @@
           <label for="consolePhoneNumber"
             >Номер телефона, привязанный к аккаунту в каршеринге</label
           >
-          <InputText
+          <InputMask
             id="consolePhoneNumber"
             type="text"
             placeholder="+7 (351) 240-04-40"
             inputmode="tel"
+            mask="+9 (999) 999-99-99"
             fluid
           />
           <Message
@@ -99,7 +101,7 @@ import { Form, type FormSubmitEvent } from "@primevue/forms"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
 import { useWebApp, useWebAppHapticFeedback } from "vue-tg"
-import { StaffType } from "~/types/staff";
+import { StaffType } from "~/types/staff"
 
 const { notificationOccurred } = useWebAppHapticFeedback()
 const { sendData } = useWebApp()
@@ -108,10 +110,6 @@ const options = [
   { label: "Перегонщик", value: StaffType.CAR_TRANSPORTER },
   { label: "Перегонщик-мойщик", value: StaffType.CAR_TRANSPORTER_AND_WASHER },
 ]
-
-const phoneNumberRegExp = new RegExp(
-  "^\\+7\\s\\(\\d{3}\\)\\s\\d{3}-\\d{2}-\\d{2}$",
-)
 
 const resolver = ref(
   zodResolver(
@@ -122,16 +120,10 @@ const resolver = ref(
         .max(64, { message: "Максимальная длина ФИО - 64 символов" }),
       carSharingPhoneNumber: z
         .string()
-        .min(1, { message: "Введите номер телефона" })
-        .regex(phoneNumberRegExp, {
-          message: "Неверный формат номера телефона",
-        }),
+        .min(1, { message: "Введите номер телефона" }),
       consolePhoneNumber: z
         .string()
-        .min(1, { message: "Введите номер телефона" })
-        .regex(phoneNumberRegExp, {
-          message: "Неверный формат номера телефона",
-        }),
+        .min(1, { message: "Введите номер телефона" }),
       staffType: z.nativeEnum(StaffType),
     }),
   ),
