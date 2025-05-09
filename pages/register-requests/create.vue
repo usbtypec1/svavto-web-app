@@ -70,13 +70,13 @@
         </FormField>
         <FormField v-slot="$field" name="staffType">
           <RadioButtonGroup class="flex flex-col gap-y-1.5">
-            <label for="staffType" class="font-semibold">Тип сотрудника</label>
+            <label for="staffType" class="font-semibold">Специализация</label>
             <div
               v-for="{ label, value } in options"
               class="flex items-center gap-x-1"
             >
-              <RadioButton :input-id="value" :value="value" fluid />
-              <label :for="value">{{ label }}</label>
+              <RadioButton :input-id="label" :value="value" fluid />
+              <label :for="label">{{ label }}</label>
             </div>
           </RadioButtonGroup>
           <Message
