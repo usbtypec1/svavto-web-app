@@ -22,7 +22,7 @@
         </p>
         <p>
           <i class="pi pi-user" />
-          <span class="font-semibold">Тип сотрудника: </span>
+          <span class="font-semibold">Специализация: </span>
           {{ formattedStaffType }}
         </p>
       </div>
