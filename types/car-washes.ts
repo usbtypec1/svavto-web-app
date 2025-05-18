@@ -21,12 +21,12 @@ export interface CarWashService {
 export interface CarWash {
   id: number
   name: string
-  car_transporter_comfort_class_car_transfer_price: number
-  car_transporter_business_class_car_transfer_price: number
-  car_transporter_van_transfer_price: number
-  car_transporter_and_washer_comfort_class_car_transfer_price: number
-  car_transporter_and_washer_business_class_car_transfer_price: number
-  car_transporter_and_washer_van_transfer_price: number
+  car_transporters_comfort_class_car_washing_price: number
+  car_transporters_business_class_car_washing_price: number
+  car_transporters_van_washing_price: number
+  car_transporters_and_washers_comfort_class_price: number
+  car_transporters_and_washers_business_class_price: number
+  car_transporters_and_washers_van_price: number
   windshield_washer_price_per_bottle: number
   is_hidden: boolean
   created_at: string
@@ -36,12 +36,12 @@ export interface CarWash {
 export interface CarWashWithServices {
   id: number
   name: string
-  car_transporter_comfort_class_car_transfer_price: number
-  car_transporter_business_class_car_transfer_price: number
-  car_transporter_van_transfer_price: number
-  car_transporter_and_washer_comfort_class_car_transfer_price: number
-  car_transporter_and_washer_business_class_car_transfer_price: number
-  car_transporter_and_washer_van_transfer_price: number
+  car_transporters_comfort_class_car_washing_price: number
+  car_transporters_business_class_car_washing_price: number
+  car_transporters_van_washing_price: number
+  car_transporters_and_washers_comfort_class_price: number
+  car_transporters_and_washers_business_class_price: number
+  car_transporters_and_washers_van_price: number
   windshield_washer_price_per_bottle: number
   is_hidden: boolean
   created_at: string
@@ -51,8 +51,11 @@ export interface CarWashWithServices {
 
 export interface CarWashFormValues {
   name: string
-  comfort_class_car_transfer_price: number
-  business_class_car_transfer_price: number
-  van_transfer_price: number
+  car_transporters_comfort_class_car_washing_price: number
+  car_transporters_business_class_car_washing_price: number
+  car_transporters_van_washing_price: number
+  car_transporters_and_washers_comfort_class_price: number
+  car_transporters_and_washers_business_class_price: number
+  car_transporters_and_washers_van_price: number
   windshield_washer_price_per_bottle: number
 }

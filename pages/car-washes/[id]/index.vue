@@ -60,9 +60,15 @@
 
     <Card>
       <template #content>
-        <div class="flex justify-between">
-          <label class="">Скрыть мойку от сотрудников</label>
-          <ToggleSwitch  />
+        <div class="flex justify-between items-center">
+          <Message
+            severity="warn"
+            icon="pi pi-exclamation-triangle"
+            variant="simple"
+          >
+            Скрыть мойку от сотрудников
+          </Message>
+          <ToggleSwitch />
         </div>
       </template>
     </Card>
@@ -96,7 +102,10 @@ import {
   useWebApp,
   MainButton,
 } from "vue-tg"
-import type { CarWashFormValues, CarWashWithServices } from "~/types/car-washes"
+import type {
+  CarWashFormValues,
+  CarWashWithServices,
+} from "~/types/car-washes"
 
 const route = useRoute()
 
@@ -114,22 +123,26 @@ const { data: carWash, refresh } = await useApi<CarWashWithServices>(
   `/car-washes/${carWashId}/`,
 )
 
-const { data: allCarWashServices } = await useFetch("/car-washes/services/", {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { services: CarWashService[] }): CarWashService[] =>
-    data.services,
+const { data: allCarWashServices } = await useApi("/car-washes/services/", {
+  transform: (data: any): CarWashService[] => data.services,
 })
 
-const initialValues = computed(() => {
-  if (carWash.value === null) return {}
-  console.log(carWash.value)
+const initialValues = computed((): CarWashFormValues | undefined => {
+  if (!carWash.value) return
   return {
     name: carWash.value.name,
-    comfort_class_car_washing_price:
-      carWash.value.comfort_class_car_washing_price,
-    business_class_car_washing_price:
-      carWash.value.business_class_car_washing_price,
-    van_washing_price: carWash.value.van_washing_price,
+    car_transporters_comfort_class_car_washing_price:
+      carWash.value.car_transporters_comfort_class_car_washing_price,
+    car_transporters_business_class_car_washing_price:
+      carWash.value.car_transporters_business_class_car_washing_price,
+    car_transporters_van_washing_price:
+      carWash.value.car_transporters_van_washing_price,
+    car_transporters_and_washers_comfort_class_price:
+      carWash.value.car_transporters_and_washers_comfort_class_price,
+    car_transporters_and_washers_business_class_price:
+      carWash.value.car_transporters_and_washers_business_class_price,
+    car_transporters_and_washers_van_price:
+      carWash.value.car_transporters_and_washers_van_price,
     windshield_washer_price_per_bottle:
       carWash.value.windshield_washer_price_per_bottle,
   }

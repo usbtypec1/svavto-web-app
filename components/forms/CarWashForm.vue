@@ -4,14 +4,16 @@
     @submit="onSubmit"
     :resolver="resolver"
     :validate-on-value-update="false"
-    :validate-on-blur="true"
+    :validate-on-blur="false"
+    :validate-on-mount="false"
+    :validate-on-submit="true"
     class="flex flex-col gap-y-2"
+    :initial-values="initialValues"
   >
     <FormField
       v-for="field in fields"
       v-slot="$field"
       :name="field.name"
-      :initialValue="initialValues[field.name] ?? field.initialValue"
       class="flex flex-col gap-1"
     >
       <label class="font-semibold">{{ field.label }}</label>
@@ -44,47 +46,78 @@
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms"
 import { zodResolver } from "@primevue/forms/resolvers/zod"
 import { z } from "zod"
+import type { CarWashFormValues } from "~/types/car-washes"
 
-interface Props {
-  initialValues?: Record<string, string | number>
-}
+const props = withDefaults(
+  defineProps<{
+    initialValues?: CarWashFormValues
+  }>(),
+  {
+    initialValues: (): CarWashFormValues => ({
+      name: "Ул. Пушкина, д. Колотушкина",
+      car_transporters_comfort_class_car_washing_price: 0,
+      car_transporters_business_class_car_washing_price: 0,
+      car_transporters_van_washing_price: 0,
+      car_transporters_and_washers_comfort_class_price: 0,
+      car_transporters_and_washers_business_class_price: 0,
+      car_transporters_and_washers_van_price: 0,
+      windshield_washer_price_per_bottle: 0,
+    }),
+  },
+)
 
-const { initialValues = {} } = defineProps<Props>()
-
-const emit = defineEmits(["submit"])
+const emit = defineEmits<{
+  submit: [event: CarWashFormValues]
+}>()
 
 const isLoading = defineModel<boolean>("isLoading", { default: false })
 
-const fields = [
+interface Field {
+  name: string
+  label: string
+  type: "text" | "number"
+}
+
+const fields: Field[] = [
   {
     name: "name",
     label: "Название",
     type: "text",
-    initialValue: "Ул. Пушкина, д. Колотушкина",
   },
   {
-    name: "comfort_class_car_washing_price",
+    name: "car_transporters_comfort_class_car_washing_price",
     label: "Комплекс комфорт класс",
     type: "number",
-    initialValue: 0,
   },
   {
-    name: "business_class_car_washing_price",
+    name: "car_transporters_business_class_car_washing_price",
     label: "Комплекс бизнес класс",
     type: "number",
-    initialValue: 0,
   },
   {
-    name: "van_washing_price",
+    name: "car_transporters_van_washing_price",
     label: "Комплекс фургонов",
     type: "number",
-    initialValue: 0,
+  },
+  {
+    name: "car_transporters_and_washers_comfort_class_price",
+    label: "Комплекс комфорт класс (перегонщики-мойщики)",
+    type: "number",
+  },
+  {
+    name: "car_transporters_and_washers_business_class_price",
+    label: "Комплекс бизнес класс (перегонщики-мойщики)",
+    type: "number",
+  },
+  {
+    name: "car_transporters_and_washers_van_price",
+    label: "Комплекс фургонов (перегонщики-мойщики)",
+    type: "number",
   },
   {
     name: "windshield_washer_price_per_bottle",
     label: "Долив 100% бутылки незамерзайки",
     type: "number",
-    initialValue: 0,
   },
 ]
 
@@ -111,6 +144,6 @@ const resolver = ref(
 
 const onSubmit = ({ values, valid }: FormSubmitEvent): void => {
   if (!valid) return
-  emit("submit", values)
+  emit("submit", values as CarWashFormValues)
 }
 </script>
