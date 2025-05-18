@@ -33,15 +33,7 @@
     >
       Нет моек
     </Message>
-    <NuxtLink :to="{ name: 'car-washes-create' }">
-      <Button
-        label="Добавить мойку"
-        icon="pi pi-plus"
-        fluid
-        class="my-4"
-        text
-      />
-    </NuxtLink>
+    <FloatingCornerButton page-name="car-washes-create" severity="success" icon="pi pi-plus" />
   </div>
 </template>
 
