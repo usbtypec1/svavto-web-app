@@ -1,8 +1,13 @@
-export const useApiFetch = <T>(url: string, options: any = {}) => {
+import type { UseFetchOptions } from "nuxt/app"
+
+export function useApi<T>(
+  url: string | (() => string),
+  options?: UseFetchOptions<T>,
+) {
   const config = useRuntimeConfig()
 
-  return useFetch<T>(url, {
-    baseURL: config.public.apiBaseUrl,
+  return useFetch(url, {
     ...options,
+    baseURL: config.public.apiBaseUrl,
   })
 }
