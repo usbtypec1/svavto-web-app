@@ -46,20 +46,20 @@
 </template>
 
 <script setup lang="ts">
-import { useWebAppPopup } from 'vue-tg'
-import { getErrorCodes } from '~/utils/errors'
-import type { CarWashListItem } from '~/types/car-washes'
-import type { ErrorResponseData } from '~/types/errors'
+import { useWebAppPopup } from "vue-tg"
+import { getErrorCodes } from "~/utils/errors"
+import type { CarWash } from "~/types/car-washes"
+import type { ErrorResponseData } from "~/types/errors"
 
 const props = defineProps<{
-  staffId: number,
+  staffId: number
 }>()
 
-const emit = defineEmits(['submit'])
+const emit = defineEmits(["submit"])
 
 const { showAlert } = useWebAppPopup()
 
-const visible = defineModel('visible', { default: false })
+const visible = defineModel("visible", { default: false })
 
 const selectedCarWashId = ref<number | null>(null)
 
@@ -67,39 +67,41 @@ const currentCarWashId = ref<number | null>(null)
 
 const runtimeConfig = useRuntimeConfig()
 
-const { data: carWashes, status: carWashesStatus } = await useFetch('/car-washes/', {
-  baseURL: runtimeConfig.public.apiBaseUrl,
-  transform: (data: { car_washes: CarWashListItem[] }): CarWashListItem[] => data.car_washes,
-})
+const { data: carWashes, status: carWashesStatus } = await useApi(
+  "/car-washes/",
+  {
+    transform: (data: any): CarWash[] => data.car_washes,
+    query: { include_hidden: false },
+  },
+)
 
 const isCarWashSameAsCurrent = computed((): boolean => {
   return (
-    currentCarWashId.value === selectedCarWashId.value
-    && currentCarWashId.value !== null
-    && selectedCarWashId.value !== null
+    currentCarWashId.value === selectedCarWashId.value &&
+    currentCarWashId.value !== null &&
+    selectedCarWashId.value !== null
   )
 })
 
 const isValid = computed((): boolean => {
-  const isSuccess = carWashesStatus.value === 'success'
+  const isSuccess = carWashesStatus.value === "success"
   const isCarWashSelected = selectedCarWashId.value !== null
   return isSuccess && isCarWashSelected && !isCarWashSameAsCurrent.value
 })
 
-
 const onSubmit = async (): Promise<void> => {
   try {
     await $fetch(`/shifts/current/${props.staffId}/car-washes/`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: { car_wash_id: selectedCarWashId.value },
       baseURL: runtimeConfig.public.apiBaseUrl,
     })
-    emit('submit', selectedCarWashId.value)
-    showAlert('Мойка успешно изменена')
+    emit("submit", selectedCarWashId.value)
+    showAlert("Мойка успешно изменена")
     visible.value = false
   } catch (error) {
     const errorCodes = getErrorCodes(error.data as ErrorResponseData)
-    if (errorCodes.includes('car_wash_same_as_current')) {
+    if (errorCodes.includes("car_wash_same_as_current")) {
       currentCarWashId.value = selectedCarWashId.value
     }
   }
