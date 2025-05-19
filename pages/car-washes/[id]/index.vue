@@ -68,7 +68,10 @@
           >
             Скрыть мойку от сотрудников
           </Message>
-          <ToggleSwitch @update:model-value="onUpdateIsHidden" />
+          <ToggleSwitch
+            :model-value="carWash!.is_hidden"
+            @update:model-value="onUpdateIsHidden"
+          />
         </div>
       </template>
     </Card>
@@ -257,5 +260,6 @@ const onUpdateIsHidden = async (isHidden: boolean): Promise<void> => {
       is_hidden: isHidden,
     },
   })
+  await refresh()
 }
 </script>
