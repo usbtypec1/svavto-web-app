@@ -68,7 +68,7 @@
           >
             Скрыть мойку от сотрудников
           </Message>
-          <ToggleSwitch />
+          <ToggleSwitch @update:model-value="onUpdateIsHidden" />
         </div>
       </template>
     </Card>
@@ -102,10 +102,7 @@ import {
   useWebApp,
   MainButton,
 } from "vue-tg"
-import type {
-  CarWashFormValues,
-  CarWashWithServices,
-} from "~/types/car-washes"
+import type { CarWashFormValues, CarWashWithServices } from "~/types/car-washes"
 
 const route = useRoute()
 
@@ -219,7 +216,7 @@ const onSaveCarWash = async (values: CarWashFormValues): Promise<void> => {
     await $fetch(`/car-washes/${carWashId}/`, {
       method: "PUT",
       baseURL: runtimeConfig.public.apiBaseUrl,
-      body: values,
+      body: { ...carWash.value, ...values },
     })
   } catch (error) {
     console.error("Error while updating car wash", error)
@@ -249,5 +246,16 @@ const onDeleteCarWash = async (): Promise<void> => {
       await deleteCarWash()
     },
   )
+}
+
+const onUpdateIsHidden = async (isHidden: boolean): Promise<void> => {
+  await $fetch(`/car-washes/${carWashId}/`, {
+    method: "PUT",
+    baseURL: runtimeConfig.public.apiBaseUrl,
+    body: {
+      ...carWash.value,
+      is_hidden: isHidden,
+    },
+  })
 }
 </script>
