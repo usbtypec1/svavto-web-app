@@ -222,6 +222,8 @@ const onSaveCarWash = async (values: CarWashFormValues): Promise<void> => {
       body: { ...carWash.value, ...values },
     })
   } catch (error) {
+    showAlert?.(`Ошибка при обновлении автомойки: ${error}`)
+    notificationOccurred?.("error")
     console.error("Error while updating car wash", error)
   } finally {
     isCarWashFormLoading.value = false
