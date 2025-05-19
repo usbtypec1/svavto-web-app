@@ -10,15 +10,132 @@
     class="flex flex-col gap-y-2"
     :initial-values="initialValues"
   >
+    <FormField name="name" v-slot="$field" class="flex flex-col gap-1">
+      <label class="font-semibold">Название</label>
+      <InputText />
+      <Message
+        v-if="$field?.invalid"
+        severity="error"
+        size="small"
+        variant="simple"
+      >
+        {{ $field.error?.message }}
+      </Message>
+    </FormField>
+
+    <Fieldset legend="Перегонщики">
+      <FormField
+        name="car_transporters_comfort_class_car_washing_price"
+        v-slot="$field"
+        class="flex flex-col gap-1"
+      >
+        <label class="font-semibold">Комплекс комфорт класс</label>
+        <InputNumber />
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+
+      <FormField
+        name="car_transporters_business_class_car_washing_price"
+        v-slot="$field"
+        class="flex flex-col gap-1"
+      >
+        <label class="font-semibold">Комплекс бизнес класс</label>
+        <InputNumber />
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+
+      <FormField
+        name="car_transporters_van_washing_price"
+        v-slot="$field"
+        class="flex flex-col gap-1"
+      >
+        <label class="font-semibold">Комплекс фургонов</label>
+        <InputNumber />
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+    </Fieldset>
+
+    <Fieldset legend="Перегонщики-мойщики">
+      <FormField
+        name="car_transporters_and_washers_comfort_class_price"
+        v-slot="$field"
+        class="flex flex-col gap-1"
+      >
+        <label class="font-semibold">Комплекс комфорт класс</label>
+        <InputNumber />
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+
+      <FormField
+        name="car_transporters_and_washers_business_class_price"
+        v-slot="$field"
+        class="flex flex-col gap-1"
+      >
+        <label class="font-semibold">Комплекс бизнес класс</label>
+        <InputNumber />
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+
+      <FormField
+        name="car_transporters_and_washers_van_price"
+        v-slot="$field"
+        class="flex flex-col gap-1"
+      >
+        <label class="font-semibold">Комплекс фургонов</label>
+        <InputNumber />
+        <Message
+          v-if="$field?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ $field.error?.message }}
+        </Message>
+      </FormField>
+    </Fieldset>
+
     <FormField
-      v-for="field in fields"
+      name="windshield_washer_price_per_bottle"
       v-slot="$field"
-      :name="field.name"
       class="flex flex-col gap-1"
     >
-      <label class="font-semibold">{{ field.label }}</label>
-      <InputText v-if="field.type === 'text'" type="text" />
-      <InputNumber v-else-if="field.type === 'number'" />
+      <label class="font-semibold">Долив 100% бутылки незамерзайки</label>
+      <InputNumber />
       <Message
         v-if="$field?.invalid"
         severity="error"
@@ -71,55 +188,6 @@ const emit = defineEmits<{
 }>()
 
 const isLoading = defineModel<boolean>("isLoading", { default: false })
-
-interface Field {
-  name: string
-  label: string
-  type: "text" | "number"
-}
-
-const fields: Field[] = [
-  {
-    name: "name",
-    label: "Название",
-    type: "text",
-  },
-  {
-    name: "car_transporters_comfort_class_car_washing_price",
-    label: "Комплекс комфорт класс",
-    type: "number",
-  },
-  {
-    name: "car_transporters_business_class_car_washing_price",
-    label: "Комплекс бизнес класс",
-    type: "number",
-  },
-  {
-    name: "car_transporters_van_washing_price",
-    label: "Комплекс фургонов",
-    type: "number",
-  },
-  {
-    name: "car_transporters_and_washers_comfort_class_price",
-    label: "Комплекс комфорт класс (перегонщики-мойщики)",
-    type: "number",
-  },
-  {
-    name: "car_transporters_and_washers_business_class_price",
-    label: "Комплекс бизнес класс (перегонщики-мойщики)",
-    type: "number",
-  },
-  {
-    name: "car_transporters_and_washers_van_price",
-    label: "Комплекс фургонов (перегонщики-мойщики)",
-    type: "number",
-  },
-  {
-    name: "windshield_washer_price_per_bottle",
-    label: "Долив 100% бутылки незамерзайки",
-    type: "number",
-  },
-]
 
 const resolver = ref(
   zodResolver(
