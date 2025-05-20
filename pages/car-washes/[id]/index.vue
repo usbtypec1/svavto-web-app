@@ -221,6 +221,9 @@ const onSaveCarWash = async (values: CarWashFormValues): Promise<void> => {
       baseURL: runtimeConfig.public.apiBaseUrl,
       body: { ...carWash.value, ...values },
     })
+    await refresh()
+    notificationOccurred?.("success")
+    showAlert?.("Автомойка обновлена")
   } catch (error) {
     showAlert?.(`Ошибка при обновлении автомойки: ${error}`)
     notificationOccurred?.("error")
@@ -237,9 +240,11 @@ const deleteCarWash = async (): Promise<void> => {
       method: "DELETE",
     })
     await navigateTo({ name: "car-washes" })
+    notificationOccurred?.("success")
   } catch (error: unknown) {
     console.error("Error while deleting car wash", error)
     showAlert("Ошибка при удалении автомойки")
+    notificationOccurred?.("error")
   }
 }
 
@@ -254,14 +259,29 @@ const onDeleteCarWash = async (): Promise<void> => {
 }
 
 const onUpdateIsHidden = async (isHidden: boolean): Promise<void> => {
-  await $fetch(`/car-washes/${carWashId}/`, {
-    method: "PUT",
-    baseURL: runtimeConfig.public.apiBaseUrl,
-    body: {
-      ...carWash.value,
-      is_hidden: isHidden,
-    },
-  })
-  await refresh()
+  try {
+    await $fetch(`/car-washes/${carWashId}/`, {
+      method: "PUT",
+      baseURL: runtimeConfig.public.apiBaseUrl,
+      body: {
+        ...carWash.value,
+        is_hidden: isHidden,
+      },
+    })
+    await refresh()
+    notificationOccurred?.("success")
+    if (isHidden) {
+      showAlert?.("Мойка скрыта от сотрудников")
+    } else {
+      showAlert?.("Мойка показана сотрудникам")
+    }
+  } catch (error) {
+    notificationOccurred?.("error")
+    if (isHidden) {
+      showAlert?.("Не удалось скрыть мойку")
+    } else {
+      showAlert?.("Не удалось показать мойку")
+    }
+  }
 }
 </script>

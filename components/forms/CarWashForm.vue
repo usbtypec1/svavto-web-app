@@ -196,13 +196,24 @@ const resolver = ref(
         .string()
         .min(1, { message: "Минимальная длина названия - 1 символ" })
         .max(100, { message: "Максимальная длина названия - 100 символов" }),
-      comfort_class_car_washing_price: z
+      car_transporters_comfort_class_car_washing_price: z
         .number({ message: "Введите цену " })
         .min(0),
-      business_class_car_washing_price: z
+      car_transporters_business_class_car_washing_price: z
         .number({ message: "Введите цену " })
         .min(0),
-      van_washing_price: z.number({ message: "Введите цену " }).min(0),
+      car_transporters_van_washing_price: z
+        .number({ message: "Введите цену " })
+        .min(0),
+      car_transporters_and_washers_comfort_class_price: z
+        .number({ message: "Введите цену " })
+        .min(0),
+      car_transporters_and_washers_business_class_price: z
+        .number({ message: "Введите цену " })
+        .min(0),
+      car_transporters_and_washers_van_price: z
+        .number({ message: "Введите цену " })
+        .min(0),
       windshield_washer_price_per_bottle: z
         .number({ message: "Введите цену " })
         .min(0),
@@ -212,6 +223,7 @@ const resolver = ref(
 
 const onSubmit = ({ values, valid }: FormSubmitEvent): void => {
   if (!valid) return
+  console.log("[Car wash form]: submitting values", values)
   emit("submit", values as CarWashFormValues)
 }
 </script>
