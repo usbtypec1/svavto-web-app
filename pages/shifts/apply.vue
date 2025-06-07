@@ -23,40 +23,51 @@
 </template>
 
 <script setup lang="ts">
-import { MainButton, useWebApp, useWebAppPopup } from 'vue-tg'
-import type { MonthAndYear } from '~/types/schedules'
+import { MainButton, useWebApp, useWebAppPopup } from "vue-tg"
+import type { MonthAndYear } from "~/types/schedules"
 
 const { sendData } = useWebApp()
-const { showConfirm } = useWebAppPopup()
+const { showConfirm, showAlert } = useWebAppPopup()
 
 const route = useRoute()
 
 const { month, year }: MonthAndYear = route.query
 
 const currentMonthDate = new Date(Number(year), Number(month) - 1)
-const maxDate =  new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 0)
+const maxDate = new Date(
+  currentMonthDate.getFullYear(),
+  currentMonthDate.getMonth() + 1,
+  0,
+)
 
 const dates = ref<Date[]>([])
 
 const dateToYYYYMMDDD = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
 }
 
-const serializedDataToSend = computed((): string => JSON.stringify(dates.value.map(dateToYYYYMMDDD)))
+const serializedDataToSend = computed((): string =>
+  JSON.stringify(dates.value.map(dateToYYYYMMDDD)),
+)
 
 const onSubmit = () => {
-  showConfirm?.(
-    'Вы уверены, что хотите записаться на выбранные даты?',
-    (ok: boolean) => ok && sendData?.(serializedDataToSend.value),
+  showAlert?.(
+    "Обращаем внимание: График необходимо составлять сразу на весь месяц.\nЭто важно для корректного планирования и организации работы всей команды.",
+    (): void => {
+      showConfirm?.(
+        "Вы уверены, что хотите записаться на выбранные даты?",
+        (ok: boolean) => ok && sendData?.(serializedDataToSend.value),
+      )
+    },
   )
 }
 
 const datesError = computed((): string | null => {
   if (!dates.value.length) {
-    return 'Выберите одну или несколько дат'
+    return "Выберите одну или несколько дат"
   }
   return null
 })
